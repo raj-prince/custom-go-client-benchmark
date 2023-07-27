@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
+	"time"
 
 	"cloud.google.com/go/storage"
 	"golang.org/x/oauth2"
@@ -89,10 +91,24 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 	return
 }
 
-func ReadObject(workerId int, bucketHandle *storage.BucketHandle) (err error) {
+func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
 	defer wg.Done()
 
-	fmt.Println("Hello ", workerId)
+	objectName := "50mb/1_thread." + strconv.Itoa(workerId) + ".0"
+	object := bucketHandle.Object(objectName)
+
+	for range time.Tick(time.Second * 10) {
+		start := time.Now()
+		rc, err := object.NewReader(ctx)
+		if err != nil {
+			return fmt.Errorf("while creating reader object: %v", err)
+		}
+
+		duration := time.Since(start)
+		fmt.Println("Reader call latency: ", duration)
+
+		rc.Close()
+	}
 
 	return
 }
@@ -114,7 +130,7 @@ func main() {
 	wg.Add(NumOfWorker)
 
 	for i := 1; i <= NumOfWorker; i++ {
-		go ReadObject(i, bucketHandle)
+		go ReadObject(ctx, i, bucketHandle)
 	}
 
 	wg.Wait()
