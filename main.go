@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -116,8 +117,19 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 }
 
 func main() {
+	clientProtocol := flag.String("client-protocol", "http", "# of iterations")
+	flag.Parse()
+
 	ctx := context.Background()
-	client, err := CreateHttpClient(ctx, false)
+
+	var client *storage.Client
+	var err error
+	if *clientProtocol == "http" {
+		client, err = CreateHttpClient(ctx, false)
+	} else {
+		client, err = CreateGrpcClient(ctx)
+
+	}
 	if err != nil {
 		fmt.Errorf("while creating the client: %v", err)
 	}
@@ -131,7 +143,7 @@ func main() {
 
 	wg.Add(NumOfWorker)
 
-	for i := 1; i <= NumOfWorker; i++ {
+	for i := 0; i < NumOfWorker; i++ {
 		go ReadObject(ctx, i, bucketHandle)
 	}
 
