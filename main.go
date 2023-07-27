@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/googleapis/gax-go/v2"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/option"
 	// Install google-c2p resolver, which is required for direct path.
@@ -27,6 +28,10 @@ var (
 	NumOfWorker = 48
 
 	NumOfReadCallPerWorker = 800
+
+	MaxRetryDuration = 30 * time.Second
+
+	RetryMultiplier = 2.0
 
 	wg sync.WaitGroup
 )
@@ -131,7 +136,14 @@ func main() {
 	} else {
 		client, err = CreateGrpcClient(ctx)
 	}
-	
+
+	client.SetRetry(
+		storage.WithBackoff(gax.Backoff{
+			Max:        MaxRetryDuration,
+			Multiplier: RetryMultiplier,
+		}),
+		storage.WithPolicy(storage.RetryAlways))
+
 	if err != nil {
 		fmt.Errorf("while creating the client: %v", err)
 	}
