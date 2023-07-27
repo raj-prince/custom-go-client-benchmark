@@ -21,7 +21,9 @@ var (
 	MaxConnsPerHost     = 100
 	MaxIdelConnsPerHost = 100
 
-	NumOfWorker = 5
+	NumOfWorker = 48
+
+	NumOfReadCallPerWorker = 800
 
 	wg sync.WaitGroup
 )
@@ -95,17 +97,17 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 	defer wg.Done()
 
 	objectName := "50mb/1_thread." + strconv.Itoa(workerId) + ".0"
-	object := bucketHandle.Object(objectName)
 
-	for range time.Tick(time.Second * 10) {
+	for i := 0; i < NumOfReadCallPerWorker; i++ {
 		start := time.Now()
+		object := bucketHandle.Object(objectName)
 		rc, err := object.NewReader(ctx)
 		if err != nil {
 			return fmt.Errorf("while creating reader object: %v", err)
 		}
 
 		duration := time.Since(start)
-		fmt.Println("Reader call latency: ", duration)
+		fmt.Println(duration)
 
 		rc.Close()
 	}
