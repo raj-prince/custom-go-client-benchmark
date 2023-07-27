@@ -15,6 +15,8 @@ import (
 	"cloud.google.com/go/storage"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/option"
+	// Install google-c2p resolver, which is required for direct path.
+	_ "google.golang.org/grpc/xds/googledirectpath"
 )
 
 var (
@@ -128,8 +130,8 @@ func main() {
 		client, err = CreateHttpClient(ctx, false)
 	} else {
 		client, err = CreateGrpcClient(ctx)
-
 	}
+	
 	if err != nil {
 		fmt.Errorf("while creating the client: %v", err)
 	}
