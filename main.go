@@ -33,6 +33,10 @@ var (
 
 	RetryMultiplier = 2.0
 
+	BucketName = "golang-grpc-test-princer-gcsfuse-us-central"
+
+	ProjectName = "gcs-fuse-test"
+
 	wg sync.WaitGroup
 )
 
@@ -148,8 +152,8 @@ func main() {
 		fmt.Errorf("while creating the client: %v", err)
 	}
 
-	bucketHandle := client.Bucket("golang-grpc-test-princer-us-west1")
-	err = bucketHandle.Create(ctx, "gcs-fuse-test", nil)
+	bucketHandle := client.Bucket(BucketName)
+	err = bucketHandle.Create(ctx, ProjectName, nil)
 
 	if err != nil {
 		fmt.Errorf("while creating the bucket: %v", err)
