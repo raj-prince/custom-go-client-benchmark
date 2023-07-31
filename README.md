@@ -6,10 +6,11 @@ To benchmark the read performance go-http client and go-grpc client.
 2. Access VM's terminal via SSH.
 3. Install `git` and `go` if not installed already.
 4. Clone this repo and make the cloned directory as working directory. 
-5. Execute this command: `nohup ./execute_pb.sh <exp_number> > output.txt 2>&1 &`
-6. The above command will generate two text files containing the latency for the
+5. Please change the object prefix and suffix - [here](https://github.com/raj-prince/custom-go-client-benchmark/blob/0db9e06666e71ac9e13972b61daa940f4cd6d5ef/main.go#L40)
+6. Execute this command: `nohup ./execute_pb.sh <exp_number> > output.txt 2>&1 &`
+7. The above command will generate two text files containing the latency for the
 respective client.
-7. Analyse the latency by various means, you may use python script to create
+8. Analyse the latency by various means, you may use python script to create
 histogram from the above generated files.
 ```python
 import sys
