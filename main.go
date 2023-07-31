@@ -37,6 +37,11 @@ var (
 
 	ProjectName = "gcs-fuse-test"
 
+	// ObjectNamePrefix<worker_id>ObjectNameSuffix is the object name format.
+	// Here, worker id goes from <0 to NumberOfWorker.
+	ObjectNamePrefix = "50mb/1_thread."
+	ObjectNameSuffix = ".0"
+
 	wg sync.WaitGroup
 )
 
@@ -108,7 +113,7 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
 	defer wg.Done()
 
-	objectName := "50mb/1_thread." + strconv.Itoa(workerId) + ".0"
+	objectName := ObjectNamePrefix + strconv.Itoa(workerId) + ObjectNameSuffix
 
 	for i := 0; i < NumOfReadCallPerWorker; i++ {
 		start := time.Now()
