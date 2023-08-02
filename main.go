@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -121,6 +122,11 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 		rc, err := object.NewReader(ctx)
 		if err != nil {
 			return fmt.Errorf("while creating reader object: %v", err)
+		}
+
+		_, err = io.Copy(io.Discard, rc)
+		if err != nil {
+			return fmt.Errorf("while reading and discarding content: %v", err)
 		}
 
 		duration := time.Since(start)
