@@ -65,7 +65,7 @@ for i in {1..1}; do list_for_100K; done
 umount ~/gcs
 
 # 100K files with without cache
-echo "LoggerPrince: listing test for 50K files without cache"
+echo "LoggerPrince: listing test for 100K files without cache"
 /home/princer_google_com/memory_work/gcsfuse/gcsfuse --type-cache-ttl 0s --stat-cache-ttl 0s gcs-fuse-memory-profile-data ~/gcs
 ps -aux | grep "gcsfuse"
 for i in {1..1}; do list_for_100K; done
