@@ -19,7 +19,7 @@ alias list_for_100K="/home/princer_google_com/memory_work/custom-go-client-bench
 echo "LoggerPrince: listing test for 1K files with cache"
 /home/princer_google_com/memory_work/gcsfuse/gcsfuse --type-cache-ttl 10m --stat-cache-ttl 10m --stat-cache-capacity 2000  gcs-fuse-memory-profile-data ~/gcs
 ps -aux | grep "gcsfuse"
-for i in {1..50}; do list_for_1K; done
+for i in {1..500}; do list_for_1K; done
 umount ~/gcs
 
 # 1K files with without cache
@@ -33,28 +33,28 @@ umount ~/gcs
 echo "LoggerPrince: listing test for 10K files with cache"
 /home/princer_google_com/memory_work/gcsfuse/gcsfuse --type-cache-ttl 10m --stat-cache-ttl 10m --stat-cache-capacity 20000  gcs-fuse-memory-profile-data ~/gcs
 ps -aux | grep "gcsfuse"
-for i in {1..5}; do list_for_10K; done
+for i in {1..50}; do list_for_10K; done
 umount ~/gcs
 
 # 10K files with without cache
 echo "LoggerPrince: listing test for 10K files without cache"
 /home/princer_google_com/memory_work/gcsfuse/gcsfuse --type-cache-ttl 0s --stat-cache-ttl 0s gcs-fuse-memory-profile-data ~/gcs
 ps -aux | grep "gcsfuse"
-for i in {1..5}; do list_for_10K; done
+for i in {1..3}; do list_for_10K; done
 umount ~/gcs
 
 # 50K files with cache
 echo "LoggerPrince: listing test for 50K files with cache"
 /home/princer_google_com/memory_work/gcsfuse/gcsfuse --type-cache-ttl 10m --stat-cache-ttl 10m --stat-cache-capacity 100000  gcs-fuse-memory-profile-data ~/gcs
 ps -aux | grep "gcsfuse"
-for i in {1..1}; do list_for_50K; done
+for i in {1..5}; do list_for_50K; done
 umount ~/gcs
 
 # 50K files with without cache
 echo "LoggerPrince: listing test for 50K files without cache"
 /home/princer_google_com/memory_work/gcsfuse/gcsfuse --type-cache-ttl 0s --stat-cache-ttl 0s gcs-fuse-memory-profile-data ~/gcs
 ps -aux | grep "gcsfuse"
-for i in {1..1}; do list_for_50K; done
+for i in {1..2}; do list_for_50K; done
 umount ~/gcs
 
 # 100K files with cache
