@@ -4,8 +4,10 @@ go 1.21
 
 require (
 	cloud.google.com/go/storage v1.31.0
+	github.com/googleapis/gax-go/v2 v2.11.0
 	github.com/jacobsa/gcloud v0.0.0-20230425120041-5ed2958cdfee
 	golang.org/x/oauth2 v0.8.0
+	golang.org/x/sync v0.2.0
 	google.golang.org/api v0.126.0
 	google.golang.org/grpc v1.55.0
 )
@@ -27,7 +29,6 @@ require (
 	github.com/google/s2a-go v0.1.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
-	github.com/googleapis/gax-go/v2 v2.11.0 // indirect
 	github.com/jacobsa/oglematchers v0.0.0-20150720000706-141901ea67cd // indirect
 	github.com/jacobsa/oglemock v0.0.0-20150831005832-e94d794d06ff // indirect
 	github.com/jacobsa/reqtrace v0.0.0-20150505043853-245c9e0234cb // indirect

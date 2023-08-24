@@ -8,8 +8,9 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"sync"
 	"syscall"
+
+	"golang.org/x/sync/errgroup"
 )
 
 var (
@@ -19,7 +20,8 @@ var (
 	fBlockSize = flag.Int("block-size", 256, "Block size in KB")
 
 	fileHandles []*os.File
-	wg          sync.WaitGroup
+
+	eG errgroup.Group
 
 	OneKB = 1024
 
@@ -39,8 +41,6 @@ func openFile(index int) (err error) {
 
 // Expect file is already opened, otherwise throws error
 func readAlreadyOpenedFile(index int) (err error) {
-	defer wg.Done()
-
 	for i := 0; i < *fNumberOfRead; i++ {
 		r := bufio.NewReader(fileHandles[index])
 		b := make([]byte, *fBlockSize*1024)
@@ -76,15 +76,20 @@ func runReadFileOperations() (err error) {
 	}
 
 	for i := 0; i < *fNumOfThreads; i++ {
-		wg.Add(1)
-		go readAlreadyOpenedFile(i)
-		if err != nil {
-			err = fmt.Errorf("while reading file: %w", err)
+		eG.Go(func() error {
+			err := readAlreadyOpenedFile(i)
+			if err != nil {
+				err = fmt.Errorf("while reading file: %w", err)
+				return err
+			}
 			return err
-		}
+		})
 	}
 
-	wg.Wait()
+	// Wait for all HTTP fetches to complete.
+	if err := eG.Wait(); err == nil {
+		fmt.Println("Successfully fetched all URLs.")
+	}
 
 	for i := 0; i < *fNumOfThreads; i++ {
 		if err = fileHandles[i].Close(); err != nil {
