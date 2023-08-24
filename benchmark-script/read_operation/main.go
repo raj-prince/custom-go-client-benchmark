@@ -16,21 +16,19 @@ var (
 	fDir          = flag.String("dir", "", "Directory file to be opened.")
 	fNumOfThreads = flag.Int("threads", 1, "Number of threads to read parallel")
 
-	fBlockSize = flag.Int("block_size", 256, "Block size in KB")
+	fBlockSize = flag.Int("block-size", 256, "Block size in KB")
 
 	fileHandles []*os.File
 	wg          sync.WaitGroup
 
 	OneKB = 1024
 
-	fNumberOfRead = flag.Int("read_count", 1, "number of read iteration")
+	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
 )
 
 func openFile(index int) (err error) {
-	defer wg.Done()
-
 	fileName := path.Join(*fDir, "file_"+strconv.Itoa(index))
-	fileHandle, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|syscall.O_DIRECT, 0600)
+	fileHandle, err := os.OpenFile(fileName, os.O_RDONLY|syscall.O_DIRECT, 0600)
 	if err != nil {
 		err = fmt.Errorf("while opening file: %w", err)
 		return
@@ -70,7 +68,6 @@ func runReadFileOperations() (err error) {
 	fileHandles = make([]*os.File, *fNumOfThreads)
 
 	for i := 0; i < *fNumOfThreads; i++ {
-		wg.Add(1)
 		err = openFile(i)
 		if err != nil {
 			err = fmt.Errorf("while opening file: %w", err)
@@ -78,11 +75,9 @@ func runReadFileOperations() (err error) {
 		}
 	}
 
-	wg.Wait()
-
 	for i := 0; i < *fNumOfThreads; i++ {
 		wg.Add(1)
-		err = readAlreadyOpenedFile(i)
+		go readAlreadyOpenedFile(i)
 		if err != nil {
 			err = fmt.Errorf("while reading file: %w", err)
 			return err
