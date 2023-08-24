@@ -86,9 +86,10 @@ func runReadFileOperations() (err error) {
 		})
 	}
 
-	// Wait for all HTTP fetches to complete.
-	if err := eG.Wait(); err == nil {
-		fmt.Println("Successfully fetched all URLs.")
+	err = eG.Wait()
+
+	if err == nil {
+		fmt.Println("read benchmark completed successfully!")
 	}
 
 	for i := 0; i < *fNumOfThreads; i++ {
