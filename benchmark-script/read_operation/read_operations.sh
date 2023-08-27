@@ -9,7 +9,7 @@ alias read_for_256KB="/home/princer_google_com/memory_work/custom-go-client-benc
 
 alias read_for_1MB="/home/princer_google_com/memory_work/custom-go-client-benchmark/benchmark-script/read_operation/read_operation --read-count 10000 --threads ${threads} --block-size 1024 --dir \"/home/princer_google_com/gcs/reading/1MB\""
 
-alias read_for_100MB="/home/princer_google_com/memory_work/custom-go-client-benchmark/benchmark-script/read_operation/read_operation --read-count 100 --threads ${threads} --block-size 1024 --dir \"/home/princer_google_com/gcs/reading/100MB\""
+alias read_for_100MB="/home/princer_google_com/memory_work/custom-go-client-benchmark/benchmark-script/read_operation/read_operation --read-count 50 --threads ${threads} --block-size 1024 --dir \"/home/princer_google_com/gcs/reading/100MB\""
 
 alias read_for_1GB="/home/princer_google_com/memory_work/custom-go-client-benchmark/benchmark-script/read_operation/read_operation --read-count 10 --threads ${threads} --block-size 1024 --dir \"/home/princer_google_com/gcs/reading/1GB\""
 
