@@ -19,3 +19,10 @@
 
 # Go workspace file
 go.work
+
+# Ignore all binaries files
+custom-go-client-benchmark
+benchmark-script/list_operation/list_operation
+benchmark-script/read_operation/read_operation
+.idea
+
