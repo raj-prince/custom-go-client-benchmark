@@ -14,6 +14,7 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/googleapis/gax-go/v2"
+	"go.opencensus.io/stats"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
@@ -129,9 +130,12 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 		}
 
 		duration := time.Since(start)
-		fmt.Println(duration)
+		stats.Record(ctx, readLatency.M(int64(duration)))
 
-		rc.Close()
+		err = rc.Close()
+		if err != nil {
+			return fmt.Errorf("while closing the reader object: %v", err)
+		}
 	}
 
 	return
@@ -140,7 +144,6 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 func main() {
 	clientProtocol := flag.String("client-protocol", "http", "# of iterations")
 	flag.Parse()
-
 	ctx := context.Background()
 
 	var client *storage.Client
@@ -166,9 +169,21 @@ func main() {
 	err = bucketHandle.Create(ctx, ProjectName, nil)
 
 	if err != nil {
-		fmt.Errorf("while creating the bucket: %v", err)
+		fmt.Fprintf(os.Stderr, "while creating bucket: %v", err)
+		os.Exit(1)
 	}
 
+	// Enable stack-driver exporter.
+	registerLatencyView()
+
+	err = enableSDExporter()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "while enabling stackdriver exporter: %v", err)
+		os.Exit(1)
+	}
+	defer closeSDExporter()
+
+	// Run the actual workload
 	for i := 0; i < NumOfWorker; i++ {
 		eG.Go(func() error {
 			idx := i
@@ -187,5 +202,6 @@ func main() {
 		fmt.Println("Read benchmark completed successfully!")
 	} else {
 		fmt.Fprintf(os.Stderr, "Error while running benchmark: %v", err)
+		os.Exit(1)
 	}
 }
