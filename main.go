@@ -10,12 +10,12 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"sync"
 	"time"
 
 	"cloud.google.com/go/storage"
 	"github.com/googleapis/gax-go/v2"
 	"golang.org/x/oauth2"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
 	// Install google-c2p resolver, which is required for direct path.
 	_ "google.golang.org/grpc/xds/googledirectpath"
@@ -43,7 +43,7 @@ var (
 	ObjectNamePrefix = "50mb/1_thread."
 	ObjectNameSuffix = ".0"
 
-	wg sync.WaitGroup
+	eG errgroup.Group
 )
 
 func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client, err error) {
@@ -112,7 +112,6 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 }
 
 func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
-	defer wg.Done()
 
 	objectName := ObjectNamePrefix + strconv.Itoa(workerId) + ObjectNameSuffix
 
@@ -152,16 +151,16 @@ func main() {
 		client, err = CreateGrpcClient(ctx)
 	}
 
+	if err != nil {
+		fmt.Errorf("while creating the client: %v", err)
+	}
+
 	client.SetRetry(
 		storage.WithBackoff(gax.Backoff{
 			Max:        MaxRetryDuration,
 			Multiplier: RetryMultiplier,
 		}),
 		storage.WithPolicy(storage.RetryAlways))
-
-	if err != nil {
-		fmt.Errorf("while creating the client: %v", err)
-	}
 
 	bucketHandle := client.Bucket(BucketName)
 	err = bucketHandle.Create(ctx, ProjectName, nil)
@@ -170,11 +169,23 @@ func main() {
 		fmt.Errorf("while creating the bucket: %v", err)
 	}
 
-	wg.Add(NumOfWorker)
-
 	for i := 0; i < NumOfWorker; i++ {
-		go ReadObject(ctx, i, bucketHandle)
+		eG.Go(func() error {
+			idx := i
+			err = ReadObject(ctx, idx, bucketHandle)
+			if err != nil {
+				err = fmt.Errorf("while reading object: %w", err)
+				return err
+			}
+			return err
+		})
 	}
 
-	wg.Wait()
+	err = eG.Wait()
+
+	if err == nil {
+		fmt.Println("Read benchmark completed successfully!")
+	} else {
+		fmt.Fprintf(os.Stderr, "Error while running benchmark: %v", err)
+	}
 }
