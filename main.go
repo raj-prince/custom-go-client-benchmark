@@ -35,9 +35,11 @@ var (
 
 	RetryMultiplier = 2.0
 
-	BucketName = "golang-grpc-test-princer-gcsfuse-us-central"
+	BucketName = flag.String("bucket", "princer-working-dirs", "GCS bucket name.")
 
-	ProjectName = "gcs-fuse-test"
+	ProjectName = flag.String("project", "gcs-fuse-test", "GCP project name.")
+
+	clientProtocol = flag.String("client-protocol", "http", "Network protocol.")
 
 	// ObjectNamePrefix<worker_id>ObjectNameSuffix is the object name format.
 	// Here, worker id goes from <0 to NumberOfWorker.
@@ -130,7 +132,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 		}
 
 		duration := time.Since(start)
-		stats.Record(ctx, readLatency.M(int64(duration)))
+		stats.Record(ctx, readLatency.M(int64(duration.Milliseconds())))
 
 		err = rc.Close()
 		if err != nil {
@@ -142,7 +144,6 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 }
 
 func main() {
-	clientProtocol := flag.String("client-protocol", "http", "# of iterations")
 	flag.Parse()
 	ctx := context.Background()
 
@@ -165,13 +166,8 @@ func main() {
 		}),
 		storage.WithPolicy(storage.RetryAlways))
 
-	bucketHandle := client.Bucket(BucketName)
-	err = bucketHandle.Create(ctx, ProjectName, nil)
-
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "while creating bucket: %v", err)
-		os.Exit(1)
-	}
+	bucketHandle := client.Bucket(*BucketName)
+	err = bucketHandle.Create(ctx, *ProjectName, nil)
 
 	// Enable stack-driver exporter.
 	registerLatencyView()
@@ -185,8 +181,8 @@ func main() {
 
 	// Run the actual workload
 	for i := 0; i < NumOfWorker; i++ {
+		idx := i
 		eG.Go(func() error {
-			idx := i
 			err = ReadObject(ctx, idx, bucketHandle)
 			if err != nil {
 				err = fmt.Errorf("while reading object: %w", err)

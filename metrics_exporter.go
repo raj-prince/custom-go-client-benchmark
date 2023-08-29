@@ -12,14 +12,14 @@ import (
 
 var (
 	// The restaurant rating in number of stars.
-	readLatency = stats.Int64("readLatency", "Complete read latency", "ms")
+	readLatency = stats.Int64("readLatency", "Complete read latency", stats.UnitMilliseconds)
 )
 
 var sdExporter *stackdriver.Exporter
 
 func registerLatencyView() {
 	v := &view.View{
-		Name:        "read_latency",
+		Name:        "go_client_read_latency",
 		Measure:     readLatency,
 		Description: "Complete read latency for a given go-client",
 		Aggregation: view.Sum(),
@@ -33,9 +33,9 @@ func registerLatencyView() {
 func enableSDExporter() (err error) {
 	sdExporter, err := stackdriver.NewExporter(stackdriver.Options{
 		// ProjectID <change this value>
-		ProjectID: "gcs-fuse-test-ml",
+		ProjectID: *ProjectName,
 		// MetricPrefix helps uniquely identify your metrics. <change this value>
-		MetricPrefix: "custom-go-client",
+		MetricPrefix: "custom.googleapis.com/custom-go-client/",
 		// ReportingInterval sets the frequency of reporting metrics
 		// to the Cloud Monitoring backend.
 		ReportingInterval: 30 * time.Second,
