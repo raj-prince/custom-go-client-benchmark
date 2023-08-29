@@ -24,5 +24,6 @@ go.work
 custom-go-client-benchmark
 benchmark-script/list_operation/list_operation
 benchmark-script/read_operation/read_operation
+benchmark-script/open_file/open_file
 .idea
 
