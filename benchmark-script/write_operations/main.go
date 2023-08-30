@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	"crypto/rand"
 	"flag"
 	"fmt"
 	"io"
@@ -25,12 +25,14 @@ var (
 
 	OneKB = 1024
 
+	fFileSize = flag.Int("file-size", 1, "in KB")
+
 	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
 )
 
 func openFile(index int) (err error) {
 	fileName := path.Join(*fDir, "file_"+strconv.Itoa(index))
-	fileHandle, err := os.OpenFile(fileName, os.O_RDONLY|syscall.O_DIRECT, 0600)
+	fileHandle, err := os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC|syscall.O_DIRECT, 0644)
 	if err != nil {
 		err = fmt.Errorf("while opening file: %w", err)
 		return
@@ -40,14 +42,30 @@ func openFile(index int) (err error) {
 }
 
 // Expect file is already opened, otherwise throws error
-func readAlreadyOpenedFile(index int) (err error) {
-	for i := 0; i < *fNumberOfRead; i++ {
-		r := bufio.NewReader(fileHandles[index])
-		b := make([]byte, *fBlockSize*1024)
+func overWriteAlreadyOpenedFile(index int) (err error) {
+	for i := 0; i < (*fFileSize / *fBlockSize); i++ {
+		b := make([]byte, *fBlockSize*OneKB)
 
-		_, err = io.CopyBuffer(io.Discard, r, b)
+		startByte := int64(i * (*fBlockSize * OneKB))
+
+		_, err = rand.Read(b)
 		if err != nil {
-			return fmt.Errorf("while reading and discarding content: %v", err)
+			return fmt.Errorf("while generating random bytest: %v", err)
+		}
+
+		_, err = fileHandles[index].Seek(startByte, io.SeekStart)
+		if err != nil {
+			return fmt.Errorf("while changing the seek position")
+		}
+
+		_, err = fileHandles[index].Write(b)
+		if err != nil {
+			return fmt.Errorf("while overwriting the file: %v", err)
+		}
+
+		err = fileHandles[index].Sync()
+		if err != nil {
+			return fmt.Errorf("while syncing the file: %v", err)
 		}
 	}
 
@@ -78,7 +96,7 @@ func runReadFileOperations() (err error) {
 	for i := 0; i < *fNumOfThreads; i++ {
 		index := i
 		eG.Go(func() error {
-			err := readAlreadyOpenedFile(index)
+			err := overWriteAlreadyOpenedFile(index)
 			if err != nil {
 				err = fmt.Errorf("while reading file: %w", err)
 				return err
@@ -90,7 +108,7 @@ func runReadFileOperations() (err error) {
 	err = eG.Wait()
 
 	if err == nil {
-		fmt.Println("read benchmark completed successfully!")
+		fmt.Println("write benchmark completed successfully!")
 	}
 
 	for i := 0; i < *fNumOfThreads; i++ {

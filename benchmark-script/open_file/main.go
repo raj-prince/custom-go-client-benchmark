@@ -7,6 +7,7 @@ import (
 	"path"
 	"strconv"
 	"syscall"
+	"time"
 )
 
 var (
@@ -47,6 +48,8 @@ func runOpenFileOperations() (err error) {
 			return err
 		}
 	}
+
+	time.Sleep(3 * time.Minute)
 
 	for i := 0; i < *fNumOfFiles; i++ {
 		if err = fileHandles[i].Close(); err != nil {
