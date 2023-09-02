@@ -21,7 +21,7 @@ var sdExporter *stackdriver.Exporter
 
 func registerLatencyView() {
 	v := &view.View{
-		Name:        "go_client_read_latency",
+		Name:        "princer_go_client_read_latency",
 		Measure:     readLatency,
 		Description: "Complete read latency for a given go-client",
 		TagKeys:     []tag.Key{tag.MustNewKey("princer_read_latency")},
