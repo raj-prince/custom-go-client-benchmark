@@ -6,13 +6,15 @@ import (
 	"time"
 
 	"contrib.go.opencensus.io/exporter/stackdriver"
+	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/stats"
 	"go.opencensus.io/stats/view"
+	"go.opencensus.io/tag"
 )
 
 var (
 	// The restaurant rating in number of stars.
-	readLatency = stats.Int64("readLatency", "Complete read latency", stats.UnitMilliseconds)
+	readLatency = stats.Float64("readLatency", "Complete read latency", stats.UnitMilliseconds)
 )
 
 var sdExporter *stackdriver.Exporter
@@ -22,7 +24,8 @@ func registerLatencyView() {
 		Name:        "go_client_read_latency",
 		Measure:     readLatency,
 		Description: "Complete read latency for a given go-client",
-		Aggregation: view.Sum(),
+		TagKeys:     []tag.Key{tag.MustNewKey("princer_read_latency")},
+		Aggregation: ochttp.DefaultLatencyDistribution,
 	}
 
 	if err := view.Register(v); err != nil {

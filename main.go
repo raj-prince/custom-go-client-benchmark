@@ -132,7 +132,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 		}
 
 		duration := time.Since(start)
-		stats.Record(ctx, readLatency.M(int64(duration.Milliseconds())))
+		stats.Record(ctx, readLatency.M(float64(duration.Milliseconds())))
 
 		err = rc.Close()
 		if err != nil {
