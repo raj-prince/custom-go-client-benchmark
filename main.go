@@ -27,9 +27,9 @@ var (
 	MaxConnsPerHost     = 100
 	MaxIdelConnsPerHost = 100
 
-	NumOfWorker = 48
+	NumOfWorker = flag.Int("worker", 48, "Number of concurrent worker to read")
 
-	NumOfReadCallPerWorker = 800
+	NumOfReadCallPerWorker = flag.Int("read-call-per-worker", 1000000, "Number of read call per worker")
 
 	MaxRetryDuration = 30 * time.Second
 
@@ -42,9 +42,9 @@ var (
 	clientProtocol = flag.String("client-protocol", "http", "Network protocol.")
 
 	// ObjectNamePrefix<worker_id>ObjectNameSuffix is the object name format.
-	// Here, worker id goes from <0 to NumberOfWorker.
-	ObjectNamePrefix = "50mb/1_thread."
-	ObjectNameSuffix = ".0"
+	// Here, worker id goes from <0 to NumberOfWorker>.
+	ObjectNamePrefix = "princer_100M_files/file_"
+	ObjectNameSuffix = ""
 
 	eG errgroup.Group
 )
@@ -118,7 +118,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 
 	objectName := ObjectNamePrefix + strconv.Itoa(workerId) + ObjectNameSuffix
 
-	for i := 0; i < NumOfReadCallPerWorker; i++ {
+	for i := 0; i < *NumOfReadCallPerWorker; i++ {
 		start := time.Now()
 		object := bucketHandle.Object(objectName)
 		rc, err := object.NewReader(ctx)
@@ -180,7 +180,7 @@ func main() {
 	defer closeSDExporter()
 
 	// Run the actual workload
-	for i := 0; i < NumOfWorker; i++ {
+	for i := 0; i < *NumOfWorker; i++ {
 		idx := i
 		eG.Go(func() error {
 			err = ReadObject(ctx, idx, bucketHandle)
