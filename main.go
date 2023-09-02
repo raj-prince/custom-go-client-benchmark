@@ -166,8 +166,8 @@ func main() {
 		}),
 		storage.WithPolicy(storage.RetryAlways))
 
+	// assumes bucket already exist
 	bucketHandle := client.Bucket(*BucketName)
-	err = bucketHandle.Create(ctx, *ProjectName, nil)
 
 	// Enable stack-driver exporter.
 	registerLatencyView()
