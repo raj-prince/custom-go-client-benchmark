@@ -49,6 +49,9 @@ func runOpenFileOperations() (err error) {
 		}
 	}
 
+	fmt.Println("All the files are opened now")
+	fmt.Println("Waiting for 3 minutes")
+
 	time.Sleep(3 * time.Minute)
 
 	for i := 0; i < *fNumOfFiles; i++ {
