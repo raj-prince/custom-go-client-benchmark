@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 )
 
 var fDir = flag.String("dir", "", "Directory within which listing performed.")
@@ -52,6 +53,11 @@ func runListingCommandLine() (err error) {
 		err = fmt.Errorf("error while executing list command")
 		return
 	}
+
+	fmt.Println("Listing completed...")
+	fmt.Println("Waiting for 3 minutes")
+
+	time.Sleep(3 * time.Minute)
 
 	// Print the output
 	fmt.Println(string(stdout))
