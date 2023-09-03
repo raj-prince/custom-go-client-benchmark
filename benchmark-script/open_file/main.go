@@ -18,7 +18,7 @@ var (
 )
 
 func openFile(index int) (err error) {
-	fileName := path.Join(*fDir, "file_"+strconv.Itoa(index))
+	fileName := path.Join(*fDir, "list_file_"+strconv.Itoa(index))
 	fileHandle, err := os.OpenFile(fileName, os.O_RDONLY|syscall.O_DIRECT, 0600)
 	if err != nil {
 		err = fmt.Errorf("while opening file: %w", err)
