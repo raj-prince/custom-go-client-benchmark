@@ -19,14 +19,14 @@ alias list_for_100K="GODEBUG=asyncpreemptoff=1 /home/princer_google_com/memory_w
 echo "LoggerPrince: listing test for 1K files with cache"
 /home/princer_google_com/memory_work/gcsfuse/gcsfuse --type-cache-ttl 10m --stat-cache-ttl 10m --stat-cache-capacity 2000  gcs-fuse-memory-profile-data ~/gcs
 ps -aux | grep "gcsfuse"
-for i in {1..500}; do list_for_1K; done
+for i in {1..1}; do list_for_1K; done
 umount ~/gcs
 
 # 1K files with without cache
 echo "LoggerPrince: listing test for 1K files without cache"
 /home/princer_google_com/memory_work/gcsfuse/gcsfuse --type-cache-ttl 0s --stat-cache-ttl 0s gcs-fuse-memory-profile-data ~/gcs
 ps -aux | grep "gcsfuse"
-for i in {1..50}; do list_for_1K; done
+for i in {1..1}; do list_for_1K; done
 umount ~/gcs
 
 # 10K files with cache
