@@ -9,7 +9,7 @@ alias list_cmd="GODEBUG=asyncpreemptoff=1 /home/princer_google_com/memory_work/c
 
 
 echo "With cache"
-/home/princer_google_com/memory_work/gcsfuse/gcsfuse --type-cache-ttl 10m --stat-cache-ttl 10m --stat-cache-capacity 200000 gcs-fuse-memory-profile-data ~/gcs
+/home/princer_google_com/memory_work/gcsfuse/gcsfuse --type-cache-ttl 10000m --stat-cache-ttl 10000m --stat-cache-capacity 200000 gcs-fuse-memory-profile-data ~/gcs
 ps -aux | grep "gcsfuse"
 list_cmd
 umount ~/gcs
