@@ -9,6 +9,7 @@ import (
 	"path"
 	"strconv"
 	"syscall"
+	"time"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -91,6 +92,9 @@ func runReadFileOperations() (err error) {
 
 	if err == nil {
 		fmt.Println("read benchmark completed successfully!")
+		fmt.Println("Waiting for 3 minutes")
+
+		time.Sleep(3 * time.Minute)
 	}
 
 	for i := 0; i < *fNumOfThreads; i++ {
