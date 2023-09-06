@@ -27,6 +27,8 @@ var (
 	MaxConnsPerHost     = 100
 	MaxIdelConnsPerHost = 100
 
+	MB = 1024 * 1024
+
 	NumOfWorker = flag.Int("worker", 48, "Number of concurrent worker to read")
 
 	NumOfReadCallPerWorker = flag.Int("read-call-per-worker", 1000000, "Number of read call per worker")
@@ -118,6 +120,10 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 
 	objectName := ObjectNamePrefix + strconv.Itoa(workerId) + ObjectNameSuffix
 
+	// gRPC server contains 2 MB of data, hence increasing the buf size to 2 MB,
+	// if we don't specify io.Copy uses 32 KB as buffer size.
+	buf := make([]byte, 2*MB)
+
 	for i := 0; i < *NumOfReadCallPerWorker; i++ {
 		start := time.Now()
 		object := bucketHandle.Object(objectName)
@@ -126,7 +132,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 			return fmt.Errorf("while creating reader object: %v", err)
 		}
 
-		_, err = io.Copy(io.Discard, rc)
+		_, err = io.CopyBuffer(io.Discard, rc, buf)
 		if err != nil {
 			return fmt.Errorf("while reading and discarding content: %v", err)
 		}
