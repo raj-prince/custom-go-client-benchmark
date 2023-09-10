@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -96,23 +95,9 @@ func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client
 }
 
 func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
-	if err := os.Setenv("STORAGE_USE_GRPC", "gRPC"); err != nil {
-		log.Fatalf("error setting grpc env var: %v", err)
-	}
 
-	if err := os.Setenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS", "true"); err != nil {
-		log.Fatalf("error setting direct path env var: %v", err)
-	}
+	client, err = storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(GrpcConnPoolSize))
 
-	client, err = storage.NewClient(ctx, option.WithGRPCConnectionPool(GrpcConnPoolSize))
-
-	if err := os.Unsetenv("STORAGE_USE_GRPC"); err != nil {
-		log.Fatalf("error while unsetting grpc env var: %v", err)
-	}
-
-	if err := os.Unsetenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS"); err != nil {
-		log.Fatalf("error while unsetting direct path env var: %v", err)
-	}
 	return
 }
 
