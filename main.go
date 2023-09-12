@@ -101,6 +101,14 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 		log.Fatalf("error setting direct path env var: %v", err)
 	}
 
+	if err := os.Setenv("GRPC_ARG_HTTP2_BDP_PROBE", "0"); err != nil {
+		log.Fatalf("error setting direct path env var: %v", err)
+	}
+
+	if err := os.Setenv("GRPC_ARG_HTTP2_STREAM_LOOKAHEAD_BYTES", "104857600"); err != nil {
+		log.Fatalf("error setting direct path env var: %v", err)
+	}
+
 	client, err = storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(GrpcConnPoolSize))
 
 	if err := os.Unsetenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS"); err != nil {
