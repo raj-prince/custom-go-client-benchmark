@@ -92,9 +92,9 @@ func runReadFileOperations() (err error) {
 
 	if err == nil {
 		fmt.Println("read benchmark completed successfully!")
-		fmt.Println("Waiting for 3 minutes")
+		fmt.Println("Waiting for 10 seconds")
 
-		time.Sleep(3 * time.Minute)
+		time.Sleep(10 * time.Second)
 	}
 
 	for i := 0; i < *fNumOfThreads; i++ {
