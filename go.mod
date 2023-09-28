@@ -11,7 +11,7 @@ require (
 	golang.org/x/oauth2 v0.10.0
 	golang.org/x/sync v0.3.0
 	google.golang.org/api v0.132.0
-	google.golang.org/grpc v1.58.0
+	google.golang.org/grpc v1.58.2
 )
 
 require (
