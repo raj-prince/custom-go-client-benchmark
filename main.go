@@ -5,6 +5,9 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"io"
 	"log"
 	"net/http"
@@ -26,7 +29,7 @@ import (
 var (
 	GrpcConnPoolSize    = 1
 	MaxConnsPerHost     = 100
-	MaxIdelConnsPerHost = 100
+	MaxIdleConnsPerHost = 100
 
 	MB = 1024 * 1024
 
@@ -49,6 +52,10 @@ var (
 	ObjectNamePrefix = "princer_100M_files/file_"
 	ObjectNameSuffix = ""
 
+	tracerName      = "princer-storage-benchmark"
+	enableTracing   = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
+	traceSampleRate = flag.Float64("trace-sample-rate", 1.0, "Sampling rate for Cloud Trace")
+
 	eG errgroup.Group
 )
 
@@ -58,7 +65,7 @@ func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client
 	if isHttp2 == false {
 		transport = &http.Transport{
 			MaxConnsPerHost:     MaxConnsPerHost,
-			MaxIdleConnsPerHost: MaxIdelConnsPerHost,
+			MaxIdleConnsPerHost: MaxIdleConnsPerHost,
 			// This disables HTTP/2 in transport.
 			TLSNextProto: make(
 				map[string]func(string, *tls.Conn) http.RoundTripper,
@@ -118,9 +125,14 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 	buf := make([]byte, 2*MB)
 
 	for i := 0; i < *NumOfReadCallPerWorker; i++ {
+		var span trace.Span
+		traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "ReadObject")
+		span.SetAttributes(
+			attribute.KeyValue{"bucket", attribute.StringValue(*BucketName)},
+		)
 		start := time.Now()
 		object := bucketHandle.Object(objectName)
-		rc, err := object.NewReader(ctx)
+		rc, err := object.NewReader(traceCtx)
 		if err != nil {
 			return fmt.Errorf("while creating reader object: %v", err)
 		}
@@ -134,6 +146,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 		stats.Record(ctx, readLatency.M(float64(duration.Milliseconds())))
 
 		err = rc.Close()
+		span.End()
 		if err != nil {
 			return fmt.Errorf("while closing the reader object: %v", err)
 		}
@@ -145,6 +158,11 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 func main() {
 	flag.Parse()
 	ctx := context.Background()
+
+	if *enableTracing {
+		cleanup := enableTraceExport(ctx, *traceSampleRate)
+		defer cleanup()
+	}
 
 	var client *storage.Client
 	var err error
@@ -184,7 +202,7 @@ func main() {
 		eG.Go(func() error {
 			err = ReadObject(ctx, idx, bucketHandle)
 			if err != nil {
-				err = fmt.Errorf("while reading object: %w", err)
+				err = fmt.Errorf("while reading object %v: %w", ObjectNamePrefix+strconv.Itoa(idx), err)
 				return err
 			}
 			return err
