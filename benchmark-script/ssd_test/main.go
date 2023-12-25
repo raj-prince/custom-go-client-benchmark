@@ -69,14 +69,6 @@ func readAlreadyOpenedFile(threadIndex int, accessPat []int) (err error) {
 		blockSize := int64(*fBlockSize * 1024)
 		for i := 0; i < len(accessPat); i++ {
 
-			if i == len(accessPat)/2 {
-				fmt.Println("50% completed")
-			}
-
-			if i == len(accessPat)/4 {
-				fmt.Println("25% completed")
-			}
-
 			st := int64(accessPat[i]) * blockSize
 			b := make([]byte, blockSize)
 			readStart := time.Now()
@@ -85,7 +77,7 @@ func readAlreadyOpenedFile(threadIndex int, accessPat []int) (err error) {
 				err = nil
 			}
 			totalTime := time.Since(readStart)
-			readTime = append(readTime, totalTime.Nanoseconds())
+			readTime = append(readTime, totalTime.Microseconds())
 
 			if int64(n) != blockSize || err != nil {
 				return fmt.Errorf("error while reading")
