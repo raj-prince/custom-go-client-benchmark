@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"io"
 	"math/rand"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"syscall"
 	"time"
@@ -16,12 +16,13 @@ import (
 )
 
 var (
-	fDir          = flag.String("dir", "", "Directory file to be opened.")
+	fDir = flag.String("dir", "", "Directory file to be opened.")
+
 	fNumOfThreads = flag.Int("threads", 1, "Number of threads to read parallel")
 
-	fBlockSize = flag.Int("block-size", 256, "Block size in KB")
+	fBlockSize = flag.Int("block-size", 1024, "Block size in KB")
 
-	fFileSize = flag.Int64("file-size", 256, "File size in KB")
+	fFileSize = flag.Int64("file-size", 5242880, "File size in KB")
 
 	fReadType = flag.String("read-type", "seq", "Read access pattern")
 
@@ -32,10 +33,12 @@ var (
 	OneKB = 1024
 
 	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
+
+	readTime []int64
 )
 
 func openFile(index int) (err error) {
-	fileName := path.Join(*fDir, "file_"+strconv.Itoa(index))
+	fileName := path.Join(*fDir, "Workload."+strconv.Itoa(index)+"/0")
 	fileHandle, err := os.OpenFile(fileName, os.O_RDONLY|syscall.O_DIRECT, 0600)
 	if err != nil {
 		err = fmt.Errorf("while opening file: %w", err)
@@ -61,12 +64,32 @@ func openFile(index int) (err error) {
 // Expect file is already opened, otherwise throws error
 func readAlreadyOpenedFile(threadIndex int, accessPat []int) (err error) {
 	for i := 0; i < *fNumberOfRead; i++ {
-		r := bufio.NewReader(fileHandles[threadIndex])
-		b := make([]byte, *fBlockSize*1024)
+		fileHandle := fileHandles[threadIndex]
 
-		_, err = io.CopyBuffer(io.Discard, r, b)
-		if err != nil {
-			return fmt.Errorf("while reading and discarding content: %v", err)
+		blockSize := int64(*fBlockSize * 1024)
+		for i := 0; i < len(accessPat); i++ {
+
+			if i == len(accessPat)/2 {
+				fmt.Println("50% completed")
+			}
+
+			if i == len(accessPat)/4 {
+				fmt.Println("25% completed")
+			}
+
+			st := int64(accessPat[i]) * blockSize
+			b := make([]byte, blockSize)
+			readStart := time.Now()
+			n, err := fileHandle.ReadAt(b, st)
+			if err == io.EOF {
+				err = nil
+			}
+			totalTime := time.Since(readStart)
+			readTime = append(readTime, totalTime.Nanoseconds())
+
+			if int64(n) != blockSize || err != nil {
+				return fmt.Errorf("error while reading")
+			}
 		}
 	}
 
@@ -100,12 +123,12 @@ func runReadFileOperations() (err error) {
 		return fmt.Errorf("block-size should be multiple of file-size")
 	}
 
+	// Change access pattern based of read-type.
 	offset := make([]int, totalIOPerThread)
-	if *fReadType == "seq" {
-		for i := 0; i < int(totalIOPerThread); i++ {
-			offset[i] = i
-		}
-	} else { // random read
+	for i := 0; i < int(totalIOPerThread); i++ {
+		offset[i] = i
+	}
+	if *fReadType != "seq" { // random read
 		for i := range offset {
 			j := rand.Intn(i + 1)
 			offset[i], offset[j] = offset[j], offset[i]
@@ -115,7 +138,7 @@ func runReadFileOperations() (err error) {
 	for i := 0; i < *fNumOfThreads; i++ {
 		index := i
 		eG.Go(func() error {
-			err := readAlreadyOpenedFile(index)
+			err := readAlreadyOpenedFile(index, offset)
 			if err != nil {
 				err = fmt.Errorf("while reading file: %w", err)
 				return err
@@ -130,7 +153,23 @@ func runReadFileOperations() (err error) {
 		fmt.Println("read benchmark completed successfully!")
 		fmt.Println("Waiting for 10 seconds")
 
-		time.Sleep(10 * time.Second)
+		sort.Slice(readTime, func(i, j int) bool {
+			return readTime[i] < readTime[j]
+		})
+
+		sum := int64(0)
+		size := len(readTime)
+		for i := 0; i < size; i++ {
+			sum += readTime[i]
+		}
+
+		fmt.Println("Average: ", sum/int64(size))
+		fmt.Println("P20: ", readTime[size/5])
+		fmt.Println("P50: ", readTime[size/2])
+		fmt.Println("P90: ", readTime[(9*size)/10])
+		fmt.Println("p99: ", readTime[(99*size)/100])
+		fmt.Println("Min: ", readTime[0])
+		fmt.Println("Max: ", readTime[size-1])
 	}
 
 	for i := 0; i < *fNumOfThreads; i++ {
