@@ -143,7 +143,6 @@ func runReadFileOperations() (err error) {
 
 	if err == nil {
 		fmt.Println("read benchmark completed successfully!")
-		fmt.Println("Waiting for 10 seconds")
 
 		sort.Slice(readTime, func(i, j int) bool {
 			return readTime[i] < readTime[j]
@@ -155,13 +154,13 @@ func runReadFileOperations() (err error) {
 			sum += readTime[i]
 		}
 
-		fmt.Println("Average: ", sum/int64(size))
-		fmt.Println("P20: ", readTime[size/5])
-		fmt.Println("P50: ", readTime[size/2])
-		fmt.Println("P90: ", readTime[(9*size)/10])
-		fmt.Println("p99: ", readTime[(99*size)/100])
-		fmt.Println("Min: ", readTime[0])
-		fmt.Println("Max: ", readTime[size-1])
+		fmt.Printf("Average: %.3f ms\n", MicroSecondsToMilliSecond(sum/int64(size)))
+		fmt.Printf("P20: %.3f ms\n", MicroSecondsToMilliSecond(readTime[size/5]))
+		fmt.Printf("P50: %.3f ms\n", MicroSecondsToMilliSecond(readTime[size/2]))
+		fmt.Printf("P90: %.3f ms\n", MicroSecondsToMilliSecond(readTime[(9*size)/10]))
+		fmt.Printf("p99: %.3f ms\n", MicroSecondsToMilliSecond(readTime[(99*size)/100]))
+		fmt.Printf("Min: %.3f ms\n", MicroSecondsToMilliSecond(readTime[0]))
+		fmt.Printf("Max: %.3f ms\n", MicroSecondsToMilliSecond(readTime[size-1]))
 	}
 
 	for i := 0; i < *fNumOfThreads; i++ {
@@ -172,6 +171,10 @@ func runReadFileOperations() (err error) {
 	}
 
 	return
+}
+
+func MicroSecondsToMilliSecond(microSecond int64) float64 {
+	return 0.001 * float64(microSecond)
 }
 
 func main() {
