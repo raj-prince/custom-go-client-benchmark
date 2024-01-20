@@ -257,7 +257,7 @@ func recordRunningRoutines() {
 
 	for {
 		go func() {
-			time.Sleep(time.Second)
+			time.Sleep(time.Minute / 2)
 			fmt.Printf("Number of Running goroutines: %d\n", runtime.NumGoroutine())
 		}()
 	}
