@@ -46,9 +46,9 @@ var (
 
 	RetryMultiplier = 2.0
 
-	BucketName = flag.String("bucket", "princer-working-dirs", "GCS bucket name.")
+	BucketName = flag.String("bucket", "golang-grpc-test-sdk-gcs-fuse-us-east", "GCS bucket name.")
 
-	ProjectName = flag.String("project", "gcs-fuse-test", "GCP project name.")
+	ProjectName = flag.String("project", "storage-sdk-prober-project", "GCP project name.")
 
 	clientProtocol = flag.String("client-protocol", "http", "Network protocol.")
 
@@ -122,6 +122,10 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 	return
 }
 
+func CreateGrpcCloudpathClient(ctx context.Context) (*storage.Client, error) {
+	return storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(GrpcConnPoolSize))
+}
+
 func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
 
 	objectName := ObjectNamePrefix + strconv.Itoa(workerId) + ObjectNameSuffix
@@ -137,14 +141,16 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 			attribute.KeyValue{"bucket", attribute.StringValue(*BucketName)},
 		)
 		start := time.Now()
-		object := bucketHandle.Object(objectName)
+		object := bucketHandle.Object(objectName).Retryer(storage.WithPolicy(storage.RetryNever))
 		rc, err := object.NewReader(traceCtx)
 		if err != nil {
+			fmt.Printf("while creating reader object: %v\n", err)
 			return fmt.Errorf("while creating reader object: %v", err)
 		}
 
 		_, err = io.CopyBuffer(io.Discard, rc, buf)
 		if err != nil {
+			fmt.Printf("while reading and discarding content: %v\n", err)
 			return fmt.Errorf("while reading and discarding content: %v", err)
 		}
 
@@ -154,6 +160,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 		err = rc.Close()
 		span.End()
 		if err != nil {
+			fmt.Printf("while closing the reader object: %v\n", err)
 			return fmt.Errorf("while closing the reader object: %v", err)
 		}
 	}
@@ -185,6 +192,8 @@ func main() {
 	var err error
 	if *clientProtocol == "http" {
 		client, err = CreateHttpClient(ctx, false)
+	} else if *clientProtocol == "cp" {
+		client, err = CreateGrpcCloudpathClient(ctx)
 	} else {
 		client, err = CreateGrpcClient(ctx)
 	}
