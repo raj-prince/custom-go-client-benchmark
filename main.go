@@ -255,11 +255,11 @@ func main() {
 func recordRunningRoutines() {
 	fmt.Printf("runtime.GOMAXPROCS: %d\n", runtime.GOMAXPROCS(0))
 
-	for {
-		go func() {
-			time.Sleep(time.Minute / 2)
+	go func() {
+		for {
+			time.Sleep(time.Second * 5)
 			fmt.Printf("Number of Running goroutines: %d\n", runtime.NumGoroutine())
-		}()
-	}
+		}
 
+	}()
 }
