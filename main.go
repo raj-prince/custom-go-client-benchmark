@@ -47,7 +47,7 @@ var (
 
 	RetryMultiplier = 2.0
 
-	BucketName = flag.String("bucket", "brenna-test-bucket", "GCS bucket name.")
+	BucketName = flag.String("bucket", "golang-grpc-test-sdk-gcs-fuse-us-east", "GCS bucket name.")
 
 	ProjectName = flag.String("project", "storage-sdk-prober-project", "GCP project name.")
 
@@ -254,12 +254,12 @@ func main() {
 
 func recordRunningRoutines() {
 	fmt.Printf("runtime.GOMAXPROCS: %d\n", runtime.GOMAXPROCS(0))
+	fmt.Printf("runtime.NumCPU: %d\n", runtime.NumCPU())
 
 	go func() {
 		for {
 			time.Sleep(time.Second * 5)
 			fmt.Printf("Number of Running goroutines: %d\n", runtime.NumGoroutine())
 		}
-
 	}()
 }
