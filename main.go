@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -46,7 +47,7 @@ var (
 
 	RetryMultiplier = 2.0
 
-	BucketName = flag.String("bucket", "golang-grpc-test-sdk-gcs-fuse-us-east", "GCS bucket name.")
+	BucketName = flag.String("bucket", "brenna-test-bucket", "GCS bucket name.")
 
 	ProjectName = flag.String("project", "storage-sdk-prober-project", "GCP project name.")
 
@@ -59,8 +60,10 @@ var (
 
 	tracerName      = "princer-storage-benchmark"
 	enableTracing   = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
-	enablePprof     = flag.Bool("enable-pprof", false, "Enable pprof server")
 	traceSampleRate = flag.Float64("trace-sample-rate", 1.0, "Sampling rate for Cloud Trace")
+
+	enablePprof      = flag.Bool("enable-pprof", false, "Enable pprof server")
+	recordGoroutines = flag.Bool("check-goroutines", false, "Print debug info")
 
 	eG errgroup.Group
 )
@@ -188,6 +191,10 @@ func main() {
 		}()
 	}
 
+	if *recordGoroutines {
+		recordRunningRoutines()
+	}
+
 	var client *storage.Client
 	var err error
 	if *clientProtocol == "http" {
@@ -243,4 +250,16 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error while running benchmark: %v", err)
 		os.Exit(1)
 	}
+}
+
+func recordRunningRoutines() {
+	fmt.Printf("runtime.GOMAXPROCS: %d\n", runtime.GOMAXPROCS(0))
+
+	for {
+		go func() {
+			time.Sleep(time.Second)
+			fmt.Printf("Number of Running goroutines: %d\n", runtime.NumGoroutine())
+		}()
+	}
+
 }
