@@ -5,9 +5,6 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"io"
 	"log"
 	"net/http"
@@ -18,9 +15,14 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/googleapis/gax-go/v2"
 	"go.opencensus.io/stats"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
+	"google.golang.org/grpc"
+
 	// Install google-c2p resolver, which is required for direct path.
 	_ "google.golang.org/grpc/balancer/rls"
 	_ "google.golang.org/grpc/xds/googledirectpath"
@@ -108,7 +110,12 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 		log.Fatalf("error setting direct path env var: %v", err)
 	}
 
-	client, err = storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(GrpcConnPoolSize))
+	dialOpt := grpc.WithRecvBufferPool(grpc.NewSharedBufferPool())
+
+	client, err = storage.NewGRPCClient(ctx,
+		option.WithGRPCConnectionPool(GrpcConnPoolSize),
+		option.WithGRPCDialOption(dialOpt),
+	)
 
 	if err := os.Unsetenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS"); err != nil {
 		log.Fatalf("error while unsetting direct path env var: %v", err)
