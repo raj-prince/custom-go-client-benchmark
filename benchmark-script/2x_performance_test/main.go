@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	fDir = flag.String("dir", "", "Directory file to be opened.")
 
+	fDir = flag.String("dir", "", "Directory file to be opened.")
+	fSSD = flag.Bool("ssd", false, "Given directory is ssd or not.")
 	fileCount = flag.Int("file-count", 10, "Number of files to read")
 
 	FileSize = 512 * OneKB
@@ -33,9 +34,14 @@ func ReadFilesSequentially(fileCount int) (err error) {
 
 		openStart := time.Now()
 		// Open file
-		fileName := path.Join(*fDir, "Workload.0/" + strconv.Itoa(i))
+		fileName := path.Join(*fDir, strconv.Itoa(i))
 		var fileHandle *os.File
-		fileHandle, err = os.OpenFile(fileName, os.O_RDONLY|syscall.O_DIRECT, 0600)
+		if *fSSD {
+			fileHandle, err = os.OpenFile(fileName, os.O_RDONLY, 0600)
+		} else {
+
+			fileHandle, err = os.OpenFile(fileName, os.O_RDONLY|syscall.O_DIRECT, 0600)
+		}
 		if err != nil {
 			err = fmt.Errorf("while opening file: %w", err)
 			return
@@ -65,7 +71,7 @@ func ReadFilesSequentially(fileCount int) (err error) {
 	}
 
 	totalTime := time.Since(startTime)
-	fmt.Println("Total time: ", totalTime)
+	fmt.Printf("Total time: %s\n", totalTime)
 
 	return
 }
@@ -83,6 +89,13 @@ func Report(latency []int64, prefix string) {
 
 	avg := sum / int64(sz)
 	fmt.Printf("Avg %s latency: %d us\n", prefix, avg)
+	fmt.Printf("Min %s latency: %d us\n", prefix, latency[0])
+	fmt.Printf("Max %s latency: %d us\n", prefix, latency[sz - 1])
+	fmt.Printf("Med %s latency: %d us\n", prefix, latency[sz / 2])
+	tt := (9 * sz) / 10
+	fmt.Printf("90th %s latency: %d us\n", prefix, latency[tt])
+
+	fmt.Printf("\n")
 }
 
 func main() {
