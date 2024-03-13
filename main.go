@@ -53,9 +53,6 @@ var (
 
 	clientProtocol = flag.String("client-protocol", "http", "Network protocol.")
 
-	// ObjectNamePrefix<worker_id>ObjectNameSuffix is the object name format.
-	// Here, worker id goes from <0 to NumberOfWorker>.
-	ObjectNamePrefix = "princer_100M_files/file_"
 	ObjectNameSuffix = ""
 
 	tracerName      = "princer-storage-benchmark"
@@ -66,7 +63,17 @@ var (
 	recordGoroutines = flag.Bool("check-goroutines", false, "Print debug info")
 
 	eG errgroup.Group
+
+	// ObjectNamePrefix<worker_id>ObjectNameSuffix is the object name format.
+	// Here, worker id goes from <0 to NumberOfWorker>.
+	objectSize = flag.String("size", "100M", "Object size portion of prefix")
+
+	noPresetBuffer   = flag.Bool("no-preset-buffer", false, "Do not use a specific buffer; use io.Copy insted of io.CopyBuffer")
+	numObjsBetweenGC = flag.Int("gc-objs", 0, "Number of objects to read between calls to force garbage collection. If <1, no GC is forced")
+	memFile          = flag.String("mem-file", "memstats", "File to output memory stats into")
 )
+
+var ObjectNamePrefix string
 
 func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client, err error) {
 	var transport *http.Transport
@@ -129,6 +136,7 @@ func CreateGrpcCloudpathClient(ctx context.Context) (*storage.Client, error) {
 	return storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(GrpcConnPoolSize))
 }
 
+// for each worker
 func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
 
 	objectName := ObjectNamePrefix + strconv.Itoa(workerId) + ObjectNameSuffix
@@ -137,12 +145,45 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 	// if we don't specify io.Copy uses 32 KB as buffer size.
 	buf := make([]byte, 2*MB)
 
+	var startMem *runtime.MemStats = &runtime.MemStats{}
+	var endMem *runtime.MemStats = &runtime.MemStats{}
+
+	var f *os.File
+	if *numObjsBetweenGC > 0 {
+		f, err = os.Create(*memFile)
+		if err != nil {
+			return err
+		}
+	}
+
 	for i := 0; i < *NumOfReadCallPerWorker; i++ {
 		var span trace.Span
 		traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "ReadObject")
 		span.SetAttributes(
 			attribute.KeyValue{"bucket", attribute.StringValue(*BucketName)},
 		)
+
+		// Capture mem stats every numObjsBetweenGC objects
+		if *numObjsBetweenGC > 0 && i%*numObjsBetweenGC == 0 {
+			runtime.ReadMemStats(endMem)
+
+			if i > 0 {
+				percentChangeHeap := (float64(endMem.HeapAlloc) - float64(startMem.HeapAlloc)) / float64(startMem.HeapAlloc) * 100.0
+				percentChangeTotal := (float64(endMem.TotalAlloc) - float64(startMem.TotalAlloc)) / float64(startMem.TotalAlloc) * 100.0
+
+				fmt.Fprintf(f, "============After %d reads============\n", i)
+				fmt.Fprintf(f, "\t\t\t\t\t\t\t(after last forced GC --> currently allocated)\n")
+
+				fmt.Fprintf(f, "Allocated heap objects:\t\t%s --> %s (%.2f%% change)\n",
+					formatBytes(int64(startMem.HeapAlloc)), formatBytes(int64(endMem.HeapAlloc)), percentChangeHeap)
+				fmt.Fprintf(f, "Total cumulative allocated:\t%s --> %s (%.2f%% change)\n",
+					formatBytes(int64(startMem.TotalAlloc)), formatBytes(int64(endMem.TotalAlloc)), percentChangeTotal)
+			}
+
+			runtime.GC()
+			runtime.ReadMemStats(startMem)
+		}
+
 		start := time.Now()
 		object := bucketHandle.Object(objectName).Retryer(storage.WithPolicy(storage.RetryNever))
 		rc, err := object.NewReader(traceCtx)
@@ -151,7 +192,11 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 			return fmt.Errorf("while creating reader object: %v", err)
 		}
 
-		_, err = io.CopyBuffer(io.Discard, rc, buf)
+		if *noPresetBuffer {
+			_, err = io.Copy(io.Discard, rc)
+		} else {
+			_, err = io.CopyBuffer(io.Discard, rc, buf)
+		}
 		if err != nil {
 			fmt.Printf("while reading and discarding content: %v\n", err)
 			return fmt.Errorf("while reading and discarding content: %v", err)
@@ -174,6 +219,8 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 func main() {
 	flag.Parse()
 	ctx := context.Background()
+
+	ObjectNamePrefix = fmt.Sprintf("princer_%s_files/file_", *objectSize)
 
 	if *enableTracing {
 		cleanup := enableTraceExport(ctx, *traceSampleRate)
@@ -262,4 +309,18 @@ func recordRunningRoutines() {
 			fmt.Printf("Number of Running goroutines: %d\n", runtime.NumGoroutine())
 		}
 	}()
+}
+
+func formatBytes(b int64) string {
+	const unit = 1024
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %ciB",
+		float64(b)/float64(div), "KMGTPE"[exp])
 }
