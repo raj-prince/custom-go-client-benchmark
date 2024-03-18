@@ -5,9 +5,6 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"io"
 	"log"
 	"net/http"
@@ -15,15 +12,23 @@ import (
 	"strconv"
 	"time"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+
 	"cloud.google.com/go/storage"
 	"github.com/googleapis/gax-go/v2"
 	"go.opencensus.io/stats"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
+
 	// Install google-c2p resolver, which is required for direct path.
 	_ "google.golang.org/grpc/balancer/rls"
 	_ "google.golang.org/grpc/xds/googledirectpath"
+
+	// Register the pprof endpoints under the web server root at /debug/pprof
+	_ "net/http/pprof"
 )
 
 var (
@@ -54,6 +59,7 @@ var (
 
 	tracerName      = "princer-storage-benchmark"
 	enableTracing   = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
+	enablePprof     = flag.Bool("enable-pprof", false, "Enable pprof server")
 	traceSampleRate = flag.Float64("trace-sample-rate", 1.0, "Sampling rate for Cloud Trace")
 
 	eG errgroup.Group
@@ -122,7 +128,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 
 	// gRPC server contains 2 MB of data, hence increasing the buf size to 2 MB,
 	// if we don't specify io.Copy uses 32 KB as buffer size.
-	buf := make([]byte, 2*MB)
+	// buf := make([]byte, 2*MB)
 
 	for i := 0; i < *NumOfReadCallPerWorker; i++ {
 		var span trace.Span
@@ -137,7 +143,8 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 			return fmt.Errorf("while creating reader object: %v", err)
 		}
 
-		_, err = io.CopyBuffer(io.Discard, rc, buf)
+		_, err = io.Copy(io.Discard, rc)
+		// _, err = io.CopyBuffer(io.Discard, rc, buf)
 		if err != nil {
 			return fmt.Errorf("while reading and discarding content: %v", err)
 		}
@@ -162,6 +169,17 @@ func main() {
 	if *enableTracing {
 		cleanup := enableTraceExport(ctx, *traceSampleRate)
 		defer cleanup()
+	}
+
+	// Start a pprof server.
+	// Example usage (run the following command while the script is running):
+	// go tool pprof http://localhost:8080/debug/pprof/profile?seconds=60
+	if *enablePprof {
+		go func() {
+			if err := http.ListenAndServe("localhost:8080", nil); err != nil {
+				log.Fatalf("error starting http server for pprof: %v", err)
+			}
+		}()
 	}
 
 	var client *storage.Client
