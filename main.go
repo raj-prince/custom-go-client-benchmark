@@ -2,25 +2,17 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"flag"
 	"fmt"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
-	"io"
 	"log"
-	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"cloud.google.com/go/storage"
 	"github.com/googleapis/gax-go/v2"
-	"go.opencensus.io/stats"
-	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
+
 	// Install google-c2p resolver, which is required for direct path.
 	_ "google.golang.org/grpc/balancer/rls"
 	_ "google.golang.org/grpc/xds/googledirectpath"
@@ -59,50 +51,6 @@ var (
 	eG errgroup.Group
 )
 
-func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client, err error) {
-	var transport *http.Transport
-	// Using http1 makes the client more performant.
-	if isHttp2 == false {
-		transport = &http.Transport{
-			MaxConnsPerHost:     MaxConnsPerHost,
-			MaxIdleConnsPerHost: MaxIdleConnsPerHost,
-			// This disables HTTP/2 in transport.
-			TLSNextProto: make(
-				map[string]func(string, *tls.Conn) http.RoundTripper,
-			),
-		}
-	} else {
-		// For http2, change in MaxConnsPerHost doesn't affect the performance.
-		transport = &http.Transport{
-			DisableKeepAlives: true,
-			MaxConnsPerHost:   MaxConnsPerHost,
-			ForceAttemptHTTP2: true,
-		}
-	}
-
-	tokenSource, err := GetTokenSource(ctx, "")
-	if err != nil {
-		return nil, fmt.Errorf("while generating tokenSource, %v", err)
-	}
-
-	// Custom http client for Go Client.
-	httpClient := &http.Client{
-		Transport: &oauth2.Transport{
-			Base:   transport,
-			Source: tokenSource,
-		},
-		Timeout: 0,
-	}
-
-	// Setting UserAgent through RoundTripper middleware
-	httpClient.Transport = &userAgentRoundTripper{
-		wrapped:   httpClient.Transport,
-		UserAgent: "prince",
-	}
-
-	return storage.NewClient(ctx, option.WithHTTPClient(httpClient))
-}
-
 func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 	if err := os.Setenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS", "true"); err != nil {
 		log.Fatalf("error setting direct path env var: %v", err)
@@ -116,61 +64,13 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 	return
 }
 
-func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
-
-	objectName := ObjectNamePrefix + strconv.Itoa(workerId) + ObjectNameSuffix
-
-	// gRPC server contains 2 MB of data, hence increasing the buf size to 2 MB,
-	// if we don't specify io.Copy uses 32 KB as buffer size.
-	buf := make([]byte, 2*MB)
-
-	for i := 0; i < *NumOfReadCallPerWorker; i++ {
-		var span trace.Span
-		traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "ReadObject")
-		span.SetAttributes(
-			attribute.KeyValue{"bucket", attribute.StringValue(*BucketName)},
-		)
-		start := time.Now()
-		object := bucketHandle.Object(objectName)
-		rc, err := object.NewReader(traceCtx)
-		if err != nil {
-			return fmt.Errorf("while creating reader object: %v", err)
-		}
-
-		_, err = io.CopyBuffer(io.Discard, rc, buf)
-		if err != nil {
-			return fmt.Errorf("while reading and discarding content: %v", err)
-		}
-
-		duration := time.Since(start)
-		stats.Record(ctx, readLatency.M(float64(duration.Milliseconds())))
-
-		err = rc.Close()
-		span.End()
-		if err != nil {
-			return fmt.Errorf("while closing the reader object: %v", err)
-		}
-	}
-
-	return
-}
-
 func main() {
 	flag.Parse()
 	ctx := context.Background()
 
-	if *enableTracing {
-		cleanup := enableTraceExport(ctx, *traceSampleRate)
-		defer cleanup()
-	}
-
 	var client *storage.Client
 	var err error
-	if *clientProtocol == "http" {
-		client, err = CreateHttpClient(ctx, false)
-	} else {
-		client, err = CreateGrpcClient(ctx)
-	}
+	client, err = CreateGrpcClient(ctx)
 
 	if err != nil {
 		fmt.Errorf("while creating the client: %v", err)
@@ -184,37 +84,13 @@ func main() {
 		storage.WithPolicy(storage.RetryAlways))
 
 	// assumes bucket already exist
+	err = client.Bucket(*BucketName).Create(context.Background(), "retry-test", &storage.BucketAttrs{Name: *BucketName})
 	bucketHandle := client.Bucket(*BucketName)
+	//ctx = callctx.SetHeaders(ctx, "x-retry-test-id", "89f4a47969ca4ae5bdfa7a633d3464b3")
+	objHandle := bucketHandle.Object("prince")
+	wr := objHandle.NewWriter(ctx)
+	wr.Write([]byte("content"))
 
-	// Enable stack-driver exporter.
-	registerLatencyView()
-
-	err = enableSDExporter()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "while enabling stackdriver exporter: %v", err)
-		os.Exit(1)
-	}
-	defer closeSDExporter()
-
-	// Run the actual workload
-	for i := 0; i < *NumOfWorker; i++ {
-		idx := i
-		eG.Go(func() error {
-			err = ReadObject(ctx, idx, bucketHandle)
-			if err != nil {
-				err = fmt.Errorf("while reading object %v: %w", ObjectNamePrefix+strconv.Itoa(idx), err)
-				return err
-			}
-			return err
-		})
-	}
-
-	err = eG.Wait()
-
-	if err == nil {
-		fmt.Println("Read benchmark completed successfully!")
-	} else {
-		fmt.Fprintf(os.Stderr, "Error while running benchmark: %v", err)
-		os.Exit(1)
-	}
+	err1 := wr.Close()
+	fmt.Println(err1)
 }
