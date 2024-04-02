@@ -120,10 +120,6 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 
 	objectName := ObjectNamePrefix + strconv.Itoa(workerId) + ObjectNameSuffix
 
-	// gRPC server contains 2 MB of data, hence increasing the buf size to 2 MB,
-	// if we don't specify io.Copy uses 32 KB as buffer size.
-	buf := make([]byte, 2*MB)
-
 	for i := 0; i < *NumOfReadCallPerWorker; i++ {
 		var span trace.Span
 		traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "ReadObject")
@@ -137,7 +133,8 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 			return fmt.Errorf("while creating reader object: %v", err)
 		}
 
-		_, err = io.CopyBuffer(io.Discard, rc, buf)
+		// Calls Reader.WriteTo implicitly.
+		_, err = io.Copy(io.Discard, rc)
 		if err != nil {
 			return fmt.Errorf("while reading and discarding content: %v", err)
 		}
