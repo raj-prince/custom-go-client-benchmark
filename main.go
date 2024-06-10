@@ -5,15 +5,16 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 
 	"cloud.google.com/go/storage"
 	"github.com/googleapis/gax-go/v2"
@@ -181,6 +182,7 @@ func main() {
 		storage.WithPolicy(storage.RetryAlways))
 
 	// assumes bucket already exist
+	err = client.Bucket(*BucketName).Create(context.Background(), "retry-test", &storage.BucketAttrs{Name: *BucketName})
 	bucketHandle := client.Bucket(*BucketName)
 
 	// Enable stack-driver exporter.
