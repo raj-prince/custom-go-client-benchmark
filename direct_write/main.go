@@ -20,6 +20,8 @@ var (
 const (
 	filePath      = "test.txt"        // Replace with your actual file path
 	totalFileSize = 1024 * 1024 * 1024 // Total desired file size
+
+	oneMiB = 1024 * 1024
 )
 
 func main() {
@@ -46,6 +48,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
+	startTime := time.Now()
 	for i := 0; i < *fNumGoroutines; i++ {
 		wg.Add(1)
 		go func(offset int64) {
@@ -69,5 +72,9 @@ func main() {
 	// Signal goroutines to stop
 	wg.Wait()
 
+	duration := time.Since(startTime)
+
+	fmt.Printf("Total time (sec)  : %f\n", duration.Seconds())
+	fmt.Printf("Throughput (MiB/s): %f\n", (totalFileSize / oneMiB) / duration.Seconds())
 	fmt.Println("Writing completed!")
 }
