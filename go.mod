@@ -8,6 +8,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.20.0
 	github.com/googleapis/gax-go/v2 v2.12.3
 	github.com/jacobsa/gcloud v0.0.0-20230425120041-5ed2958cdfee
+	github.com/ncw/directio v1.0.5
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/detectors/gcp v1.20.0
 	go.opentelemetry.io/otel v1.24.0
