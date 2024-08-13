@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	//"bufio"
 	"flag"
 	"fmt"
 	"io"
@@ -18,7 +18,9 @@ var (
 	fDir          = flag.String("dir", "", "Directory file to be opened.")
 	fNumOfThreads = flag.Int("threads", 1, "Number of threads to read parallel")
 
-	fBlockSize = flag.Int("block-size", 256, "Block size in KB")
+	fBlockSizeKB = flag.Int("block-size-kb", 1024, "Block size in KB")
+
+	fFileSizeMB = flag.Int64("file-size-mb", 1024, "File size in MB")
 
 	fileHandles []*os.File
 
@@ -27,10 +29,18 @@ var (
 	OneKB = 1024
 
 	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
+
+	fOutputDir = flag.String("output-dir", "", "Directory to dump the output")
+	fFilePrefix = flag.String("file-prefix", "", "Prefix file")
 )
 
+var gResult *Result
+func init() {
+	gResult = &Result{}
+}
+
 func openFile(index int) (err error) {
-	fileName := path.Join(*fDir, "file_"+strconv.Itoa(index))
+	fileName := path.Join(*fDir, *fFilePrefix+strconv.Itoa(index))
 	fileHandle, err := os.OpenFile(fileName, os.O_RDONLY|syscall.O_DIRECT, 0600)
 	if err != nil {
 		err = fmt.Errorf("while opening file: %w", err)
@@ -42,16 +52,21 @@ func openFile(index int) (err error) {
 
 // Expect file is already opened, otherwise throws error
 func readAlreadyOpenedFile(index int) (err error) {
+	b := make([]byte, *fBlockSizeKB*1024)
 	for i := 0; i < *fNumberOfRead; i++ {
-		r := bufio.NewReader(fileHandles[index])
-		b := make([]byte, *fBlockSize*1024)
+		readStart := time.Now()
+		_, _ = fileHandles[index].Seek(0, 0)
 
-		_, err = io.CopyBuffer(io.Discard, r, b)
+		_, err = io.CopyBuffer(io.Discard, fileHandles[index], b)
 		if err != nil {
 			return fmt.Errorf("while reading and discarding content: %v", err)
 		}
-	}
 
+		readLatency := time.Since(readStart)
+
+		throughput := float64(*fFileSizeMB) / readLatency.Seconds()
+		gResult.Append(readLatency.Seconds(), throughput)
+	}
 	return
 }
 
@@ -63,6 +78,11 @@ func runReadFileOperations() (err error) {
 
 	if *fNumOfThreads <= 0 {
 		err = fmt.Errorf("threads count not valid")
+		return
+	}
+
+	if *fFileSizeMB <= 0 {
+		err = fmt.Errorf("file size is not valid")
 		return
 	}
 
@@ -88,14 +108,7 @@ func runReadFileOperations() (err error) {
 		})
 	}
 
-	err = eG.Wait()
-
-	if err == nil {
-		fmt.Println("read benchmark completed successfully!")
-		fmt.Println("Waiting for 10 seconds")
-
-		time.Sleep(10 * time.Second)
-	}
+	groupError := eG.Wait()
 
 	for i := 0; i < *fNumOfThreads; i++ {
 		if err = fileHandles[i].Close(); err != nil {
@@ -104,16 +117,30 @@ func runReadFileOperations() (err error) {
 		}
 	}
 
+	if groupError != nil {
+		err = groupError
+	} else {
+		fmt.Println("read benchmark completed successfully!")
+	}
 	return
 }
 
 func main() {
 	flag.Parse()
+	fmt.Println("\n******* Passed flags: *******")
+	flag.VisitAll(func(f *flag.Flag) {
+		fmt.Printf("Flag: %s, Value: %v\n", f.Name, f.Value)
+	})
 
 	err := runReadFileOperations()
 	if err != nil {
 		fmt.Println(os.Stderr, err)
 		os.Exit(1)
 	}
+	if *fOutputDir == "" {
+		*fOutputDir, _ = os.Getwd()
+	}
+	gResult.DumpMetricsCSV(path.Join(*fOutputDir, "metrics.csv"))
+	gResult.PrintStats()
 
 }
