@@ -7,11 +7,13 @@ import (
 	"os"
 	"sort"
 	"sync"
+	"time"
 )
 
 type Metric struct {
 	latency   float64
 	throughput float64
+	unixTime int64
 }
 
 type Result struct {
@@ -26,6 +28,7 @@ func (r *Result) Append(latency float64, throughput float64) {
 	newMetric := Metric{
 		latency:   latency,
 		throughput: throughput,
+		unixTime: time.Now().Unix(),
 	}
 	r.metrics = append(r.metrics, newMetric)
 }
@@ -76,13 +79,14 @@ func (r *Result) DumpMetricsCSV(filePath string) error {
 
 
 	// Write the CSV header
-	err = writer.Write([]string{"ReadLatency(s)", "Throughput(MiB/s)"})
+	err = writer.Write([]string{"Timestamp", "ReadLatency(s)", "Throughput(MiB/s)"})
 	if err != nil {
 		return err
 	}
 
 	for _, metric := range r.metrics {
 		err = writer.Write([]string{
+			fmt.Sprintf("%d", metric.unixTime),
 			fmt.Sprintf("%.3f", metric.latency),
 			fmt.Sprintf("%.3f", metric.throughput),
 		})
