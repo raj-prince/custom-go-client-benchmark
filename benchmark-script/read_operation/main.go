@@ -57,7 +57,16 @@ func readAlreadyOpenedFile(index int) (err error) {
 		readStart := time.Now()
 		_, _ = fileHandles[index].Seek(0, 0)
 
-		_, err = io.CopyBuffer(io.Discard, fileHandles[index], b)
+		for {
+			_, err = fileHandles[index].Read(b)
+			if err != nil {
+				if err == io.EOF {
+					err = nil
+				}
+				break
+			}
+		}
+
 		if err != nil {
 			return fmt.Errorf("while reading and discarding content: %v", err)
 		}
