@@ -8,6 +8,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	// Register the pprof endpoints under the web server root at /debug/pprof
+	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"time"
@@ -26,9 +28,6 @@ import (
 	// Install google-c2p resolver, which is required for direct path.
 	_ "google.golang.org/grpc/balancer/rls"
 	_ "google.golang.org/grpc/xds/googledirectpath"
-
-	// Register the pprof endpoints under the web server root at /debug/pprof
-	_ "net/http/pprof"
 )
 
 var (
@@ -139,6 +138,9 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 			return fmt.Errorf("while creating reader object: %v", err)
 		}
 
+		ttfbTime := time.Since(start)
+		stats.Record(ctx, readLatency.M(float64(ttfbTime.Milliseconds())))
+
 		// Calls Reader.WriteTo implicitly.
 		_, err = io.Copy(io.Discard, rc)
 		if err != nil {
@@ -202,6 +204,7 @@ func main() {
 
 	// Enable stack-driver exporter.
 	registerLatencyView()
+	registerTTFBLatencyView()
 
 	err = enableSDExporter()
 	if err != nil {
