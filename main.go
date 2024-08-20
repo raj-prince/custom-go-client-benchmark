@@ -139,7 +139,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 		}
 
 		ttfbTime := time.Since(start)
-		stats.Record(ctx, readLatency.M(float64(ttfbTime.Milliseconds())))
+		stats.Record(ctx, ttfbReadLatency.M(float64(ttfbTime.Milliseconds())))
 
 		// Calls Reader.WriteTo implicitly.
 		_, err = io.Copy(io.Discard, rc)
