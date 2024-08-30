@@ -53,6 +53,9 @@ func main() {
 		}
 		return nil
 	})
+
+	fmt.Println(cmnStartTime)
+	fmt.Println(cmnEndTime)
 	if err != nil {
 		fmt.Printf("Error reading CSV files: %v\n", err)
 		return
@@ -165,6 +168,19 @@ func printPercentiles(rows []DataRow) {
 	}
 	avgLatency := totalLatency / float64(len(rows))
 
+	// Calculate standard deviation
+	var squaredDiffSum float64
+	for _, metric := range rows {
+		squaredDiff := math.Pow(metric.ReadLatency-avgLatency, 2)
+		squaredDiffSum += squaredDiff
+	}
+
+	// Calculate the variance
+	variance := squaredDiffSum / float64(len(rows))
+
+	// Calculate the standard deviation
+	standardDeviation := math.Sqrt(variance)
+
 	// Calculate percentiles (e.g., 50th, 90th, 95th, 99th)
 	latencyValues := make([]float64, len(rows))
 	for i, metric := range rows {
@@ -175,6 +191,8 @@ func printPercentiles(rows []DataRow) {
 
 	fmt.Println("\n******* Metrics Summary: ReadLatency (s) *******")
 	fmt.Printf("Average Latency: %.2f\n", avgLatency)
+	fmt.Printf("Count: %d\n", len(rows))
+	fmt.Printf("Standard deviation: %.2f\n", standardDeviation)
 	fmt.Printf("p0: %.2f\n", percentileFloat64(latencyValues, 0))
 	fmt.Printf("p50: %.2f\n", percentileFloat64(latencyValues, 50))
 	fmt.Printf("p90: %.2f\n", percentileFloat64(latencyValues, 90))
