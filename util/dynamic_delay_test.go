@@ -8,6 +8,14 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"fmt"
+	"math"
+"math/rand"
+"testing"
+"time"
+
+"github.com/google/go-cmp/cmp"
+"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func applySamples(numSamples int, expectedValue float64, rnd *rand.Rand, d *Delay) int {

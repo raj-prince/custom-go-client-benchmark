@@ -20,6 +20,7 @@ require (
 	gonum.org/v1/plot v0.14.0
 	google.golang.org/api v0.191.0
 	google.golang.org/grpc v1.64.1
+	github.com/google/go-cmp v0.6.0
 )
 
 require (
