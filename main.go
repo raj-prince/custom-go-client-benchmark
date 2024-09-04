@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/raj-prince/custom-go-client-benchmark/util"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -29,8 +30,7 @@ import (
 	_ "google.golang.org/grpc/balancer/rls"
 	_ "google.golang.org/grpc/xds/googledirectpath"
 
-	// Register the pprof endpoints under the web server root at /debug/pprof
-	_ "net/http/pprof"
+	"cloud.google.com/go/profiler"
 )
 
 var (
@@ -61,11 +61,25 @@ var (
 
 	tracerName      = "princer-storage-benchmark"
 	enableTracing   = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
+	enableCloudProfiler   = flag.Bool("enable-cloud-profiler", false, "Enable cloud profiler")
 	enablePprof     = flag.Bool("enable-pprof", false, "Enable pprof server")
 	traceSampleRate = flag.Float64("trace-sample-rate", 1.0, "Sampling rate for Cloud Trace")
+	enableHeap       = flag.Bool("heap", false, "enable heap profile collection")
+	enableHeapAlloc  = flag.Bool("heap_alloc", false, "enable heap allocation profile collection")
+	enableThread     = flag.Bool("thread", false, "enable thread profile collection")
+	enableContention = flag.Bool("contention", false, "enable contention profile collection")
+	projectID        = flag.String("project_id", "", "project ID to run profiler with; only required when running outside of GCP.")
+	version          = flag.String("version", "original", "version to run profiler with")
 
 	eG errgroup.Group
 )
+
+var gReqLatency *util.Result
+var gReadLatency *util.Result
+func init() {
+	gReqLatency = &util.Result{Name: "ReqLatency"}
+	gReadLatency = &util.Result{Name: "ReadLatency"}
+}
 
 func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client, err error) {
 	var transport *http.Transport
@@ -142,6 +156,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 		}
 
 		ttfbTime := time.Since(start)
+		gReqLatency.Append(ttfbTime.Seconds(), 0)
 		stats.Record(ctx, ttfbReadLatency.M(float64(ttfbTime.Milliseconds())))
 
 		// Calls Reader.WriteTo implicitly.
@@ -152,7 +167,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 
 		duration := time.Since(start)
 		stats.Record(ctx, readLatency.M(float64(duration.Milliseconds())))
-
+		gReadLatency.Append(duration.Seconds(), 0)
 		err = rc.Close()
 		span.End()
 		if err != nil {
@@ -170,6 +185,21 @@ func main() {
 	if *enableTracing {
 		cleanup := enableTraceExport(ctx, *traceSampleRate)
 		defer cleanup()
+	}
+
+	if *enableCloudProfiler {
+		if err := profiler.Start(profiler.Config{
+			Service:              "custom-go-benchmark",
+			ServiceVersion:       *version,
+			ProjectID:            *projectID,
+			NoHeapProfiling:      !*enableHeap,
+			NoAllocProfiling:     !*enableHeapAlloc,
+			NoGoroutineProfiling: !*enableThread,
+			MutexProfiling:       *enableContention,
+			DebugLogging:         true,
+		}); err != nil {
+			log.Fatalf("Failed to start profiler: %v", err)
+		}
 	}
 
 	// Start a pprof server.
@@ -200,7 +230,10 @@ func main() {
 			Max:        MaxRetryDuration,
 			Multiplier: RetryMultiplier,
 		}),
-		storage.WithPolicy(storage.RetryAlways))
+		storage.WithPolicy(storage.RetryAlways),
+		storage.WithReadDynamicTimeout(0.99, 15, 50*time.Millisecond, 50*time.Millisecond, 1*time.Minute),
+		//storage.WithMinReadThroughput(1024, 1 * time.Second),
+		)
 
 	// assumes bucket already exist
 	bucketHandle := client.Bucket(*BucketName)
@@ -232,6 +265,16 @@ func main() {
 	err = eG.Wait()
 
 	if err == nil {
+		gReqLatency.PrintStats()
+		gReadLatency.PrintStats()
+		err = gReqLatency.DumpMetricsCSV("req.csv")
+		if err != nil {
+			fmt.Println("Error while dumping req latency as csv file")
+		}
+		err = gReadLatency.DumpMetricsCSV("read.csv")
+		if err != nil {
+			fmt.Println("Error while dumping read latency as CSV")
+		}
 		fmt.Println("Read benchmark completed successfully!")
 	} else {
 		fmt.Fprintf(os.Stderr, "Error while running benchmark: %v", err)
