@@ -56,8 +56,8 @@ var (
 
 	// ObjectNamePrefix<worker_id>ObjectNameSuffix is the object name format.
 	// Here, worker id goes from <0 to NumberOfWorker>.
-	ObjectNamePrefix = "princer_100M_files/file_"
-	ObjectNameSuffix = ""
+	ObjectNamePrefix = flag.String("object-prefix", "princer_100M_files/file_", "Object prefix")
+	ObjectNameSuffix = flag.String("object-suffix", "", "Object suffix")
 
 	tracerName      = "princer-storage-benchmark"
 	enableTracing   = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
@@ -140,7 +140,7 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 
 func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
 
-	objectName := ObjectNamePrefix + strconv.Itoa(workerId) + ObjectNameSuffix
+	objectName := *ObjectNamePrefix + strconv.Itoa(workerId) + *ObjectNameSuffix
 
 	for i := 0; i < *NumOfReadCallPerWorker; i++ {
 		var span trace.Span
@@ -231,7 +231,7 @@ func main() {
 			Multiplier: RetryMultiplier,
 		}),
 		storage.WithPolicy(storage.RetryAlways),
-		storage.WithReadDynamicTimeout(0.99, 15, 50*time.Millisecond, 50*time.Millisecond, 1*time.Minute),
+		//storage.WithReadDynamicTimeout(0.99, 15, 50*time.Millisecond, 50*time.Millisecond, 1*time.Minute),
 		//storage.WithMinReadThroughput(1024, 1 * time.Second),
 		)
 
@@ -255,7 +255,7 @@ func main() {
 		eG.Go(func() error {
 			err = ReadObject(ctx, idx, bucketHandle)
 			if err != nil {
-				err = fmt.Errorf("while reading object %v: %w", ObjectNamePrefix+strconv.Itoa(idx), err)
+				err = fmt.Errorf("while reading object %v: %w", *ObjectNamePrefix+strconv.Itoa(idx), err)
 				return err
 			}
 			return err
