@@ -1,14 +1,13 @@
 package util
 
 import (
-	"fmt"
 	"math"
-"math/rand"
-"testing"
-"time"
+	"math/rand"
+	"testing"
+	"time"
 
-"github.com/google/go-cmp/cmp"
-"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func applySamples(numSamples int, expectedValue float64, rnd *rand.Rand, d *Delay) int {
@@ -28,15 +27,12 @@ func applySamples(numSamples int, expectedValue float64, rnd *rand.Rand, d *Dela
 func applySamplesWithUpdate(numSamples int, expectedValue float64, rnd *rand.Rand, d *Delay) {
 	for i := 0; i < numSamples; i++ {
 		randomDelay := time.Duration(-math.Log(rnd.Float64()) * expectedValue * float64(time.Second))
-		//randomDelay := time.Duration(rand.Float64() * 1000000000)
-		fmt.Println("Added value: ", randomDelay)
 		d.Update(randomDelay)
-		fmt.Println("Timeout: ", d.Value())
 	}
 }
 
 func TestNewDelay(t *testing.T) {
-	d, err := NewDelay(1-0.01, 15, 1*time.Millisecond, 1*time.Hour)
+	d, err := NewDelay(1-0.01, 15, 1*time.Millisecond, 1*time.Millisecond, 1*time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +52,7 @@ func TestNewDelay(t *testing.T) {
 
 func TestConvergence99(t *testing.T) {
 	// d should converge to the 99-percentile value.
-	d, err := NewDelay(1-0.01, 15, 500*time.Millisecond, 10*time.Second)
+	d, err := NewDelay(1-0.01, 15, 1*time.Millisecond, 1*time.Millisecond, 1*time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +90,7 @@ func TestConvergence99(t *testing.T) {
 
 func TestConvergence90(t *testing.T) {
 	// d should converge to the 90-percentile value.
-	d, err := NewDelay(1-0.1, 15, 1*time.Millisecond, 1*time.Hour)
+	d, err := NewDelay(1-0.1, 15, 1*time.Millisecond, 1*time.Millisecond, 1*time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +113,7 @@ func TestConvergence90(t *testing.T) {
 }
 
 func TestOverflow(t *testing.T) {
-	d, err := NewDelay(1-0.1, 15, 1*time.Millisecond, 1*time.Hour)
+	d, err := NewDelay(1-0.1, 15, 1*time.Millisecond, 1*time.Millisecond, 1*time.Hour)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,4 +130,3 @@ func TestOverflow(t *testing.T) {
 		t.Fatalf("unexpected d.Value: got %v, want %v", got, want)
 	}
 }
-

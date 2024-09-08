@@ -205,7 +205,7 @@ func main() {
 	p.X.Label.Text = "X"
 	p.Y.Label.Text = "Y"
 
-	delay, err := util.NewDelay(0.99, 100, 500*time.Millisecond, 1*time.Hour)
+	delay, err := util.NewDelay(0.50, 15, 500*time.Millisecond, 500*time.Millisecond, 700*time.Millisecond)
 	if err != nil {
 		panic(err)
 	}
@@ -214,7 +214,7 @@ func main() {
 	actualSample(p, dataRows, delay)
 
 	// Save the plot as a PNG image
-	if err := p.Save(20*vg.Inch, 20*vg.Inch, "point_plot.png"); err != nil {
+	if err := p.Save(50*vg.Inch, 20*vg.Inch, "point_plot_15.png"); err != nil {
 		panic(err)
 	}
 }
