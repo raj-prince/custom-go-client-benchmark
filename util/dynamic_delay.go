@@ -9,7 +9,6 @@ import (
 // Package dynamicdelay calculates the delay at a fixed percentile, based on
 // delay samples.
 //
-//
 // Delay is not goroutine-safe.
 type Delay struct {
 	increaseFactor float64
@@ -30,7 +29,7 @@ type Delay struct {
 //
 // Decrease can never lower the delay past minDelay, Increase can never raise
 // the delay past maxDelay.
-func NewDelay(targetPercentile float64, increaseRate float64, minDelay, maxDelay time.Duration) (*Delay, error) {
+func NewDelay(targetPercentile float64, increaseRate float64, initialDelay, minDelay, maxDelay time.Duration) (*Delay, error) {
 	if targetPercentile < 0 || targetPercentile > 1 {
 		return nil, fmt.Errorf("invalid targetPercentile (%v): must be within [0, 1]", targetPercentile)
 	}
@@ -39,6 +38,12 @@ func NewDelay(targetPercentile float64, increaseRate float64, minDelay, maxDelay
 	}
 	if minDelay >= maxDelay {
 		return nil, fmt.Errorf("invalid minDelay (%v) and maxDelay (%v) combination: minDelay must be smaller than maxDelay", minDelay, maxDelay)
+	}
+	if initialDelay < minDelay {
+		initialDelay = minDelay
+	}
+	if initialDelay > maxDelay {
+		initialDelay = maxDelay
 	}
 	// See http://google3/net/rpc/contrib/hedged_call/dynamic_delay.h?l=35&rcl=194811090
 	increaseFactor := math.Exp(math.Log(2) / increaseRate)
@@ -55,7 +60,7 @@ func NewDelay(targetPercentile float64, increaseRate float64, minDelay, maxDelay
 		decreaseFactor: decreaseFactor,
 		minDelay:       minDelay,
 		maxDelay:       maxDelay,
-		value:          minDelay,
+		value:          initialDelay,
 	}, nil
 }
 
