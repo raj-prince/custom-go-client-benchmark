@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"image/color"
 	"math"
@@ -15,6 +16,18 @@ import (
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
+)
+
+var (
+	increaseRate     = flag.Float64("increase-rate", 15, "Increase rate")
+	targetPercentile = flag.Float64("target-percentile", 0.99, "Target percentile")
+	initialDelay     = flag.Duration("initial-delay", 500*time.Millisecond, "Initial delay")
+	minDelay         = flag.Duration("min-delay", 10*time.Millisecond, "Min delay")
+	maxDelay         = flag.Duration("max-delay", 10*time.Minute, "Max delay")
+
+	sampleCount = flag.Int("sample-count", 500, "Sample count")
+
+	outputFile = flag.String("output-file", "plot", "Plot file name")
 )
 
 func applySamples(p *plot.Plot, numSamples int, expectedValue float64, rnd *rand.Rand, d *util.Delay) {
@@ -47,7 +60,7 @@ func ConvertToXYs(xValues, yValues []float64) plotter.XYs {
 }
 
 func actualSample(p *plot.Plot, dataRows []DataRow, d *util.Delay) {
-	totalCnt := 500
+	totalCnt := *sampleCount
 	xValues := make([]float64, totalCnt)
 	yValues1 := make([]float64, totalCnt)
 	yValues2 := make([]float64, totalCnt)
@@ -191,10 +204,13 @@ func readCSV(path string) ([]DataRow, error) {
 }
 
 func main() {
+	// Parse the flag.
+	flag.Parse()
+
 	// Create a new plot
 	p := plot.New()
 
-	dataRows, err := GetDataRows("/usr/local/google/home/princer/csv/metrics")
+	dataRows, err := GetDataRows("./metrics/req/")
 	if err != nil {
 		fmt.Println("Error while fetching datarows")
 		return
@@ -205,7 +221,7 @@ func main() {
 	p.X.Label.Text = "X"
 	p.Y.Label.Text = "Y"
 
-	delay, err := util.NewDelay(0.50, 15, 500*time.Millisecond, 500*time.Millisecond, 700*time.Millisecond)
+	delay, err := util.NewDelay(*targetPercentile, *increaseRate, *initialDelay, *minDelay, *maxDelay)
 	if err != nil {
 		panic(err)
 	}
@@ -214,7 +230,7 @@ func main() {
 	actualSample(p, dataRows, delay)
 
 	// Save the plot as a PNG image
-	if err := p.Save(50*vg.Inch, 20*vg.Inch, "point_plot_15.png"); err != nil {
+	if err := p.Save(65*vg.Inch, 30*vg.Inch, fmt.Sprintf("%s.png", *outputFile)); err != nil {
 		panic(err)
 	}
 }
