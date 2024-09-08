@@ -98,7 +98,6 @@ func actualSample(p *plot.Plot, dataRows []DataRow, d *util.Delay) {
 		panic(err)
 	}
 	line2.Color = color.RGBA{B: 255, A: 255} // Blue color
-	fmt.Println(len(dataRows))
 
 	// Add lines to the plot
 	p.Add(line1, line2)
@@ -159,8 +158,6 @@ func GetDataRows(folder string) ([]DataRow, error) {
 		return nil
 	})
 
-	fmt.Println(cmnStartTime)
-	fmt.Println(cmnEndTime)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading CSV files: %v\n", err)
 	}
@@ -230,7 +227,7 @@ func main() {
 	actualSample(p, dataRows, delay)
 
 	// Save the plot as a PNG image
-	if err := p.Save(65*vg.Inch, 30*vg.Inch, fmt.Sprintf("%s.png", *outputFile)); err != nil {
+	if err := p.Save(65*vg.Inch, 30*vg.Inch, fmt.Sprintf("plots/%s.png", *outputFile)); err != nil {
 		panic(err)
 	}
 }
