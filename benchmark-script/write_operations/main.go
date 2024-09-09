@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path"
 	"strconv"
@@ -29,47 +28,59 @@ var (
 	fFileSize = flag.Int("file-size", 1, "in KB")
 
 	fNumOfWrite = flag.Int("write-count", 1, "number of write iteration")
+	fOutputDir  = flag.String("output-dir", "", "Directory to dump the output")
 )
 
-func openFile(index int) (err error) {
-	fileName := path.Join(*fDir, "file_"+strconv.Itoa(index))
-	fileHandle, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|syscall.O_DIRECT, 0644)
+var gResult *Result
+
+func init() {
+	gResult = &Result{}
+}
+
+func openFile(fileSuffix string) (fileHandle *os.File, err error) {
+	fileName := path.Join(*fDir, "file_"+fileSuffix)
+	fileHandle, err = os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC|syscall.O_DIRECT, 0644)
 	if err != nil {
 		err = fmt.Errorf("while opening file: %w", err)
 		return
 	}
-	fileHandles[index] = fileHandle
+
 	return
 }
 
 // Expect file is already opened, otherwise throws error
 func overWriteAlreadyOpenedFile(index int) (err error) {
 	for cnt := 0; cnt < *fNumOfWrite; cnt++ {
+		writeStart := time.Now()
+		fileName := strconv.Itoa(index) + "__" + strconv.Itoa(cnt)
+		fh, err := openFile(fileName)
+		if err != nil {
+			return fmt.Errorf("Error while creating the file %v", err)
+		}
+
 		for i := 0; i < (*fFileSize / *fBlockSize); i++ {
 			b := make([]byte, *fBlockSize*OneKB)
-
-			startByte := int64(i * (*fBlockSize * OneKB))
 
 			_, err = rand.Read(b)
 			if err != nil {
 				return fmt.Errorf("while generating random bytest: %v", err)
 			}
 
-			_, err = fileHandles[index].Seek(startByte, io.SeekStart)
-			if err != nil {
-				return fmt.Errorf("while changing the seek position")
-			}
-
-			_, err = fileHandles[index].Write(b)
+			_, err = fh.Write(b)
 			if err != nil {
 				return fmt.Errorf("while overwriting the file: %v", err)
 			}
-
-			err = fileHandles[index].Sync()
-			if err != nil {
-				return fmt.Errorf("while syncing the file: %v", err)
-			}
 		}
+
+		err = fh.Close()
+		if err != nil {
+			return fmt.Errorf("while closing the file: %v", err)
+		}
+
+		writeLatency := time.Since(writeStart)
+
+		throughput := float64(*fFileSize) / writeLatency.Seconds()
+		gResult.Append(writeLatency.Seconds(), throughput)
 	}
 
 	return
@@ -84,16 +95,6 @@ func runReadFileOperations() (err error) {
 	if *fNumOfThreads <= 0 {
 		err = fmt.Errorf("threads count not valid")
 		return
-	}
-
-	fileHandles = make([]*os.File, *fNumOfThreads)
-
-	for i := 0; i < *fNumOfThreads; i++ {
-		err = openFile(i)
-		if err != nil {
-			err = fmt.Errorf("while opening file: %w", err)
-			return err
-		}
 	}
 
 	for i := 0; i < *fNumOfThreads; i++ {
@@ -112,16 +113,9 @@ func runReadFileOperations() (err error) {
 
 	if err == nil {
 		fmt.Println("write benchmark completed successfully!")
-		fmt.Println("Waiting for 3 minutes")
+		fmt.Println("Waiting for 1 minutes")
 
-		time.Sleep(3 * time.Minute)
-	}
-
-	for i := 0; i < *fNumOfThreads; i++ {
-		if err = fileHandles[i].Close(); err != nil {
-			err = fmt.Errorf("while closing the fileHandle: %w", err)
-			return
-		}
+		time.Sleep(1 * time.Minute)
 	}
 
 	return
@@ -129,6 +123,10 @@ func runReadFileOperations() (err error) {
 
 func main() {
 	flag.Parse()
+	fmt.Println("\n******* Passed flags: *******")
+	flag.VisitAll(func(f *flag.Flag) {
+		fmt.Printf("Flag: %s, Value: %v\n", f.Name, f.Value)
+	})
 
 	err := runReadFileOperations()
 	if err != nil {
@@ -136,4 +134,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	if *fOutputDir == "" {
+		*fOutputDir, _ = os.Getwd()
+	}
+	gResult.DumpMetricsCSV(path.Join(*fOutputDir, "metrics.csv"))
+	gResult.PrintStats()
 }
