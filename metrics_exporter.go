@@ -15,6 +15,7 @@ import (
 var (
 	// The restaurant rating in number of stars.
 	readLatency = stats.Float64("readLatency", "Complete read latency", stats.UnitMilliseconds)
+	ttfbReadLatency = stats.Float64("ttfbReadLatency", "TTFB read latency", stats.UnitMilliseconds)
 )
 
 var sdExporter *stackdriver.Exporter
@@ -33,6 +34,19 @@ func registerLatencyView() {
 	}
 }
 
+func registerTTFBLatencyView() {
+	v := &view.View{
+		Name:        "princer_go_client_ttfb_read_latency",
+		Measure:     ttfbReadLatency,
+		Description: "TTFB read latency for a given go-client",
+		TagKeys:     []tag.Key{tag.MustNewKey("princer_ttfb_read_latency")},
+		Aggregation: ochttp.DefaultLatencyDistribution,
+	}
+
+	if err := view.Register(v); err != nil {
+		log.Fatalf("Failed to register the readLatency view: %v", err)
+	}
+}
 func enableSDExporter() (err error) {
 	sdExporter, err := stackdriver.NewExporter(stackdriver.Options{
 		// ProjectID <change this value>

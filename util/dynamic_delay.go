@@ -9,6 +9,11 @@ import (
 // Package dynamicdelay calculates the delay at a fixed percentile, based on
 // delay samples.
 //
+// This package is a port of the C++ implementation:
+// //net/rpc/contrib/hedged_call/dynamic_delay.h
+
+// Delay computes the desired delay between hedged RPC calls.
+//
 // Delay is not goroutine-safe.
 type Delay struct {
 	increaseFactor float64
