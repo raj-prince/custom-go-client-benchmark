@@ -120,7 +120,7 @@ func runReadFileOperations() (err error) {
 }
 
 func main() {
-	fmt.Println("Started execution")
+	fmt.Println(os.Stderr, "Started execution")
 	flag.Parse()
 	fmt.Println("\n******* Passed flags: *******")
 	flag.VisitAll(func(f *flag.Flag) {
