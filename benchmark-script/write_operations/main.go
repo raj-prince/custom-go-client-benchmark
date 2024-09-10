@@ -56,7 +56,7 @@ func overWriteAlreadyOpenedFile(index int) (err error) {
 
 	for cnt := 0; cnt < *fNumOfWrite; cnt++ {
 		writeStart := time.Now()
-		fileName := strconv.Itoa(index) + "__" + strconv.Itoa(cnt)
+		fileName := strconv.Itoa(*fFileSize) + "_" + strconv.Itoa(index) + "__" + strconv.Itoa(cnt)
 		fh, err := openFile(fileName)
 		if err != nil {
 			return fmt.Errorf("Error while creating the file %v", err)
@@ -120,6 +120,7 @@ func runReadFileOperations() (err error) {
 }
 
 func main() {
+	fmt.Println("Started execution")
 	flag.Parse()
 	fmt.Println("\n******* Passed flags: *******")
 	flag.VisitAll(func(f *flag.Flag) {
