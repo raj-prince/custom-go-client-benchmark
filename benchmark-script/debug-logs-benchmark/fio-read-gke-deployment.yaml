@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gcsfuse-mount-deployment-debug-on
+  namespace: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gcsfuse-mount
+  template:
+    metadata:
+      annotations:
+        gke-gcsfuse/volumes: "true"
+      labels:
+        app: gcsfuse-mount
+    spec:
+      serviceAccountName: lankita-ksa-xai-test
+      nodeSelector:
+        cloud.google.com/gke-ephemeral-storage-local-ssd: "true"
+      containers:
+      - name: gcsfuse-mount
+        image: ubuntu
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /mnt/disks/test-bucket
+          name: gcs-fuse-csi-test-bucket
+        resources:
+          requests:
+            cpu: "4000m"
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          set -e
+
+          echo "Mounts are successful"
+
+          echo "Starting the gcsfuse mounts from pod"
+          echo "Installing fio..."
+          apt-get update
+          apt-get install -y wget fio bc
+          job_spec=./workload_job_spec.fio
+          wget --output-document=$job_spec https://raw.githubusercontent.com/GoogleCloudPlatform/gcsfuse/tmp_fio_job/perfmetrics/scripts/job_files/read_cache_load_test.fio
+          cat $job_spec
+          echo "Running fio workflow"
+          echo "First epoch"
+          ls -R /mnt/disks/test-bucket/1M 1> /dev/null
+          NUMJOBS=50 NRFILES=20000 FILE_SIZE=1MB BLOCK_SIZE=128K READ_TYPE=randread DIR=/mnt/disks/test-bucket/1M fio $job_spec --alloc-size=1048576 > ./output_1.json
+          sleep 10s
+          echo "Second epoch"
+          ls -R /mnt/disks/test-bucket/1M 1> /dev/null
+          NUMJOBS=50 NRFILES=20000 FILE_SIZE=1MB BLOCK_SIZE=128K READ_TYPE=randread DIR=/mnt/disks/test-bucket/1M fio $job_spec --alloc-size=1048576 > ./output_2.json
+          echo "********* RUN COMPLETE  ********"
+          while true; do sleep 1000; done
+      volumes:
+      - name: gcs-fuse-csi-test-bucket
+        csi:
+          driver: gcsfuse.csi.storage.gke.io
+          readOnly: false
+          volumeAttributes:
+            bucketName: "princer-read-cache-load-test-west"
+            mountOptions: "implicit-dirs,max-conns-per-host=0,debug_fuse,debug_gcs,debug_mutex,metadata-cache:ttl-secs:-1,metadata-cache:stat-cache-max-size-mb:-1,metadata-cache:type-cache-max-size-mb:-1,file-cache:max-size-mb:-1,file-cache:cache-file-for-range-read:true"
