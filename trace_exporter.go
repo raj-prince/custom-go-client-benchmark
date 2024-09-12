@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"log"
+
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	octrace "go.opencensus.io/trace"
 	"go.opentelemetry.io/contrib/detectors/gcp"
@@ -11,7 +13,6 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
-	"log"
 )
 
 // enableTraceExport turns on Open Telemetry tracing with export to Cloud Trace.
@@ -30,7 +31,7 @@ func enableTraceExport(ctx context.Context, sampleRate float64) func() {
 		// Add your own custom attributes to identify your application
 		resource.WithAttributes(
 			semconv.ServiceName(tracerName),
-			attribute.KeyValue{"transport", attribute.StringValue(*clientProtocol)},
+			attribute.KeyValue{Key: "transport", Value: attribute.StringValue(*clientProtocol)},
 		),
 	)
 	if err != nil {

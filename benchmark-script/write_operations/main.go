@@ -24,6 +24,7 @@ var (
 
 	eG errgroup.Group
 
+	// OneKB means 1024 bytes.
 	OneKB = 1024
 
 	fFileSize = flag.Int("file-size", 1, "in KB")
@@ -132,7 +133,7 @@ func main() {
 
 	err := runReadFileOperations()
 	if err != nil {
-		fmt.Println(os.Stderr, err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 

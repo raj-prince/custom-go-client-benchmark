@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-// Package dynamicdelay calculates the delay at a fixed percentile, based on
+// Dynamic delay calculates the delay at a fixed percentile, based on
 // delay samples.
-//
+
 // Delay is not goroutine-safe.
 type Delay struct {
 	increaseFactor float64
@@ -64,7 +64,7 @@ func NewDelay(targetPercentile float64, increaseRate float64, initialDelay, minD
 	}, nil
 }
 
-// increase notes that the RPC took longer than the delay returned by Value.
+// Increase notes that the RPC took longer than the delay returned by Value.
 func (d *Delay) Increase() {
 	v := time.Duration(float64(d.value) * d.increaseFactor)
 	if v > d.maxDelay {
@@ -74,7 +74,7 @@ func (d *Delay) Increase() {
 	}
 }
 
-// decrease notes that the RPC completed before the delay returned by Value.
+// Decrease notes that the RPC completed before the delay returned by Value.
 func (d *Delay) Decrease() {
 	v := time.Duration(float64(d.value) * d.decreaseFactor)
 	if v < d.minDelay {
@@ -99,6 +99,7 @@ func (d *Delay) Value() time.Duration {
 	return d.value
 }
 
+// PrintDelay prints the state of Delay object.
 func (d *Delay) PrintDelay() {
 	fmt.Println("IncreaseFactor: ", d.increaseFactor)
 	fmt.Println("DecreaseFactor: ", d.decreaseFactor)

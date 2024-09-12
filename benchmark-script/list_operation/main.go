@@ -9,6 +9,7 @@ import (
 )
 
 var fDir = flag.String("dir", "", "Directory within which listing performed.")
+var fGoList = flag.Bool("go-list", false, "Directory within which listing performed using go-list.")
 
 // This doesn't match with
 func runListingGoScript() (err error) {
@@ -66,12 +67,16 @@ func runListingCommandLine() (err error) {
 }
 
 func main() {
-
 	flag.Parse()
 
-	err := runListingCommandLine()
+	var err error
+	if *fGoList {
+		err = runListingGoScript()
+	} else {
+		err = runListingCommandLine()
+	}
 	if err != nil {
-		fmt.Println(os.Stderr, err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 

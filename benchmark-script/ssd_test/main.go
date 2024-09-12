@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"golang.org/x/sync/errgroup"
 	"os"
 	"path"
 	"strconv"
-	"syscall"
+
+	"golang.org/x/sync/errgroup"
 )
 
 var (
@@ -15,46 +15,11 @@ var (
 
 	fNumOfThreads = flag.Int("threads", 1, "Number of threads to read parallel")
 
-	fBlockSize = flag.Int("block-size", 512, "Block size in KB")
-
-	fFileSize = flag.Int64("file-size", 524288, "File size in KB")
-
-	fReadType = flag.String("read-type", "seq", "Read access pattern")
-
-	fileHandles []*os.File
-
 	eG errgroup.Group
 
+	// OneKB means 1024 bytes.
 	OneKB = 1024
-
-	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
-
-	readTime []int64
 )
-
-func openFile(index int) (err error) {
-	fileName := path.Join(*fDir, "Workload."+strconv.Itoa(index)+"/0")
-	fileHandle, err := os.OpenFile(fileName, os.O_RDONLY|syscall.O_DIRECT, 0600)
-	if err != nil {
-		err = fmt.Errorf("while opening file: %w", err)
-		return
-	}
-
-	fileInfo, err := fileHandle.Stat()
-	if err != nil {
-		err = fmt.Errorf("bad fileHandle: %w", err)
-		return err
-	}
-
-	size := fileInfo.Size()
-	if size != *fFileSize*1024 {
-		err = fmt.Errorf("file present is not equal to given file-size")
-		return err
-	}
-
-	fileHandles[index] = fileHandle
-	return
-}
 
 // Expect file is already opened, otherwise throws error
 func statFile(threadIndex int) (err error) {
@@ -100,16 +65,12 @@ func runReadFileOperations() (err error) {
 	return
 }
 
-func MicroSecondsToMilliSecond(microSecond int64) float64 {
-	return 0.001 * float64(microSecond)
-}
-
 func main() {
 	flag.Parse()
 
 	err := runReadFileOperations()
 	if err != nil {
-		fmt.Println(os.Stderr, err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 

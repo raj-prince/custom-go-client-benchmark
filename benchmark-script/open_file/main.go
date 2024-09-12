@@ -69,7 +69,7 @@ func main() {
 
 	err := runOpenFileOperations()
 	if err != nil {
-		fmt.Println(os.Stderr, err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 

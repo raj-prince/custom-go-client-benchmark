@@ -10,6 +10,7 @@ import (
 
 const chunkSize = 1024 // Size of the chunk to read
 
+// ReadFile reads a file from a given offset.
 func ReadFile(startOffset int64, file *os.File) {
 	// Create a buffer to hold the chunk data
 	buffer := make([]byte, chunkSize)
@@ -18,18 +19,18 @@ func ReadFile(startOffset int64, file *os.File) {
 	if err != nil && err != io.EOF {
 		fmt.Println("Error reading chunk:", err)
 		return
+	}
+
+	if err == io.EOF {
+		fmt.Println("read completed with Error: ", err)
 	} else {
-		if err == io.EOF {
-			fmt.Println("read completed with Error: ", err)
-		} else {
-			fmt.Println("content: ", string(buffer[:]))
-			fmt.Println("read completed, successfully with startOffset: ", startOffset)
-		}
+		fmt.Println("content: ", string(buffer[:]))
+		fmt.Println("read completed, successfully with startOffset: ", startOffset)
 	}
 }
 
 func main() {
-	file, err := os.OpenFile("/usr/local/google/home/princer/gcs/ssd_pd_1_epoch_time.log", os.O_RDWR|syscall.O_DIRECT, 666)
+	file, err := os.OpenFile("/usr/local/google/home/princer/gcs/ssd_pd_1_epoch_time.log", os.O_RDWR|syscall.O_DIRECT, 0666)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return

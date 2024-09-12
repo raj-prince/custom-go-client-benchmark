@@ -8,6 +8,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	// Register the pprof endpoints under the web server root at /debug/pprof
+	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"time"
@@ -26,36 +28,32 @@ import (
 	// Install google-c2p resolver, which is required for direct path.
 	_ "google.golang.org/grpc/balancer/rls"
 	_ "google.golang.org/grpc/xds/googledirectpath"
-
-	// Register the pprof endpoints under the web server root at /debug/pprof
-	_ "net/http/pprof"
 )
 
 var (
-	GrpcConnPoolSize    = 1
-	MaxConnsPerHost     = 100
-	MaxIdleConnsPerHost = 100
+	grpcConnPoolSize    = 1
+	maxConnsPerHost     = 100
+	maxIdleConnsPerHost = 100
 
+	// MB means 1024 Kb.
 	MB = 1024 * 1024
 
-	NumOfWorker = flag.Int("worker", 48, "Number of concurrent worker to read")
+	numOfWorker = flag.Int("worker", 48, "Number of concurrent worker to read")
 
-	NumOfReadCallPerWorker = flag.Int("read-call-per-worker", 1000000, "Number of read call per worker")
+	numOfReadCallPerWorker = flag.Int("read-call-per-worker", 1000000, "Number of read call per worker")
 
-	MaxRetryDuration = 30 * time.Second
+	maxRetryDuration = 30 * time.Second
 
-	RetryMultiplier = 2.0
+	retryMultiplier = 2.0
 
-	BucketName = flag.String("bucket", "princer-working-dirs", "GCS bucket name.")
+	bucketName = flag.String("bucket", "princer-working-dirs", "GCS bucket name.")
 
+	// ProjectName denotes gcp project name.
 	ProjectName = flag.String("project", "gcs-fuse-test", "GCP project name.")
 
-	clientProtocol = flag.String("client-protocol", "http", "Network protocol.")
-
-	// ObjectNamePrefix<worker_id>ObjectNameSuffix is the object name format.
-	// Here, worker id goes from <0 to NumberOfWorker>.
-	ObjectNamePrefix = "princer_100M_files/file_"
-	ObjectNameSuffix = ""
+	clientProtocol   = flag.String("client-protocol", "http", "Network protocol.")
+	objectNamePrefix = "princer_100M_files/file_"
+	objectNameSuffix = ""
 
 	tracerName      = "princer-storage-benchmark"
 	enableTracing   = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
@@ -65,13 +63,14 @@ var (
 	eG errgroup.Group
 )
 
-func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client, err error) {
+// CreateHTTPClient create http storage client.
+func CreateHTTPClient(ctx context.Context, isHTTP2 bool) (client *storage.Client, err error) {
 	var transport *http.Transport
 	// Using http1 makes the client more performant.
-	if isHttp2 == false {
+	if !isHTTP2 {
 		transport = &http.Transport{
-			MaxConnsPerHost:     MaxConnsPerHost,
-			MaxIdleConnsPerHost: MaxIdleConnsPerHost,
+			MaxConnsPerHost:     maxConnsPerHost,
+			MaxIdleConnsPerHost: maxIdleConnsPerHost,
 			// This disables HTTP/2 in transport.
 			TLSNextProto: make(
 				map[string]func(string, *tls.Conn) http.RoundTripper,
@@ -81,7 +80,7 @@ func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client
 		// For http2, change in MaxConnsPerHost doesn't affect the performance.
 		transport = &http.Transport{
 			DisableKeepAlives: true,
-			MaxConnsPerHost:   MaxConnsPerHost,
+			MaxConnsPerHost:   maxConnsPerHost,
 			ForceAttemptHTTP2: true,
 		}
 	}
@@ -109,12 +108,13 @@ func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client
 	return storage.NewClient(ctx, option.WithHTTPClient(httpClient))
 }
 
+// CreateGrpcClient creates grpc client.
 func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 	if err := os.Setenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS", "true"); err != nil {
 		log.Fatalf("error setting direct path env var: %v", err)
 	}
 
-	client, err = storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(GrpcConnPoolSize))
+	client, err = storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(grpcConnPoolSize))
 
 	if err := os.Unsetenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS"); err != nil {
 		log.Fatalf("error while unsetting direct path env var: %v", err)
@@ -122,15 +122,16 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 	return
 }
 
-func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
+// ReadObject creates reader object corresponding to workerID with the help of bucketHandle.
+func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketHandle) (err error) {
 
-	objectName := ObjectNamePrefix + strconv.Itoa(workerId) + ObjectNameSuffix
+	objectName := objectNamePrefix + strconv.Itoa(workerID) + objectNameSuffix
 
-	for i := 0; i < *NumOfReadCallPerWorker; i++ {
+	for i := 0; i < *numOfReadCallPerWorker; i++ {
 		var span trace.Span
 		traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "ReadObject")
 		span.SetAttributes(
-			attribute.KeyValue{"bucket", attribute.StringValue(*BucketName)},
+			attribute.KeyValue{Key: "bucket", Value: attribute.StringValue(*bucketName)},
 		)
 		start := time.Now()
 		object := bucketHandle.Object(objectName)
@@ -181,42 +182,43 @@ func main() {
 	var client *storage.Client
 	var err error
 	if *clientProtocol == "http" {
-		client, err = CreateHttpClient(ctx, false)
+		client, err = CreateHTTPClient(ctx, false)
 	} else {
 		client, err = CreateGrpcClient(ctx)
 	}
 
 	if err != nil {
-		fmt.Errorf("while creating the client: %v", err)
+		fmt.Printf("while creating the client: %v", err)
+		os.Exit(1)
 	}
 
 	client.SetRetry(
 		storage.WithBackoff(gax.Backoff{
-			Max:        MaxRetryDuration,
-			Multiplier: RetryMultiplier,
+			Max:        maxRetryDuration,
+			Multiplier: retryMultiplier,
 		}),
 		storage.WithPolicy(storage.RetryAlways))
 
 	// assumes bucket already exist
-	bucketHandle := client.Bucket(*BucketName)
+	bucketHandle := client.Bucket(*bucketName)
 
 	// Enable stack-driver exporter.
 	registerLatencyView()
 
 	err = enableSDExporter()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "while enabling stackdriver exporter: %v", err)
+		fmt.Printf("while enabling stackdriver exporter: %v", err)
 		os.Exit(1)
 	}
 	defer closeSDExporter()
 
 	// Run the actual workload
-	for i := 0; i < *NumOfWorker; i++ {
+	for i := 0; i < *numOfWorker; i++ {
 		idx := i
 		eG.Go(func() error {
 			err = ReadObject(ctx, idx, bucketHandle)
 			if err != nil {
-				err = fmt.Errorf("while reading object %v: %w", ObjectNamePrefix+strconv.Itoa(idx), err)
+				err = fmt.Errorf("while reading object %v: %w", objectNamePrefix+strconv.Itoa(idx), err)
 				return err
 			}
 			return err

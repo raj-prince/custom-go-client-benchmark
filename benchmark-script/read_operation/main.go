@@ -24,6 +24,7 @@ var (
 
 	eG errgroup.Group
 
+	// OneKB means 1024 bytes.
 	OneKB = 1024
 
 	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
@@ -112,7 +113,7 @@ func main() {
 
 	err := runReadFileOperations()
 	if err != nil {
-		fmt.Println(os.Stderr, err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
