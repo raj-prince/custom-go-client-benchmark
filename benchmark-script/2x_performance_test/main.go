@@ -16,18 +16,20 @@ var (
 	fSSD      = flag.Bool("ssd", false, "Given directory is ssd or not.")
 	fileCount = flag.Int("file-count", 10, "Number of files to read")
 
-	FileSize         = 512 * OneKB
-	OneKB            = 1024
+	fileSize         = 512 * oneKB
+	oneKB            = 1024
 	openLatency      []int64
 	readLatency      []int64
 	closeLatency     []int64
 	totalReadLatency []int64
 )
 
+// ReadFilesSequentially sequentially reads n (fileCount) number of
+// files from a directory one by one.
 func ReadFilesSequentially(fileCount int) (err error) {
 	startTime := time.Now()
 
-	b := make([]byte, FileSize*1024)
+	b := make([]byte, fileSize*1024)
 
 	for i := 0; i < fileCount; i++ {
 
@@ -75,6 +77,7 @@ func ReadFilesSequentially(fileCount int) (err error) {
 	return
 }
 
+// Report prints the statistical measurement of the given latencies.
 func Report(latency []int64, prefix string) {
 	sort.Slice(latency, func(i, j int) bool {
 		return latency[i] < latency[j]

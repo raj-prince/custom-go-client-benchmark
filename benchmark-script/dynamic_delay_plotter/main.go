@@ -64,8 +64,6 @@ func actualSample(p *plot.Plot, dataRows []DataRow, d *util.Delay) {
 		xValues[i] = float64(i)
 		yValues1[i] = d.Value().Seconds()
 		yValues2[i] = actualDelay.Seconds()
-
-		//AddPoints(p, actualDelay.Seconds(), d.Value().Seconds())
 	}
 
 	// Add line series for the first curve (sine)
@@ -89,24 +87,15 @@ func actualSample(p *plot.Plot, dataRows []DataRow, d *util.Delay) {
 	fmt.Println("Over threshold: ", samplesOverThreshold)
 }
 
-func AddPoints(p *plot.Plot, x float64, y float64) {
-	// Create a slice of points (we'll have just one point)
-	pts := plotter.XYs{{X: x, Y: y}} // Adjust these coordinates as needed
-
-	// Add the points to the plot
-	scatter, err := plotter.NewScatter(pts)
-	if err != nil {
-		panic(err)
-	}
-	p.Add(scatter)
-}
-
+// DataRow represents one metrics.
 type DataRow struct {
 	Timestamp   int64
 	ReadLatency float64
 	Throughput  float64
 }
 
+// GetDataRows parses all the CSV file present in a directory and return the
+// list of DataRow.
 func GetDataRows(folder string) ([]DataRow, error) {
 	// Store all data rows from all files
 	var allDataRows []DataRow

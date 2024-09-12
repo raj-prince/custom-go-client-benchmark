@@ -24,6 +24,7 @@ var (
 
 	eG errgroup.Group
 
+	// OneKB means 1024 bytes.
 	OneKB = 1024
 
 	fFileSize = flag.Int("file-size", 1, "in KB")

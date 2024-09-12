@@ -16,7 +16,11 @@ import (
 )
 
 const (
+
+	// KiB means 1024 bytes.
 	KiB = 1024
+
+	// MiB means 1024 KiB.
 	MiB = 1024 * KiB
 )
 
@@ -76,6 +80,7 @@ func profileOnce(path string) (err error) {
 //
 // }
 
+// ObjectAccessControlProjectTeam represents a team.
 type ObjectAccessControlProjectTeam struct {
 	// ProjectNumber: The project number.
 	ProjectNumber string `json:"projectNumber,omitempty"`
@@ -100,7 +105,7 @@ type ObjectAccessControlProjectTeam struct {
 	NullFields []string `json:"-"`
 }
 
-// ObjectAccessControl: An access-control entry.
+// ObjectAccessControl is an access-control entry.
 type ObjectAccessControl struct {
 	// Bucket: The name of the bucket.
 	Bucket string `json:"bucket,omitempty"`
@@ -115,7 +120,7 @@ type ObjectAccessControl struct {
 	// forms:
 	// - user-userId
 	// - user-email
-	// - group-groupId
+	// - group-groupID
 	// - group-email
 	// - domain-domain
 	// - project-team-projectId
@@ -128,8 +133,8 @@ type ObjectAccessControl struct {
 	// example.com, the entity would be domain-example.com.
 	Entity string `json:"entity,omitempty"`
 
-	// EntityId: The ID for the entity, if any.
-	EntityId string `json:"entityId,omitempty"`
+	// EntityID: The ID for the entity, if any.
+	EntityID string `json:"entityId,omitempty"`
 
 	// Etag: HTTP 1.1 Entity tag for the access-control entry.
 	Etag string `json:"etag,omitempty"`
@@ -138,8 +143,8 @@ type ObjectAccessControl struct {
 	// object.
 	Generation int64 `json:"generation,omitempty,string"`
 
-	// Id: The ID of the access-control entry.
-	Id string `json:"id,omitempty"`
+	// ID: The ID of the access-control entry.
+	ID string `json:"id,omitempty"`
 
 	// Kind: The kind of item this is. For object access control entries,
 	// this is always storage#objectAccessControl.
@@ -177,6 +182,8 @@ type ObjectAccessControl struct {
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
 }
+
+// Test is just a test struct for memory experiment.
 type Test struct {
 	Name            string
 	ContentType     string
@@ -219,9 +226,10 @@ type Test struct {
 	ContentDisposition string
 	CustomTime         string
 	EventBasedHold     bool
-	Acl                []ObjectAccessControl
+	ACL                []ObjectAccessControl
 }
 
+// CloneMap just do deep copy of a map.
 func CloneMap(m map[string]string) map[string]string {
 
 	//return &map[string]string{strings.Clone("key1"): strings.Clone("testddddddd"),
@@ -234,13 +242,15 @@ func CloneMap(m map[string]string) map[string]string {
 
 	return newMap
 }
+
+// GetObject returns a customized Test object.
 func GetObject() *Test {
 	return &Test{
 		Name:        strings.Clone("aa"),
 		ContentType: "text/plane",
 		Metadata: map[string]string{strings.Clone("key1"): strings.Clone("testddddddd"),
 			strings.Clone("key2"): strings.Clone("testddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddhffffffffffffff")},
-		Acl: []ObjectAccessControl{{}, {}, {}, {}, {}},
+		ACL: []ObjectAccessControl{{}, {}, {}, {}, {}},
 	}
 }
 

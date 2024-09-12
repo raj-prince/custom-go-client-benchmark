@@ -17,6 +17,7 @@ var (
 
 	eG errgroup.Group
 
+	// OneKB means 1024 bytes.
 	OneKB = 1024
 )
 
@@ -62,10 +63,6 @@ func runReadFileOperations() (err error) {
 	}
 
 	return
-}
-
-func MicroSecondsToMilliSecond(microSecond int64) float64 {
-	return 0.001 * float64(microSecond)
 }
 
 func main() {

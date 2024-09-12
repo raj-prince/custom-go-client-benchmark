@@ -19,6 +19,7 @@ var (
 	forceDownload = flag.Bool("force-download", false, "Force download or not")
 )
 
+// DataRow represents one metrics.
 type DataRow struct {
 	Timestamp   int64
 	ReadLatency float64
