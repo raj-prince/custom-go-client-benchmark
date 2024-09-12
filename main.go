@@ -67,7 +67,7 @@ var (
 func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client, err error) {
 	var transport *http.Transport
 	// Using http1 makes the client more performant.
-	if isHttp2 == false {
+	if !isHttp2 {
 		transport = &http.Transport{
 			MaxConnsPerHost:     MaxConnsPerHost,
 			MaxIdleConnsPerHost: MaxIdleConnsPerHost,

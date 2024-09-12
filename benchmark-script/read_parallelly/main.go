@@ -29,7 +29,7 @@ func ReadFile(startOffset int64, file *os.File) {
 }
 
 func main() {
-	file, err := os.OpenFile("/usr/local/google/home/princer/gcs/ssd_pd_1_epoch_time.log", os.O_RDWR|syscall.O_DIRECT, 666)
+	file, err := os.OpenFile("/usr/local/google/home/princer/gcs/ssd_pd_1_epoch_time.log", os.O_RDWR|syscall.O_DIRECT, 0666)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return

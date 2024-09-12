@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"image/color"
 	"math"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -29,21 +28,6 @@ var (
 
 	outputFile = flag.String("output-file", "plot", "Plot file name")
 )
-
-func applySamples(p *plot.Plot, numSamples int, expectedValue float64, rnd *rand.Rand, d *util.Delay) {
-	var samplesOverThreshold int
-	for i := 0; i < numSamples; i++ {
-		randomDelay := time.Duration(-math.Log(rnd.Float64()) * expectedValue * float64(time.Second))
-		if randomDelay > d.Value() {
-			samplesOverThreshold++
-			d.Increase()
-		} else {
-			d.Decrease()
-		}
-		AddPoints(p, randomDelay.Seconds(), d.Value().Seconds())
-	}
-	fmt.Println("Over threshold: ", samplesOverThreshold)
-}
 
 // ConvertToXYs takes separate x and y slices and converts them into the correct plotter.XYs format
 func ConvertToXYs(xValues, yValues []float64) plotter.XYs {
@@ -159,7 +143,7 @@ func GetDataRows(folder string) ([]DataRow, error) {
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("Error reading CSV files: %v\n", err)
+		return nil, fmt.Errorf("while reading CSV files: %v", err)
 	}
 
 	return allDataRows, nil
