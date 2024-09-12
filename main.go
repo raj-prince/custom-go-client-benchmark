@@ -8,6 +8,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	// Register the pprof endpoints under the web server root at /debug/pprof
+	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"time"
@@ -26,9 +28,6 @@ import (
 	// Install google-c2p resolver, which is required for direct path.
 	_ "google.golang.org/grpc/balancer/rls"
 	_ "google.golang.org/grpc/xds/googledirectpath"
-
-	// Register the pprof endpoints under the web server root at /debug/pprof
-	_ "net/http/pprof"
 )
 
 var (
@@ -130,7 +129,7 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 		var span trace.Span
 		traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "ReadObject")
 		span.SetAttributes(
-			attribute.KeyValue{"bucket", attribute.StringValue(*BucketName)},
+			attribute.KeyValue{Key: "bucket", Value: attribute.StringValue(*BucketName)},
 		)
 		start := time.Now()
 		object := bucketHandle.Object(objectName)
@@ -187,7 +186,8 @@ func main() {
 	}
 
 	if err != nil {
-		fmt.Errorf("while creating the client: %v", err)
+		fmt.Printf("while creating the client: %v", err)
+		os.Exit(1)
 	}
 
 	client.SetRetry(
@@ -205,7 +205,7 @@ func main() {
 
 	err = enableSDExporter()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "while enabling stackdriver exporter: %v", err)
+		fmt.Printf("while enabling stackdriver exporter: %v", err)
 		os.Exit(1)
 	}
 	defer closeSDExporter()

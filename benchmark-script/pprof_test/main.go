@@ -5,13 +5,14 @@ package main
 import (
 	"crypto/md5"
 	"fmt"
-	"google.golang.org/api/googleapi"
 	"os"
 	"runtime"
 	"runtime/pprof"
 	"strings"
 	"time"
 	"unsafe"
+
+	"google.golang.org/api/googleapi"
 )
 
 const (
@@ -273,7 +274,7 @@ func temp() []*Test {
 		fmt.Println(len(clone3))
 		test = append(test, test1)
 	}
-	fmt.Println("Object ACL: %v", unsafe.Sizeof(ObjectAccessControl{}))
+	fmt.Printf("Object ACL: %v\n", unsafe.Sizeof(ObjectAccessControl{}))
 	return test
 }
 func main() {

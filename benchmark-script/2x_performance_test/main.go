@@ -12,16 +12,15 @@ import (
 )
 
 var (
-
-	fDir = flag.String("dir", "", "Directory file to be opened.")
-	fSSD = flag.Bool("ssd", false, "Given directory is ssd or not.")
+	fDir      = flag.String("dir", "", "Directory file to be opened.")
+	fSSD      = flag.Bool("ssd", false, "Given directory is ssd or not.")
 	fileCount = flag.Int("file-count", 10, "Number of files to read")
 
-	FileSize = 512 * OneKB
-	OneKB = 1024
-	openLatency []int64
-	readLatency []int64
-	closeLatency []int64
+	FileSize         = 512 * OneKB
+	OneKB            = 1024
+	openLatency      []int64
+	readLatency      []int64
+	closeLatency     []int64
 	totalReadLatency []int64
 )
 
@@ -90,8 +89,8 @@ func Report(latency []int64, prefix string) {
 	avg := sum / int64(sz)
 	fmt.Printf("Avg %s latency: %d us\n", prefix, avg)
 	fmt.Printf("Min %s latency: %d us\n", prefix, latency[0])
-	fmt.Printf("Max %s latency: %d us\n", prefix, latency[sz - 1])
-	fmt.Printf("Med %s latency: %d us\n", prefix, latency[sz / 2])
+	fmt.Printf("Max %s latency: %d us\n", prefix, latency[sz-1])
+	fmt.Printf("Med %s latency: %d us\n", prefix, latency[sz/2])
 	tt := (9 * sz) / 10
 	fmt.Printf("90th %s latency: %d us\n", prefix, latency[tt])
 
@@ -103,7 +102,7 @@ func main() {
 
 	err := ReadFilesSequentially(*fileCount)
 	if err != nil {
-		fmt.Println(os.Stderr, err)
+		fmt.Println(err)
 		os.Exit(1)
 	} else {
 		// Print the stats
