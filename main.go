@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
+	"math/rand"
 	"net/http"
 	// Register the pprof endpoints under the web server root at /debug/pprof
 	_ "net/http/pprof"
@@ -68,12 +70,15 @@ var (
 	enableHeapAlloc  = flag.Bool("heap_alloc", false, "enable heap allocation profile collection")
 	enableThread     = flag.Bool("thread", false, "enable thread profile collection")
 	enableContention = flag.Bool("contention", false, "enable contention profile collection")
+	isRangeRead = flag.Bool("read-range", false, "Is range read")
+	rangeLength = flag.Int64("range-len", int64(8 * MB), "Range read size in MB")
+	fileSize = flag.Int64("file-size", int64(1024 * MB), "File size in MB")
 	projectID        = flag.String("project_id", "", "project ID to run profiler with; only required when running outside of GCP.")
 	version          = flag.String("version", "original", "version to run profiler with")
-
 	eG errgroup.Group
 )
 
+var gPattern []int64
 var gReqLatency *util.Result
 var gReadLatency *util.Result
 func init() {
@@ -138,40 +143,75 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 	return
 }
 
+func RangeReadHelper(ctx context.Context, objectName string, bh *storage.BucketHandle, offset, len int64) error {
+	var span trace.Span
+	traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "ReadObject")
+	span.SetAttributes(
+		attribute.KeyValue{Key: "bucket", Value: attribute.StringValue(*BucketName)},
+	)
+	start := time.Now()
+	object := bh.Object(objectName)
+	rc, err := object.NewRangeReader(traceCtx, offset, len)
+	if err != nil {
+		return fmt.Errorf("while creating reader object: %v", err)
+	}
+
+	ttfbTime := time.Since(start)
+	gReqLatency.Append(ttfbTime.Seconds(), 0)
+	stats.Record(ctx, ttfbReadLatency.M(float64(ttfbTime.Milliseconds())))
+
+	// Calls Reader.WriteTo implicitly.
+	_, err = io.Copy(io.Discard, rc)
+	if err != nil {
+		return fmt.Errorf("while reading and discarding content: %v", err)
+	}
+
+	duration := time.Since(start)
+	stats.Record(ctx, readLatency.M(float64(duration.Milliseconds())))
+	gReadLatency.Append(duration.Seconds(), 0)
+	err = rc.Close()
+	span.End()
+	if err != nil {
+		return fmt.Errorf("while closing the reader object: %v", err)
+	}
+
+	return nil
+}
+
+func getRandReadPattern() []int64 {
+	numOfRanges := int64(math.Ceil(float64((int64(*fileSize)) / (int64(*rangeLength)))))
+	pattern := make([]int64, numOfRanges)
+	indices := make([]int64, numOfRanges)
+	for i := int64(0); i < numOfRanges; i++ {
+		indices[int(i)] = i
+	}
+	for i := int64(0); i < numOfRanges; i++ {
+		randNum := rand.Intn(len(indices))
+		pattern[i] = indices[randNum] * (*rangeLength)
+		indices = append(indices[:randNum], indices[randNum+1:]...)
+		fmt.Println(pattern[i])
+	}
+	return pattern
+}
+
 func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
 
 	objectName := *ObjectNamePrefix + strconv.Itoa(workerId) + *ObjectNameSuffix
 
 	for i := 0; i < *NumOfReadCallPerWorker; i++ {
-		var span trace.Span
-		traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "ReadObject")
-		span.SetAttributes(
-			attribute.KeyValue{"bucket", attribute.StringValue(*BucketName)},
-		)
-		start := time.Now()
-		object := bucketHandle.Object(objectName)
-		rc, err := object.NewReader(traceCtx)
-		if err != nil {
-			return fmt.Errorf("while creating reader object: %v", err)
-		}
-
-		ttfbTime := time.Since(start)
-		gReqLatency.Append(ttfbTime.Seconds(), 0)
-		stats.Record(ctx, ttfbReadLatency.M(float64(ttfbTime.Milliseconds())))
-
-		// Calls Reader.WriteTo implicitly.
-		_, err = io.Copy(io.Discard, rc)
-		if err != nil {
-			return fmt.Errorf("while reading and discarding content: %v", err)
-		}
-
-		duration := time.Since(start)
-		stats.Record(ctx, readLatency.M(float64(duration.Milliseconds())))
-		gReadLatency.Append(duration.Seconds(), 0)
-		err = rc.Close()
-		span.End()
-		if err != nil {
-			return fmt.Errorf("while closing the reader object: %v", err)
+		if !*isRangeRead {
+			err = RangeReadHelper(ctx, objectName, bucketHandle, 0, -1)
+			if err != nil {
+				return fmt.Errorf("while reading object: %v", err)
+			}
+		} else {
+			for p := 0; p < len(gPattern); p++ {
+				offset := gPattern[p]
+				err = RangeReadHelper(ctx, objectName, bucketHandle, offset, *rangeLength)
+				if err != nil {
+					return fmt.Errorf("while reading object: %v", err)
+				}
+			}
 		}
 	}
 
@@ -180,6 +220,11 @@ func ReadObject(ctx context.Context, workerId int, bucketHandle *storage.BucketH
 
 func main() {
 	flag.Parse()
+	gPattern = getRandReadPattern()
+	for i, p := range gPattern {
+		fmt.Println(i)
+		fmt.Println(p)
+	}
 	ctx := context.Background()
 
 	if *enableTracing {
@@ -231,7 +276,7 @@ func main() {
 			Multiplier: RetryMultiplier,
 		}),
 		storage.WithPolicy(storage.RetryAlways),
-		//storage.WithReadDynamicTimeout(0.99, 15, 50*time.Millisecond, 50*time.Millisecond, 1*time.Minute),
+		//storage.WithReadDynamicTimeout(0.99, 15, 80*time.Millisecond, 50*time.Millisecond, 2*time.Minute),
 		//storage.WithMinReadThroughput(1024, 1 * time.Second),
 		)
 
