@@ -72,6 +72,7 @@ var (
 	enableContention = flag.Bool("contention", false, "enable contention profile collection")
 	isRangeRead = flag.Bool("read-range", false, "Is range read")
 	rangeLength = flag.Int64("range-len", int64(8 * MB), "Range read size in MB")
+	minDelay = flag.Duration("min-delay", 500 * time.Millisecond, "min delay")
 	fileSize = flag.Int64("file-size", int64(1024 * MB), "File size in MB")
 	projectID        = flag.String("project_id", "", "project ID to run profiler with; only required when running outside of GCP.")
 	version          = flag.String("version", "original", "version to run profiler with")
@@ -276,8 +277,8 @@ func main() {
 			Multiplier: RetryMultiplier,
 		}),
 		storage.WithPolicy(storage.RetryAlways),
-		//storage.WithReadDynamicTimeout(0.99, 15, 80*time.Millisecond, 50*time.Millisecond, 2*time.Minute),
-		//storage.WithMinReadThroughput(1024, 1 * time.Second),
+		storage.WithReadDynamicTimeout(0.99, 15, *minDelay, *minDelay, 2*time.Minute),
+		storage.WithMinReadThroughput(1024, 1 * time.Second),
 		)
 
 	// assumes bucket already exist
