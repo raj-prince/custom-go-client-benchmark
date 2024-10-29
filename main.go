@@ -28,36 +28,32 @@ import (
 )
 
 var (
+	eG errgroup.Group
+
 	grpcConnPoolSize    = 1
 	maxConnsPerHost     = 100
 	maxIdleConnsPerHost = 100
+	MiB                 = 1024 * 1024
+	maxRetryDuration    = 30 * time.Second
+	retryMultiplier     = 2.0
 
-	// MB means 1024 Kb.
-	MB = 1024 * 1024
+	objectNamePrefix = "" // set to "princer_{size}_files/file_" after flags are parsed
+	objectNameSuffix = ""
+	tracerName       = "princer-storage-benchmark"
 
-	numOfWorker = flag.Int("worker", 48, "Number of concurrent worker to read")
-
+	// Flags.
+	numOfWorker            = flag.Int("worker", 48, "Number of concurrent worker to read")
 	numOfReadCallPerWorker = flag.Int("read-call-per-worker", 1000000, "Number of read call per worker")
 
-	maxRetryDuration = 30 * time.Second
-
-	retryMultiplier = 2.0
-
-	bucketName = flag.String("bucket", "princer-working-dirs", "GCS bucket name.")
-
-	// ProjectName denotes gcp project name.
+	bucketName  = flag.String("bucket", "princer-working-dirs", "GCS bucket name.")
 	ProjectName = flag.String("project", "gcs-fuse-test", "GCP project name.")
 
-	clientProtocol   = flag.String("client-protocol", "http", "Network protocol.")
-	objectNamePrefix = "princer_100M_files/file_"
-	objectNameSuffix = ""
+	clientProtocol = flag.String("client-protocol", "http", "Network protocol.")
+	objectSize     = flag.String("size", "100M", "Object size portion of prefix")
 
-	tracerName      = "princer-storage-benchmark"
 	enableTracing   = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
 	enablePprof     = flag.Bool("enable-pprof", false, "Enable pprof server")
 	traceSampleRate = flag.Float64("trace-sample-rate", 1.0, "Sampling rate for Cloud Trace")
-
-	eG errgroup.Group
 )
 
 // CreateHTTPClient create http storage client.
@@ -112,7 +108,6 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 
 // ReadObject creates reader object corresponding to workerID with the help of bucketHandle.
 func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketHandle) (err error) {
-
 	objectName := objectNamePrefix + strconv.Itoa(workerID) + objectNameSuffix
 
 	for i := 0; i < *numOfReadCallPerWorker; i++ {
@@ -150,6 +145,8 @@ func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketH
 func main() {
 	flag.Parse()
 	ctx := context.Background()
+
+	objectNamePrefix = fmt.Sprintf("princer_%s_files/file_", *objectSize)
 
 	if *enableTracing {
 		cleanup := enableTraceExport(ctx, *traceSampleRate)
