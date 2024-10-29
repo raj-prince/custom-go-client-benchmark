@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-
 	// Register the pprof endpoints under the web server root at /debug/pprof
 	_ "net/http/pprof"
 	"os"
@@ -107,7 +106,11 @@ func CreateHTTPClient(ctx context.Context, isHTTP2 bool) (client *storage.Client
 
 // CreateGrpcClient creates grpc client.
 func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
-	return storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(grpcConnPoolSize))
+	tokenSource, err := GetTokenSource(ctx, "")
+	if err != nil {
+		return nil, err
+	}
+	return storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(grpcConnPoolSize), option.WithTokenSource(tokenSource), storage.WithDisabledClientMetrics())
 }
 
 // ReadObject creates reader object corresponding to workerID with the help of bucketHandle.
