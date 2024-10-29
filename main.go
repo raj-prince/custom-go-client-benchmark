@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+
 	// Register the pprof endpoints under the web server root at /debug/pprof
 	_ "net/http/pprof"
 	"os"
@@ -24,10 +25,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
-
-	// Install google-c2p resolver, which is required for direct path.
-	_ "google.golang.org/grpc/balancer/rls"
-	_ "google.golang.org/grpc/xds/googledirectpath"
 )
 
 var (
@@ -110,16 +107,7 @@ func CreateHTTPClient(ctx context.Context, isHTTP2 bool) (client *storage.Client
 
 // CreateGrpcClient creates grpc client.
 func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
-	if err := os.Setenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS", "true"); err != nil {
-		log.Fatalf("error setting direct path env var: %v", err)
-	}
-
-	client, err = storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(grpcConnPoolSize))
-
-	if err := os.Unsetenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS"); err != nil {
-		log.Fatalf("error while unsetting direct path env var: %v", err)
-	}
-	return
+	return storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(grpcConnPoolSize))
 }
 
 // ReadObject creates reader object corresponding to workerID with the help of bucketHandle.
