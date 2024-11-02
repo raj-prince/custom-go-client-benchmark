@@ -43,7 +43,7 @@ func registerFirstByteLatencyView() {
 	}
 
 	if err := view.Register(v); err != nil {
-		log.Fatalf("Failed to register the readLatency view: %v", err)
+		log.Fatalf("Failed to register the firstByteReadLatency view: %v", err)
 	}
 }
 
