@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+
 	// Register the pprof endpoints under the web server root at /debug/pprof
 	_ "net/http/pprof"
 	"os"
@@ -18,6 +19,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
+	"cloud.google.com/go/profiler"
 	"cloud.google.com/go/storage"
 	"github.com/googleapis/gax-go/v2"
 	"go.opencensus.io/stats"
@@ -55,6 +57,16 @@ var (
 	enableTracing   = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
 	enablePprof     = flag.Bool("enable-pprof", false, "Enable pprof server")
 	traceSampleRate = flag.Float64("trace-sample-rate", 1.0, "Sampling rate for Cloud Trace")
+
+	// Cloud profiler.
+	enableCloudProfiler = flag.Bool("enable-cloud-profiler", false, "Enable cloud profiler")
+	enableHeap          = flag.Bool("heap", false, "enable heap profile collection")
+	enableCpu           = flag.Bool("cpu", true, "enable heap profile collection")
+	enableHeapAlloc     = flag.Bool("heap_alloc", false, "enable heap allocation profile collection")
+	enableThread        = flag.Bool("thread", false, "enable thread profile collection")
+	enableContention    = flag.Bool("contention", false, "enable contention profile collection")
+	projectID           = flag.String("project_id", "", "project ID to run profiler with; only required when running outside of GCP.")
+	version             = flag.String("version", "original", "version to run profiler with")
 
 	eG errgroup.Group
 )
@@ -168,6 +180,22 @@ func main() {
 				log.Fatalf("error starting http server for pprof: %v", err)
 			}
 		}()
+	}
+
+	if *enableCloudProfiler {
+		if err := profiler.Start(profiler.Config{
+			Service:              "custom-go-benchmark",
+			ServiceVersion:       *version,
+			ProjectID:            *projectID,
+			NoCPUProfiling:       !*enableCpu,
+			NoHeapProfiling:      !*enableHeap,
+			NoAllocProfiling:     !*enableHeapAlloc,
+			NoGoroutineProfiling: !*enableThread,
+			MutexProfiling:       *enableContention,
+			DebugLogging:         true,
+		}); err != nil {
+			log.Fatalf("Failed to start profiler: %v", err)
+		}
 	}
 
 	var client *storage.Client

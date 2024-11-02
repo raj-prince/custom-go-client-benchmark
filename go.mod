@@ -3,7 +3,8 @@ module github.com/raj-prince/custom-go-client-benchmark
 go 1.22.7
 
 require (
-	cloud.google.com/go/storage v1.45.0
+	cloud.google.com/go/profiler v0.4.1
+	cloud.google.com/go/storage v1.46.0
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.14
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.20.0
 	github.com/google/go-cmp v0.6.0
@@ -18,15 +19,14 @@ require (
 	golang.org/x/oauth2 v0.23.0
 	golang.org/x/sync v0.8.0
 	gonum.org/v1/plot v0.14.0
-	google.golang.org/api v0.201.0
-	google.golang.org/grpc v1.67.1
+	google.golang.org/api v0.203.0
 )
 
 require (
 	cel.dev/expr v0.16.2 // indirect
 	cloud.google.com/go v0.116.0 // indirect
-	cloud.google.com/go/auth v0.9.9 // indirect
-	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
+	cloud.google.com/go/auth v0.10.0 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.2.5 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
 	cloud.google.com/go/iam v1.2.1 // indirect
 	cloud.google.com/go/monitoring v1.21.1 // indirect
@@ -52,6 +52,7 @@ require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
+	github.com/google/pprof v0.0.0-20240528025155-186aa0362fba // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
@@ -75,6 +76,7 @@ require (
 	google.golang.org/genproto v0.0.0-20241021214115-324edc3d5d38 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241021214115-324edc3d5d38 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241021214115-324edc3d5d38 // indirect
+	google.golang.org/grpc v1.67.1 // indirect
 	google.golang.org/grpc/stats/opentelemetry v0.0.0-20241022172816-80937a99d53c // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
 )
