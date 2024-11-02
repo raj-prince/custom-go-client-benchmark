@@ -61,13 +61,10 @@ var (
 	// Cloud profiler.
 	enableCloudProfiler = flag.Bool("enable-cloud-profiler", false, "Enable cloud profiler")
 	enableHeap          = flag.Bool("heap", false, "enable heap profile collection")
+	enableCpu           = flag.Bool("cpu", true, "enable heap profile collection")
 	enableHeapAlloc     = flag.Bool("heap_alloc", false, "enable heap allocation profile collection")
 	enableThread        = flag.Bool("thread", false, "enable thread profile collection")
 	enableContention    = flag.Bool("contention", false, "enable contention profile collection")
-	isRangeRead         = flag.Bool("read-range", false, "Is range read")
-	rangeLength         = flag.Int64("range-len", int64(8*MB), "Range read size in MB")
-	minDelay            = flag.Duration("min-delay", 500*time.Millisecond, "min delay")
-	fileSize            = flag.Int64("file-size", int64(1024*MB), "File size in MB")
 	projectID           = flag.String("project_id", "", "project ID to run profiler with; only required when running outside of GCP.")
 	version             = flag.String("version", "original", "version to run profiler with")
 
@@ -190,6 +187,7 @@ func main() {
 			Service:              "custom-go-benchmark",
 			ServiceVersion:       *version,
 			ProjectID:            *projectID,
+			NoCPUProfiling:       !*enableCpu,
 			NoHeapProfiling:      !*enableHeap,
 			NoAllocProfiling:     !*enableHeapAlloc,
 			NoGoroutineProfiling: !*enableThread,
