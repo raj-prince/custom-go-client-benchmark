@@ -50,8 +50,10 @@ var (
 	ProjectName = flag.String("project", "gcs-fuse-test", "GCP project name.")
 
 	clientProtocol   = flag.String("client-protocol", "http", "Network protocol.")
-	objectNamePrefix = "princer_100M_files/file_"
-	objectNameSuffix = ""
+
+	// Object name = objectNamePrefix + {thread_id} + objectNameSuffix
+	objectNamePrefix = flag.String("obj-prefix", "princer_100M_files/file_", "Object prefix")
+	objectNameSuffix = flag.String("obj-suffix", "", "Object suffix")
 
 	tracerName      = "princer-storage-benchmark"
 	enableTracing   = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
@@ -138,7 +140,7 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 // ReadObject creates reader object corresponding to workerID with the help of bucketHandle.
 func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketHandle) (err error) {
 
-	objectName := objectNamePrefix + strconv.Itoa(workerID) + objectNameSuffix
+	objectName := *objectNamePrefix + strconv.Itoa(workerID) + *objectNameSuffix
 
 	for i := 0; i < *numOfReadCallPerWorker; i++ {
 		var span trace.Span
@@ -250,7 +252,7 @@ func main() {
 		eG.Go(func() error {
 			err = ReadObject(ctx, idx, bucketHandle)
 			if err != nil {
-				err = fmt.Errorf("while reading object %v: %w", objectNamePrefix+strconv.Itoa(idx), err)
+				err = fmt.Errorf("while reading object %v: %w", *objectNamePrefix+strconv.Itoa(idx)+*objectNameSuffix, err)
 				return err
 			}
 			return err
