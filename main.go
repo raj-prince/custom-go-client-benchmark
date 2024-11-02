@@ -61,7 +61,7 @@ var (
 	// Cloud profiler.
 	enableCloudProfiler = flag.Bool("enable-cloud-profiler", false, "Enable cloud profiler")
 	enableHeap          = flag.Bool("heap", false, "enable heap profile collection")
-	enableCpu           = flag.Bool("cpu", true, "enable heap profile collection")
+	enableCPU           = flag.Bool("cpu", true, "enable cpu profile collection")
 	enableHeapAlloc     = flag.Bool("heap_alloc", false, "enable heap allocation profile collection")
 	enableThread        = flag.Bool("thread", false, "enable thread profile collection")
 	enableContention    = flag.Bool("contention", false, "enable contention profile collection")
@@ -122,9 +122,8 @@ func CreateHTTPClient(ctx context.Context, isHTTP2 bool) (client *storage.Client
 				Min: time.Second,
 				TargetPercentile: 0.99,
 			}))
-	} else {
-		return storage.NewClient(ctx, option.WithHTTPClient(httpClient))
 	}
+	return storage.NewClient(ctx, option.WithHTTPClient(httpClient))
 }
 
 // CreateGrpcClient creates grpc client.
@@ -153,6 +152,8 @@ func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketH
 		if err != nil {
 			return fmt.Errorf("while creating reader object: %v", err)
 		}
+		firstByteTime := time.Since(start)
+		stats.Record(ctx, firstByteReadLatency.M(float64(firstByteTime.Milliseconds())))
 
 		// Calls Reader.WriteTo implicitly.
 		_, err = io.Copy(io.Discard, rc)
@@ -198,7 +199,7 @@ func main() {
 			Service:              "custom-go-benchmark",
 			ServiceVersion:       *version,
 			ProjectID:            *projectID,
-			NoCPUProfiling:       !*enableCpu,
+			NoCPUProfiling:       !*enableCPU,
 			NoHeapProfiling:      !*enableHeap,
 			NoAllocProfiling:     !*enableHeapAlloc,
 			NoGoroutineProfiling: !*enableThread,
@@ -234,6 +235,7 @@ func main() {
 
 	// Enable stack-driver exporter.
 	registerLatencyView()
+	registerFirstByteLatencyView()
 
 	err = enableSDExporter()
 	if err != nil {
