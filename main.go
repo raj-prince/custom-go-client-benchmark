@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-
 	// Register the pprof endpoints under the web server root at /debug/pprof
 	_ "net/http/pprof"
 	"os"
@@ -21,6 +20,7 @@ import (
 
 	"cloud.google.com/go/profiler"
 	"cloud.google.com/go/storage"
+	"cloud.google.com/go/storage/experimental"
 	"github.com/googleapis/gax-go/v2"
 	"go.opencensus.io/stats"
 	"golang.org/x/oauth2"
@@ -68,6 +68,9 @@ var (
 	projectID           = flag.String("project_id", "", "project ID to run profiler with; only required when running outside of GCP.")
 	version             = flag.String("version", "original", "version to run profiler with")
 
+	// Enable read stall retry.
+	enableReadStallRetry = flag.Bool("enable-read-stall-retry", false, "Enable read stall retry")
+
 	eG errgroup.Group
 )
 
@@ -113,7 +116,15 @@ func CreateHTTPClient(ctx context.Context, isHTTP2 bool) (client *storage.Client
 		UserAgent: "prince",
 	}
 
-	return storage.NewClient(ctx, option.WithHTTPClient(httpClient))
+	if *enableReadStallRetry {
+		return storage.NewClient(ctx, option.WithHTTPClient(httpClient),
+			experimental.WithReadStallTimeout(&experimental.ReadStallTimeoutConfig{
+				Min: time.Second,
+				TargetPercentile: 0.99,
+			}))
+	} else {
+		return storage.NewClient(ctx, option.WithHTTPClient(httpClient))
+	}
 }
 
 // CreateGrpcClient creates grpc client.
