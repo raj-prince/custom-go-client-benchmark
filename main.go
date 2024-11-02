@@ -153,6 +153,8 @@ func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketH
 		if err != nil {
 			return fmt.Errorf("while creating reader object: %v", err)
 		}
+		firstByteTime := time.Since(start)
+		stats.Record(ctx, firstByteReadLatency.M(float64(firstByteTime.Milliseconds())))
 
 		// Calls Reader.WriteTo implicitly.
 		_, err = io.Copy(io.Discard, rc)
@@ -234,6 +236,7 @@ func main() {
 
 	// Enable stack-driver exporter.
 	registerLatencyView()
+	registerFirstByteLatencyView()
 
 	err = enableSDExporter()
 	if err != nil {
