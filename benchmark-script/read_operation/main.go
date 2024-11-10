@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math"
 	"math/rand"
 	"os"
 	"path"
@@ -83,7 +82,9 @@ func readAlreadyOpenedFile(index int) (err error) {
 }
 
 func getRandReadPattern() []int64 {
-	numOfRanges := int64(math.Ceil(float64((int64(*fFileSizeMB) * 1024 * 1024) / (int64(*fBlockSizeKB) * 1024))))
+	fileSizeBytes := int64(*fFileSizeMB) * 1024 * 1024
+	blockSizeBytes := int64(*fBlockSizeKB) * 1024
+	numOfRanges := (fileSizeBytes + blockSizeBytes - 1) / blockSizeBytes
 	pattern := make([]int64, numOfRanges)
 	indices := make([]int64, numOfRanges)
 	for i := int64(0); i < numOfRanges; i++ {
