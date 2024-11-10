@@ -143,7 +143,7 @@ func main() {
 
 	err := runReadFileOperations()
 	if err != nil {
-		fmt.Println(os.Stderr, err)
+		fmt.Printf("while performing read: %v", err)
 		os.Exit(1)
 	}
 	if *fOutputDir == "" {
