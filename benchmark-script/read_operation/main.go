@@ -4,12 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"path"
 	"strconv"
 	"syscall"
 	"time"
-
 
 	"golang.org/x/sync/errgroup"
 )
@@ -30,11 +30,13 @@ var (
 
 	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
 
-	fOutputDir = flag.String("output-dir", "", "Directory to dump the output")
+	fOutputDir  = flag.String("output-dir", "", "Directory to dump the output")
 	fFilePrefix = flag.String("file-prefix", "", "Prefix file")
+	fReadType   = flag.String("read", "read", "Whether to do sequential reads (read) or random reads (randread)")
 )
 
 var gResult *Result
+
 func init() {
 	gResult = &Result{}
 }
@@ -79,6 +81,53 @@ func readAlreadyOpenedFile(index int) (err error) {
 	return
 }
 
+func getRandReadPattern() []int64 {
+	fileSizeBytes := int64(*fFileSizeMB) * 1024 * 1024
+	blockSizeBytes := int64(*fBlockSizeKB) * 1024
+	numOfRanges := (fileSizeBytes + blockSizeBytes - 1) / blockSizeBytes
+	pattern := make([]int64, numOfRanges)
+	indices := make([]int64, numOfRanges)
+	for i := int64(0); i < numOfRanges; i++ {
+		indices[int(i)] = i
+	}
+	for i := int64(0); i < numOfRanges; i++ {
+		randNum := rand.Intn(len(indices))
+		pattern[i] = indices[randNum] * int64(*fBlockSizeKB*1024)
+		indices = append(indices[:randNum], indices[randNum+1:]...)
+	}
+	return pattern
+}
+
+func randReadAlreadyOpenedFile(index int) (err error) {
+	pattern := getRandReadPattern()
+	b := make([]byte, *fBlockSizeKB*1024)
+	for i := 0; i < *fNumberOfRead; i++ {
+		readStart := time.Now()
+
+		for j := 0; j < len(pattern); j++ {
+			offset := pattern[j]
+			_, _ = fileHandles[index].Seek(offset, 0)
+
+			_, err = fileHandles[index].Read(b)
+			if err != nil && err != io.EOF {
+				break
+			} else {
+				err = nil
+			}
+		}
+
+		if err != nil {
+			return fmt.Errorf("while reading and discarding content: %v", err)
+		}
+
+		readLatency := time.Since(readStart)
+
+		throughput := float64(*fFileSizeMB) / readLatency.Seconds()
+		gResult.Append(readLatency.Seconds(), throughput)
+	}
+	return
+}
+
 func runReadFileOperations() (err error) {
 	if *fDir == "" {
 		err = fmt.Errorf("you must set --dir flag")
@@ -108,7 +157,11 @@ func runReadFileOperations() (err error) {
 	for i := 0; i < *fNumOfThreads; i++ {
 		index := i
 		eG.Go(func() error {
-			err := readAlreadyOpenedFile(index)
+			if *fReadType == "randread" {
+				err = randReadAlreadyOpenedFile(index)
+			} else {
+				err = readAlreadyOpenedFile(index)
+			}
 			if err != nil {
 				err = fmt.Errorf("while reading file: %w", err)
 				return err
