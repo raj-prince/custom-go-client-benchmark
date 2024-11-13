@@ -162,10 +162,10 @@ func CreateAndPerformControlClientOperation(ctx context.Context) (err error) {
 		RequestId: "",
 	}, callOptions...)
 
-	fmt.Println("storageLayoutFetch time: ", time.Since(startTime).Seconds())
+	fmt.Println("Time taken (second) in storageLayoutFetch: ", time.Since(startTime).Seconds())
 	timeCheck1 := time.Now()
 	namespace := storageLayout.GetHierarchicalNamespace()
-	fmt.Println("namespace fetch time: ", time.Since(timeCheck1).Seconds())
+	fmt.Println("Time taken (second) in namespace fetch: ", time.Since(timeCheck1).Seconds())
 	fmt.Println(namespace)
 
 	return nil
