@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+	"context"
+	"go.opencensus.io/stats"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -53,7 +55,7 @@ func openFile(index int) (err error) {
 }
 
 // Expect file is already opened, otherwise throws error
-func readAlreadyOpenedFile(index int) (err error) {
+func readAlreadyOpenedFile(ctx context.Context, index int) (err error) {
 	b := make([]byte, *fBlockSizeKB*1024)
 	for i := 0; i < *fNumberOfRead; i++ {
 		readStart := time.Now()
@@ -74,6 +76,7 @@ func readAlreadyOpenedFile(index int) (err error) {
 		}
 
 		readLatency := time.Since(readStart)
+		stats.Record(ctx, readLatencyStat.M(float64(readLatency.Milliseconds())))
 
 		throughput := float64(*fFileSizeMB) / readLatency.Seconds()
 		gResult.Append(readLatency.Seconds(), throughput)
@@ -98,7 +101,7 @@ func getRandReadPattern() []int64 {
 	return pattern
 }
 
-func randReadAlreadyOpenedFile(index int) (err error) {
+func randReadAlreadyOpenedFile(ctx context.Context, index int) (err error) {
 	pattern := getRandReadPattern()
 	b := make([]byte, *fBlockSizeKB*1024)
 	for i := 0; i < *fNumberOfRead; i++ {
@@ -124,11 +127,20 @@ func randReadAlreadyOpenedFile(index int) (err error) {
 		if err != nil {
 			return fmt.Errorf("while reading and discarding content: %v", err)
 		}
+<<<<<<< Updated upstream
+=======
+
+		readLatency := time.Since(readStart)
+		stats.Record(ctx, readLatencyStat.M(float64(readLatency.Milliseconds())))
+
+		throughput := float64(*fFileSizeMB) / readLatency.Seconds()
+		gResult.Append(readLatency.Seconds(), throughput)
+>>>>>>> Stashed changes
 	}
 	return
 }
 
-func runReadFileOperations() (err error) {
+func runReadFileOperations(ctx context.Context) (err error) {
 	if *fDir == "" {
 		err = fmt.Errorf("you must set --dir flag")
 		return
@@ -158,9 +170,9 @@ func runReadFileOperations() (err error) {
 		index := i
 		eG.Go(func() error {
 			if *fReadType == "randread" {
-				err = randReadAlreadyOpenedFile(index)
+				err = randReadAlreadyOpenedFile(ctx, index)
 			} else {
-				err = readAlreadyOpenedFile(index)
+				err = readAlreadyOpenedFile(ctx, index)
 			}
 			if err != nil {
 				err = fmt.Errorf("while reading file: %w", err)
@@ -188,13 +200,25 @@ func runReadFileOperations() (err error) {
 }
 
 func main() {
+	ctx := context.Background()
+
 	flag.Parse()
 	fmt.Println("\n******* Passed flags: *******")
 	flag.VisitAll(func(f *flag.Flag) {
 		fmt.Printf("Flag: %s, Value: %v\n", f.Name, f.Value)
 	})
 
-	err := runReadFileOperations()
+	// Enable stack-driver exporter.
+	registerLatencyView()
+
+	err := enableSDExporter()
+	if err != nil {
+		fmt.Printf("while enabling stackdriver exporter: %v", err)
+		os.Exit(1)
+	}
+	defer closeSDExporter()
+
+	err = runReadFileOperations(ctx)
 	if err != nil {
 		fmt.Printf("while performing read: %v", err)
 		os.Exit(1)
@@ -202,8 +226,13 @@ func main() {
 	if *fOutputDir == "" {
 		*fOutputDir, _ = os.Getwd()
 	}
+<<<<<<< Updated upstream
 	csvFileName := "metrics_" + *fReadType + ".csv"
 	gResult.DumpMetricsCSV(path.Join(*fOutputDir, csvFileName))
+=======
+	
+	gResult.DumpMetricsCSV(path.Join(*fOutputDir, "metrics.csv"))
+>>>>>>> Stashed changes
 	gResult.PrintStats()
 
 }
