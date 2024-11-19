@@ -121,21 +121,12 @@ func randReadAlreadyOpenedFile(ctx context.Context, index int) (err error) {
 			readLatency := time.Since(readStart)
 			throughput := float64((*fBlockSizeKB) / 1024) / readLatency.Seconds()
 			gResult.Append(readLatency.Seconds(), throughput)
-
+			stats.Record(ctx, readLatencyStat.M(float64(readLatency.Milliseconds())))
 		}
 
 		if err != nil {
 			return fmt.Errorf("while reading and discarding content: %v", err)
 		}
-<<<<<<< Updated upstream
-=======
-
-		readLatency := time.Since(readStart)
-		stats.Record(ctx, readLatencyStat.M(float64(readLatency.Milliseconds())))
-
-		throughput := float64(*fFileSizeMB) / readLatency.Seconds()
-		gResult.Append(readLatency.Seconds(), throughput)
->>>>>>> Stashed changes
 	}
 	return
 }
@@ -226,13 +217,9 @@ func main() {
 	if *fOutputDir == "" {
 		*fOutputDir, _ = os.Getwd()
 	}
-<<<<<<< Updated upstream
+
 	csvFileName := "metrics_" + *fReadType + ".csv"
 	gResult.DumpMetricsCSV(path.Join(*fOutputDir, csvFileName))
-=======
-	
-	gResult.DumpMetricsCSV(path.Join(*fOutputDir, "metrics.csv"))
->>>>>>> Stashed changes
 	gResult.PrintStats()
 
 }
