@@ -17,11 +17,22 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 
-	"go.opentelemetry.io/contrib/exporters/autoexport"
+	cloudmetric "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric"
+	"strings"
+	"time"
+
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
+
+func metricFormatter(m metricdata.Metrics) string {
+	return "custom.googleapis.com/gcsfuse-scale-test/" + strings.ReplaceAll(m.Name, ".", "/")
+}
 
 // setupOpenTelemetry sets up the OpenTelemetry SDK and exporters for metrics and
 // traces. If it does not return an error, call shutdown for proper cleanup.
@@ -40,14 +51,26 @@ func setupOpenTelemetry(ctx context.Context) (shutdown func(context.Context) err
 		return err
 	}
 
-	// Configure Metric Export to send metrics as OTLP
-	mreader, err := autoexport.NewMetricReader(ctx)
-	if err != nil {
-		err = errors.Join(err, shutdown(ctx))
-		return
+	options := []cloudmetric.Option{
+		cloudmetric.WithMetricDescriptorTypeFormatter(metricFormatter),
+		cloudmetric.WithFilteredResourceAttributes(func(kv attribute.KeyValue) bool {
+			// Ensure that PID is available as a metric label on metrics explorer.
+			return cloudmetric.DefaultResourceAttributesFilter(kv) ||
+				kv.Key == semconv.ProcessPIDKey
+		}),
+		cloudmetric.WithProjectID("gcs-tess"),
 	}
+
+	exporter, err := cloudmetric.New(options...)
+	if err != nil {
+		fmt.Printf("Error while creating Google Cloud exporter:%v\n", err)
+		return nil, nil
+	}
+
+	r := metric.NewPeriodicReader(exporter, metric.WithInterval(60 * time.Second))
+
 	mp := metric.NewMeterProvider(
-		metric.WithReader(mreader),
+		metric.WithReader(r),
 	)
 	shutdownFuncs = append(shutdownFuncs, mp.Shutdown)
 	otel.SetMeterProvider(mp)

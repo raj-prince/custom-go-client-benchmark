@@ -26,7 +26,7 @@ const (
 
 func init() {
 	var err error
-	latencyHistogram, err = meter.Float64Histogram("read_latency", metric.WithUnit("ms"), metric.WithDescription("Test sample"))
+	latencyHistogram, err = meter.Float64Histogram("warp_read_latency", metric.WithUnit("ms"), metric.WithDescription("Test sample"))
 	if err != nil {
 		panic(err)
 	}
@@ -220,7 +220,9 @@ func main() {
 
 	defer func() {
 		err = shutdown(ctx)
-		panic(err)
+		if err != nil {
+			log.Fatalf("failed to shutdown OpenTelemetry: %v", err)
+		}
 	}()
 
 	flag.Parse()
