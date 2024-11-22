@@ -46,6 +46,7 @@ func getResource(ctx context.Context) (*resource.Resource, error) {
 			semconv.ServiceName("gcsfuse-scale-tester"),
 			semconv.ServiceVersion("0.0.1"),
 		),
+		resource.WithFromEnv(),
 	)
 }
 
