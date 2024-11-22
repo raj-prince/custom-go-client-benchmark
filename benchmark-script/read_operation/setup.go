@@ -24,36 +24,41 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/contrib/detectors/gcp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/sdk/resource"
-	"go.opentelemetry.io/contrib/detectors/gcp"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+)
+
+const (
+	ServiceName = "gcsfuse-scale-tester"
+	Version     = "0.0.1"
 )
 
 func metricFormatter(m metricdata.Metrics) string {
 	return "custom.googleapis.com/gcsfuse-scale-tester/" + strings.ReplaceAll(m.Name, ".", "/")
 }
 
-func getResource(ctx context.Context) (*resource.Resource, error) {
+// getResource returns a resource describing application and its run environment.
+func getApplicationResource(ctx context.Context) (*resource.Resource, error) {
 	return resource.New(ctx,
 		// Use the GCP resource detector to detect information about the GCP platform
 		resource.WithDetectors(gcp.NewDetector()),
 		resource.WithTelemetrySDK(),
 		resource.WithAttributes(
-			semconv.ServiceName("gcsfuse-scale-tester"),
-			semconv.ServiceVersion("0.0.1"),
+			semconv.ServiceName(ServiceName),
+			semconv.ServiceVersion(Version),
 		),
+		// To get pod specific metrices. Ref: https://github.com/open-telemetry/opentelemetry-go-contrib/blob/7a12292a9f4bfe9f562e8d32cbdddd694280d851/detectors/gcp/README.md?plain=1#L47
 		resource.WithFromEnv(),
 	)
 }
 
-// setupOpenTelemetry sets up the OpenTelemetry SDK and exporters for metrics and
-// traces. If it does not return an error, call shutdown for proper cleanup.
-// [START opentelemetry_instrumentation_setup_opentelemetry]
-func setupOpenTelemetry(ctx context.Context) (shutdown func(context.Context) error, err error) {
+// setupOpenTelemetryWithCloudExporter sets up OpenTelemetry with a Cloud exporter.
+func setupOpenTelemetryWithCloudExporter(ctx context.Context, exportInterval time.Duration) (shutdown func(context.Context) error, err error) {
 	var shutdownFuncs []func(context.Context) error
 
 	// shutdown combines shutdown functions from multiple OpenTelemetry
@@ -77,16 +82,24 @@ func setupOpenTelemetry(ctx context.Context) (shutdown func(context.Context) err
 		cloudmetric.WithProjectID("gcs-tess"),
 	}
 
+	// Create cloud exporter.
 	exporter, err := cloudmetric.New(options...)
 	if err != nil {
 		fmt.Printf("Error while creating Google Cloud exporter:%v\n", err)
 		return nil, nil
 	}
 
-	r := metric.NewPeriodicReader(exporter, metric.WithInterval(60 * time.Second))
+	r := metric.NewPeriodicReader(exporter, metric.WithInterval(exportInterval))
 
-	resource, err := getResource(ctx)
+	// Create a resource that describes the application.  This is used to
+	// add context to the metrics that are exported.  For example, this
+	// resource can include information about the environment where the
+	// application is running, such as the Kubernetes cluster name and pod
+	// name.  This information is useful for filtering and aggregating
+	// metrics in the Cloud Monitoring console.
+	resource, err := getApplicationResource(ctx)
 	if err != nil {
+	
 		log.Fatalf("failed to create resource: %v", err)
 	}
 

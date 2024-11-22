@@ -22,38 +22,35 @@ import (
 
 const (
 	scopeName = "github.com/raj-prince/warp-test/instrumentation"
+	OneKB = 1024
 )
 
 func init() {
 	var err error
 	latencyHistogram, err = meter.Float64Histogram("warp_read_latency", metric.WithUnit("ms"), metric.WithDescription("Test sample"))
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to start latency histogram: %v", err)
 	}
 }
 
 var (
-	meter = otel.Meter(scopeName)
+	// OTLP metrics.
+	meter            = otel.Meter(scopeName)
 	latencyHistogram metric.Float64Histogram
 
 	fDir          = flag.String("dir", "", "Directory file to be opened.")
-	fNumOfThreads = flag.Int("threads", 1, "Number of threads to read parallel")
 
-	fBlockSizeKB = flag.Int("block-size-kb", 1024, "Block size in KB")
-
-	fFileSizeMB = flag.Int64("file-size-mb", 1024, "File size in MB")
-
-	fileHandles []*os.File
-
-	eG errgroup.Group
-
-	OneKB = 1024
-
-	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
-
-	fOutputDir  = flag.String("output-dir", "", "Directory to dump the output")
+	// Workload.
 	fFilePrefix = flag.String("file-prefix", "", "Prefix file")
 	fReadType   = flag.String("read", "read", "Whether to do sequential reads (read) or random reads (randread)")
+	fNumOfThreads = flag.Int("threads", 1, "Number of threads to read parallel")
+	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
+	fBlockSizeKB = flag.Int("block-size-kb", 1024, "Block size in KB")
+	fFileSizeMB = flag.Int64("file-size-mb", 1024, "File size in MB")
+
+	// Helper.
+	fileHandles []*os.File
+	eG errgroup.Group
 )
 
 var gResult *Result
@@ -127,7 +124,7 @@ func randReadAlreadyOpenedFile(ctx context.Context, index int) (err error) {
 	for i := 0; i < *fNumberOfRead; i++ {
 		for j := 0; j < len(pattern); j++ {
 			offset := pattern[j]
-			
+
 			readStart := time.Now()
 			_, _ = fileHandles[index].Seek(offset, 0)
 
@@ -139,7 +136,7 @@ func randReadAlreadyOpenedFile(ctx context.Context, index int) (err error) {
 			}
 
 			readLatency := time.Since(readStart)
-			throughput := float64((*fBlockSizeKB) / 1024) / readLatency.Seconds()
+			throughput := float64((*fBlockSizeKB)/1024) / readLatency.Seconds()
 			gResult.Append(readLatency.Seconds(), throughput)
 			stats.Record(ctx, readLatencyStat.M(float64(readLatency.Milliseconds())))
 		}
@@ -211,13 +208,18 @@ func runReadFileOperations(ctx context.Context) (err error) {
 }
 
 func main() {
-	ctx := context.Background()
+	flag.Parse()
+	log.Println("Application called with below flags: ")
+	flag.VisitAll(func(f *flag.Flag) {
+		log.Printf("Flag: %s, Value: %v\n", f.Name, f.Value)
+	})
 
-	shutdown, err := setupOpenTelemetry(ctx)
+	// Setup OTEL with cloud exporter.
+	ctx := context.Background()
+	shutdown, err := setupOpenTelemetryWithCloudExporter(ctx, 60*time.Second)
 	if err != nil {
 		log.Fatalf("failed to setup OpenTelemetry: %v", err)
 	}
-
 	defer func() {
 		err = shutdown(ctx)
 		if err != nil {
@@ -225,21 +227,12 @@ func main() {
 		}
 	}()
 
-	flag.Parse()
-	fmt.Println("\n******* Passed flags: *******")
-	flag.VisitAll(func(f *flag.Flag) {
-		fmt.Printf("Flag: %s, Value: %v\n", f.Name, f.Value)
-	})
-
+	// Start actual workload.
 	err = runReadFileOperations(ctx)
-	time.Sleep(10 * time.Second)
 	if err != nil {
 		log.Fatalf("while performing read: %v", err)
-		os.Exit(1)
-	}
-	if *fOutputDir == "" {
-		*fOutputDir, _ = os.Getwd()
 	}
 
+	// TODO: to remove once totally switch over metrics.
 	gResult.PrintStats()
 }
