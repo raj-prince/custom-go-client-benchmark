@@ -1,40 +1,56 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"os"
 	"path"
 	"strconv"
 	"syscall"
 	"time"
-	"context"
-	"go.opencensus.io/stats"
 
+	"go.opencensus.io/stats"
+	"go.opentelemetry.io/otel/metric"
 	"golang.org/x/sync/errgroup"
+
+	"go.opentelemetry.io/otel"
 )
 
-var (
-	fDir          = flag.String("dir", "", "Directory file to be opened.")
-	fNumOfThreads = flag.Int("threads", 1, "Number of threads to read parallel")
-
-	fBlockSizeKB = flag.Int("block-size-kb", 1024, "Block size in KB")
-
-	fFileSizeMB = flag.Int64("file-size-mb", 1024, "File size in MB")
-
-	fileHandles []*os.File
-
-	eG errgroup.Group
-
+const (
+	scopeName = "github.com/raj-prince/warp-test/instrumentation"
 	OneKB = 1024
+)
 
-	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
+func init() {
+	var err error
+	latencyHistogram, err = meter.Float64Histogram("warp_read_latency", metric.WithUnit("ms"), metric.WithDescription("Test sample"))
+	if err != nil {
+		log.Fatalf("Failed to start latency histogram: %v", err)
+	}
+}
 
-	fOutputDir  = flag.String("output-dir", "", "Directory to dump the output")
+var (
+	// OTLP metrics.
+	meter            = otel.Meter(scopeName)
+	latencyHistogram metric.Float64Histogram
+
+	fDir          = flag.String("dir", "", "Directory file to be opened.")
+
+	// Workload.
 	fFilePrefix = flag.String("file-prefix", "", "Prefix file")
 	fReadType   = flag.String("read", "read", "Whether to do sequential reads (read) or random reads (randread)")
+	fNumOfThreads = flag.Int("threads", 1, "Number of threads to read parallel")
+	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
+	fBlockSizeKB = flag.Int("block-size-kb", 1024, "Block size in KB")
+	fFileSizeMB = flag.Int64("file-size-mb", 1024, "File size in MB")
+
+	// Helper.
+	fileHandles []*os.File
+	eG errgroup.Group
 )
 
 var gResult *Result
@@ -76,7 +92,8 @@ func readAlreadyOpenedFile(ctx context.Context, index int) (err error) {
 		}
 
 		readLatency := time.Since(readStart)
-		stats.Record(ctx, readLatencyStat.M(float64(readLatency.Milliseconds())))
+		// stats.Record(ctx, readLatencyStat.M(float64(readLatency.Milliseconds())))
+		latencyHistogram.Record(ctx, float64(readLatency.Milliseconds()))
 
 		throughput := float64(*fFileSizeMB) / readLatency.Seconds()
 		gResult.Append(readLatency.Seconds(), throughput)
@@ -107,7 +124,7 @@ func randReadAlreadyOpenedFile(ctx context.Context, index int) (err error) {
 	for i := 0; i < *fNumberOfRead; i++ {
 		for j := 0; j < len(pattern); j++ {
 			offset := pattern[j]
-			
+
 			readStart := time.Now()
 			_, _ = fileHandles[index].Seek(offset, 0)
 
@@ -119,7 +136,7 @@ func randReadAlreadyOpenedFile(ctx context.Context, index int) (err error) {
 			}
 
 			readLatency := time.Since(readStart)
-			throughput := float64((*fBlockSizeKB) / 1024) / readLatency.Seconds()
+			throughput := float64((*fBlockSizeKB)/1024) / readLatency.Seconds()
 			gResult.Append(readLatency.Seconds(), throughput)
 			stats.Record(ctx, readLatencyStat.M(float64(readLatency.Milliseconds())))
 		}
@@ -191,35 +208,31 @@ func runReadFileOperations(ctx context.Context) (err error) {
 }
 
 func main() {
-	ctx := context.Background()
-
 	flag.Parse()
-	fmt.Println("\n******* Passed flags: *******")
+	log.Println("Application called with below flags: ")
 	flag.VisitAll(func(f *flag.Flag) {
-		fmt.Printf("Flag: %s, Value: %v\n", f.Name, f.Value)
+		log.Printf("Flag: %s, Value: %v\n", f.Name, f.Value)
 	})
 
-	// Enable stack-driver exporter.
-	registerLatencyView()
-
-	err := enableSDExporter()
+	// Setup OTEL with cloud exporter.
+	ctx := context.Background()
+	shutdown, err := setupOpenTelemetryWithCloudExporter(ctx, 60*time.Second)
 	if err != nil {
-		fmt.Printf("while enabling stackdriver exporter: %v", err)
-		os.Exit(1)
+		log.Fatalf("failed to setup OpenTelemetry: %v", err)
 	}
-	defer closeSDExporter()
+	defer func() {
+		err = shutdown(ctx)
+		if err != nil {
+			log.Fatalf("failed to shutdown OpenTelemetry: %v", err)
+		}
+	}()
 
+	// Start actual workload.
 	err = runReadFileOperations(ctx)
 	if err != nil {
-		fmt.Printf("while performing read: %v", err)
-		os.Exit(1)
-	}
-	if *fOutputDir == "" {
-		*fOutputDir, _ = os.Getwd()
+		log.Fatalf("while performing read: %v", err)
 	}
 
-	csvFileName := "metrics_" + *fReadType + ".csv"
-	gResult.DumpMetricsCSV(path.Join(*fOutputDir, csvFileName))
+	// TODO: to remove once totally switch over metrics.
 	gResult.PrintStats()
-
 }
