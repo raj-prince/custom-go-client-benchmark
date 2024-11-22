@@ -70,8 +70,8 @@ func setupOpenTelemetry(ctx context.Context) (shutdown func(context.Context) err
 		cloudmetric.WithMetricDescriptorTypeFormatter(metricFormatter),
 		cloudmetric.WithFilteredResourceAttributes(func(kv attribute.KeyValue) bool {
 			// Ensure that PID is available as a metric label on metrics explorer.
-			return cloudmetric.DefaultResourceAttributesFilter(kv) ||
-				kv.Key == semconv.ProcessPIDKey
+			return kv.Key == semconv.K8SContainerNameKey || kv.Key == semconv.K8SClusterNameKey ||
+				kv.Key == semconv.ProcessPIDKey || kv.Key == semconv.K8SPodNameKey
 		}),
 		cloudmetric.WithProjectID("gcs-tess"),
 	}
