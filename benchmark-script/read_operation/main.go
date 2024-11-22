@@ -13,7 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	"go.opencensus.io/stats"
 	"go.opentelemetry.io/otel/metric"
 	"golang.org/x/sync/errgroup"
 
@@ -22,7 +21,7 @@ import (
 
 const (
 	scopeName = "github.com/raj-prince/warp-test/instrumentation"
-	OneKB = 1024
+	OneKB     = 1024
 )
 
 func init() {
@@ -38,19 +37,19 @@ var (
 	meter            = otel.Meter(scopeName)
 	latencyHistogram metric.Float64Histogram
 
-	fDir          = flag.String("dir", "", "Directory file to be opened.")
+	fDir = flag.String("dir", "", "Directory file to be opened.")
 
 	// Workload.
-	fFilePrefix = flag.String("file-prefix", "", "Prefix file")
-	fReadType   = flag.String("read", "read", "Whether to do sequential reads (read) or random reads (randread)")
+	fFilePrefix   = flag.String("file-prefix", "", "Prefix file")
+	fReadType     = flag.String("read", "read", "Whether to do sequential reads (read) or random reads (randread)")
 	fNumOfThreads = flag.Int("threads", 1, "Number of threads to read parallel")
 	fNumberOfRead = flag.Int("read-count", 1, "number of read iteration")
-	fBlockSizeKB = flag.Int("block-size-kb", 1024, "Block size in KB")
-	fFileSizeMB = flag.Int64("file-size-mb", 1024, "File size in MB")
+	fBlockSizeKB  = flag.Int("block-size-kb", 1024, "Block size in KB")
+	fFileSizeMB   = flag.Int64("file-size-mb", 1024, "File size in MB")
 
 	// Helper.
 	fileHandles []*os.File
-	eG errgroup.Group
+	eG          errgroup.Group
 )
 
 var gResult *Result
@@ -92,7 +91,6 @@ func readAlreadyOpenedFile(ctx context.Context, index int) (err error) {
 		}
 
 		readLatency := time.Since(readStart)
-		// stats.Record(ctx, readLatencyStat.M(float64(readLatency.Milliseconds())))
 		latencyHistogram.Record(ctx, float64(readLatency.Milliseconds()))
 
 		throughput := float64(*fFileSizeMB) / readLatency.Seconds()
@@ -130,19 +128,13 @@ func randReadAlreadyOpenedFile(ctx context.Context, index int) (err error) {
 
 			_, err = fileHandles[index].Read(b)
 			if err != nil && err != io.EOF {
-				break
-			} else {
-				err = nil
+				return fmt.Errorf("while reading and discarding content: %v", err)
 			}
 
 			readLatency := time.Since(readStart)
 			throughput := float64((*fBlockSizeKB)/1024) / readLatency.Seconds()
 			gResult.Append(readLatency.Seconds(), throughput)
-			stats.Record(ctx, readLatencyStat.M(float64(readLatency.Milliseconds())))
-		}
-
-		if err != nil {
-			return fmt.Errorf("while reading and discarding content: %v", err)
+			latencyHistogram.Record(ctx, float64(readLatency.Milliseconds()))
 		}
 	}
 	return
