@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	cloudmetric "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric"
 	"strings"
@@ -28,10 +29,24 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	"go.opentelemetry.io/otel/sdk/resource"
+	"go.opentelemetry.io/contrib/detectors/gcp"
 )
 
 func metricFormatter(m metricdata.Metrics) string {
-	return "custom.googleapis.com/gcsfuse-scale-test/" + strings.ReplaceAll(m.Name, ".", "/")
+	return "custom.googleapis.com/gcsfuse-scale-tester/" + strings.ReplaceAll(m.Name, ".", "/")
+}
+
+func getResource(ctx context.Context) (*resource.Resource, error) {
+	return resource.New(ctx,
+		// Use the GCP resource detector to detect information about the GCP platform
+		resource.WithDetectors(gcp.NewDetector()),
+		resource.WithTelemetrySDK(),
+		resource.WithAttributes(
+			semconv.ServiceName("gcsfuse-scale-tester"),
+			semconv.ServiceVersion("0.0.1"),
+		),
+	)
 }
 
 // setupOpenTelemetry sets up the OpenTelemetry SDK and exporters for metrics and
@@ -69,8 +84,14 @@ func setupOpenTelemetry(ctx context.Context) (shutdown func(context.Context) err
 
 	r := metric.NewPeriodicReader(exporter, metric.WithInterval(60 * time.Second))
 
+	resource, err := getResource(ctx)
+	if err != nil {
+		log.Fatalf("failed to create resource: %v", err)
+	}
+
 	mp := metric.NewMeterProvider(
 		metric.WithReader(r),
+		metric.WithResource(resource),
 	)
 	shutdownFuncs = append(shutdownFuncs, mp.Shutdown)
 	otel.SetMeterProvider(mp)
