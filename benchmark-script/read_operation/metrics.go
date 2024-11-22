@@ -41,7 +41,7 @@ func enableSDExporter() (err error) {
 		MetricPrefix: "custom.googleapis.com/warp-test/",
 		// ReportingInterval sets the frequency of reporting metrics
 		// to the Cloud Monitoring backend.
-		ReportingInterval: 5 * time.Second,
+		ReportingInterval: 60 * time.Second,
 	})
 
 	if err != nil {
