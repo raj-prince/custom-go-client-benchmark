@@ -8,11 +8,14 @@ import (
 	"io"
 	"log"
 	"net/http"
+
 	// Register the pprof endpoints under the web server root at /debug/pprof
 	_ "net/http/pprof"
 	"os"
 	"strconv"
 	"time"
+
+	control "cloud.google.com/go/storage/control/apiv2"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -26,6 +29,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
+	"cloud.google.com/go/storage/control/apiv2/controlpb"
 )
 
 var (
@@ -137,6 +141,37 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 	return storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(grpcConnPoolSize), option.WithTokenSource(tokenSource), storage.WithDisabledClientMetrics())
 }
 
+// CreateStorageControlClient creates control client.
+func CreateAndPerformControlClientOperation(ctx context.Context) (err error) {
+	tokenSource, err := GetTokenSource(ctx, "")
+	if err != nil {
+		return err
+	}
+
+	// , storage.WithDisabledClientMetrics()
+	ctrlClient, err := control.NewStorageControlClient(ctx, option.WithGRPCConnectionPool(grpcConnPoolSize), option.WithTokenSource(tokenSource))
+	if err != nil {
+		return err
+	}
+
+	startTime := time.Now()
+	var callOptions []gax.CallOption
+	storageLayout, err := ctrlClient.GetStorageLayout(context.Background(), &controlpb.GetStorageLayoutRequest{
+		Name:      fmt.Sprintf("projects/_/buckets/%s/storageLayout", *bucketName),
+		Prefix:    "",
+		RequestId: "",
+	}, callOptions...)
+
+	fmt.Println("Time taken (second) in storageLayoutFetch: ", time.Since(startTime).Seconds())
+	timeCheck1 := time.Now()
+	namespace := storageLayout.GetHierarchicalNamespace()
+	fmt.Println("Time taken (second) in namespace fetch: ", time.Since(timeCheck1).Seconds())
+	fmt.Println(namespace)
+
+	return nil
+
+}
+
 // ReadObject creates reader object corresponding to workerID with the help of bucketHandle.
 func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketHandle) (err error) {
 
@@ -216,8 +251,15 @@ func main() {
 	var err error
 	if *clientProtocol == "http" {
 		client, err = CreateHTTPClient(ctx, false)
-	} else {
+	} else if *clientProtocol == "grpc" {
 		client, err = CreateGrpcClient(ctx)
+	} else {
+		err := CreateAndPerformControlClientOperation(ctx)
+		if err != nil {
+			fmt.Printf("while creating the client: %v", err)
+			os.Exit(1)	
+		}
+		os.Exit(0)
 	}
 
 	if err != nil {
