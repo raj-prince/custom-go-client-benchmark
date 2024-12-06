@@ -130,12 +130,21 @@ func CreateHTTPClient(ctx context.Context, isHTTP2 bool) (client *storage.Client
 
 // CreateGrpcClient creates grpc client.
 func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
+	fmt.Println("GRPC")
 	tokenSource, err := GetTokenSource(ctx, "")
 	if err != nil {
 		return nil, err
 	}
+
+	if err := storage.CheckDirectConnectivitySupported(ctx, "tail-latency-test-bucket-asia-east1", option.WithGRPCConnectionPool(grpcConnPoolSize), option.WithTokenSource(tokenSource), storage.WithDisabledClientMetrics()); err != nil {
+		log.Println("Direct path: %v", err)
+	} else {
+		log.Println("Direct path is working")
+	}
+
 	return storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(grpcConnPoolSize), option.WithTokenSource(tokenSource), storage.WithDisabledClientMetrics())
 }
+
 
 // ReadObject creates reader object corresponding to workerID with the help of bucketHandle.
 func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketHandle) (err error) {
@@ -150,6 +159,7 @@ func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketH
 		)
 		start := time.Now()
 		object := bucketHandle.Object(objectName)
+
 		rc, err := object.NewReader(traceCtx)
 		if err != nil {
 			return fmt.Errorf("while creating reader object: %v", err)
@@ -234,6 +244,12 @@ func main() {
 
 	// assumes bucket already exist
 	bucketHandle := client.Bucket(*bucketName)
+
+	start := time.Now()
+	_, err = bucketHandle.Object("1KB_50files_0subdir/").Attrs(ctx)
+	fmt.Println("Time taken by stat: ", time.Since(start))
+
+	
 
 	// Enable stack-driver exporter.
 	registerLatencyView()
