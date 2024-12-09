@@ -64,7 +64,7 @@ func IsStorageConditionsNotEmpty(conditions storage.Conditions) bool {
 }
 
 func GenerateData(size int) ([]byte, error) {
-	data := make([]byte, size)
+	data := make([]byte, size*1024*1024)
 	if _, err := rand.Read(data); err != nil {
 		return nil, err
 	}

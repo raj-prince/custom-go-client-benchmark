@@ -314,13 +314,17 @@ func main() {
 	// Run the actual workload
 
 	objname := "reproObj"
-	for i := 1; i < 11; i++ {
-		contents, _ := util.GenerateData(i)
-		req := &gcs.CreateObjectRequest{
-			Name:     objname,
-			Contents: bytes.NewReader(contents),
+	for j := 1; j <= 100; j++ {
+		log.Printf("Iteration Number : %d\n", j)
+		for i := 1; i < 11; i++ {
+			contents, _ := util.GenerateData(i)
+			log.Printf("Writing content of size %vMb\n", i)
+			req := &gcs.CreateObjectRequest{
+				Name:     objname,
+				Contents: bytes.NewReader(contents),
+			}
+			err = writeObject(ctx, bucketHandle, req)
 		}
-		err = writeObject(ctx, bucketHandle, req)
 	}
 
 	if err == nil {
