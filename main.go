@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -14,9 +16,12 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/jacobsa/gcloud/gcs"
+	"github.com/raj-prince/custom-go-client-benchmark/util"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/api/googleapi"
 
 	"cloud.google.com/go/profiler"
 	"cloud.google.com/go/storage"
@@ -49,7 +54,7 @@ var (
 	// ProjectName denotes gcp project name.
 	ProjectName = flag.String("project", "gcs-fuse-test", "GCP project name.")
 
-	clientProtocol   = flag.String("client-protocol", "http", "Network protocol.")
+	clientProtocol = flag.String("client-protocol", "http", "Network protocol.")
 
 	// Object name = objectNamePrefix + {thread_id} + objectNameSuffix
 	objectNamePrefix = flag.String("obj-prefix", "princer_100M_files/file_", "Object prefix")
@@ -121,7 +126,7 @@ func CreateHTTPClient(ctx context.Context, isHTTP2 bool) (client *storage.Client
 	if *enableReadStallRetry {
 		return storage.NewClient(ctx, option.WithHTTPClient(httpClient),
 			experimental.WithReadStallTimeout(&experimental.ReadStallTimeoutConfig{
-				Min: time.Second,
+				Min:              time.Second,
 				TargetPercentile: 0.99,
 			}))
 	}
@@ -174,6 +179,66 @@ func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketH
 	}
 
 	return
+}
+
+func writeObject(ctx context.Context, bh *storage.BucketHandle, req *gcs.CreateObjectRequest) (err error) {
+	obj := bh.Object(req.Name)
+
+	// GenerationPrecondition - If non-nil, the object will be created/overwritten
+	// only if the current generation for the object name is equal to the given value.
+	// Zero means the object does not exist.
+	// MetaGenerationPrecondition - If non-nil, the object will be created/overwritten
+	// only if the current metaGeneration for the object name is equal to the given value.
+	// Zero means the object does not exist.
+	preconditions := storage.Conditions{}
+
+	if req.GenerationPrecondition != nil {
+		if *req.GenerationPrecondition == 0 {
+			preconditions.DoesNotExist = true
+		} else {
+			preconditions.GenerationMatch = *req.GenerationPrecondition
+		}
+	}
+
+	if req.MetaGenerationPrecondition != nil && *req.MetaGenerationPrecondition != 0 {
+		preconditions.MetagenerationMatch = *req.MetaGenerationPrecondition
+	}
+
+	// Setting up the conditions on the object if it's not empty i.e, atleast
+	// if one of the condition is set.
+	if util.IsStorageConditionsNotEmpty(preconditions) {
+		obj = obj.If(preconditions)
+	}
+
+	obj = bh.Object(req.Name)
+	// Creating a NewWriter with requested attributes, using Go Storage Client.
+	// Chuck size for resumable upload is default i.e. 16MB.
+	wc := obj.NewWriter(ctx)
+	wc = util.SetAttrsInWriter(wc, req)
+	wc.ProgressFunc = func(bytesUploadedSoFar int64) {
+		log.Printf("gcs: Req %#16x: -- CreateObject(%q): %20v bytes uploaded so far", ctx.Value("GcsReqId"), req.Name, bytesUploadedSoFar)
+	}
+
+	// Copy the contents to the writer.
+	if _, err = io.Copy(wc, req.Contents); err != nil {
+		err = fmt.Errorf("error in io.Copy: %w", err)
+		return
+	}
+
+	// We can't use defer to close the writer, because we need to close the
+	// writer successfully before calling Attrs() method of writer.
+	if err = wc.Close(); err != nil {
+		var gErr *googleapi.Error
+		if errors.As(err, &gErr) {
+			if gErr.Code == http.StatusPreconditionFailed {
+				err = &gcs.PreconditionError{Err: err}
+				return
+			}
+		}
+		err = fmt.Errorf("error in closing writer : %w", err)
+		return
+	}
+	return err
 }
 
 func main() {
@@ -247,22 +312,19 @@ func main() {
 	defer closeSDExporter()
 
 	// Run the actual workload
-	for i := 0; i < *numOfWorker; i++ {
-		idx := i
-		eG.Go(func() error {
-			err = ReadObject(ctx, idx, bucketHandle)
-			if err != nil {
-				err = fmt.Errorf("while reading object %v: %w", *objectNamePrefix+strconv.Itoa(idx)+*objectNameSuffix, err)
-				return err
-			}
-			return err
-		})
+
+	objname := "reproObj"
+	for i := 1; i < 11; i++ {
+		contents, _ := util.GenerateData(i)
+		req := &gcs.CreateObjectRequest{
+			Name:     objname,
+			Contents: bytes.NewReader(contents),
+		}
+		err = writeObject(ctx, bucketHandle, req)
 	}
 
-	err = eG.Wait()
-
 	if err == nil {
-		fmt.Println("Read benchmark completed successfully!")
+		fmt.Println("Write benchmark completed successfully!")
 	} else {
 		fmt.Fprintf(os.Stderr, "Error while running benchmark: %v", err)
 		os.Exit(1)
