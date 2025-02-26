@@ -1,6 +1,8 @@
 package main
 
 import (
+	"path"
+	"syscall"
 	"context"
 	"bytes"
 	"crypto/rand"
@@ -52,6 +54,8 @@ var (
 
 	bucketName = flag.String("bucket", "princer-working-dirs", "GCS bucket name.")
 
+	fDir = flag.String("dir", "", "mount.")
+
 	// ProjectName denotes gcp project name.
 	ProjectName = flag.String("project", "gcs-fuse-test", "GCP project name.")
 
@@ -96,6 +100,7 @@ func CreateHTTPClient(ctx context.Context, isHTTP2 bool) (client *storage.Client
 			),
 		}
 	} else {
+		fmt.Println("http2")
 		// For http2, change in MaxConnsPerHost doesn't affect the performance.
 		transport = &http.Transport{
 			DisableKeepAlives: true,
@@ -222,6 +227,50 @@ func WriteObject(ctx context.Context, workerId int, bucketHandle *storage.Bucket
 
 	return
 }
+
+func WriteViaGCSFuse(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
+
+	objectName := *objectNamePrefix + strconv.Itoa(workerId) + *objectNameSuffix
+
+	for i := 0; i < *numOfReadCallPerWorker; i++ {
+
+		data := make([]byte, (*fileSize)*1024*1024)
+		rand.Read(data)
+
+		start := time.Now()
+		fh, err := openFile(objectName + strconv.Itoa(i))
+		if err != nil {
+			return fmt.Errorf("while opening the file: %v", err)
+		}
+		_, err = fh.Write(data)
+		if err != nil {
+			return fmt.Errorf("while overwriting the file: %v", err)
+		}
+
+		err = fh.Close()
+		if err != nil {
+			return fmt.Errorf("while closing the file: %v", err)
+		}
+
+
+		duration := time.Since(start)
+		stats.Record(ctx, writeLatency.M(float64(duration.Milliseconds())))
+
+	}
+
+	return
+}
+
+func openFile(filePath string) (fileHandle *os.File, err error) {
+	fileName := path.Join(*fDir, filePath)
+	fileHandle, err = os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC|syscall.O_DIRECT, 0644)
+	if err != nil {
+		err = fmt.Errorf("while opening file: %w", err)
+		return
+	}
+
+	return
+}
 func main() {
 	flag.Parse()
 	ctx := context.Background()
@@ -261,8 +310,10 @@ func main() {
 	var client *storage.Client
 	var err error
 	if *clientProtocol == "http" {
+		fmt.Println("htp client")
 		client, err = CreateHTTPClient(ctx, false)
 	} else {
+		fmt.Println("grpc client")
 		client, err = CreateGrpcClient(ctx)
 	}
 
@@ -296,7 +347,7 @@ func main() {
 	for i := 0; i < *numOfWorker; i++ {
 		idx := i
 		eG.Go(func() error {
-			err = WriteObject(ctx, idx, bucketHandle)
+			err = WriteViaGCSFuse(ctx, idx, bucketHandle)
 			if err != nil {
 				err = fmt.Errorf("while reading object %v: %w", *objectNamePrefix+strconv.Itoa(idx)+*objectNameSuffix, err)
 				return err
