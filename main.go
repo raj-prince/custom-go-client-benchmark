@@ -42,6 +42,8 @@ var (
 
 	fileSize = flag.Int("size", 100, "Number of concurrent worker to read")
 
+	chunkSize = flag.Int("chunk", 16, "Number of concurrent worker to read")
+
 	numOfReadCallPerWorker = flag.Int("read-call-per-worker", 1000000, "Number of read call per worker")
 
 	maxRetryDuration = 30 * time.Second
@@ -198,6 +200,7 @@ func WriteObject(ctx context.Context, workerId int, bucketHandle *storage.Bucket
 		start := time.Now()
 		object := bucketHandle.Object(objectName + strconv.Itoa(i))
 		wc := object.NewWriter(traceCtx)
+		wc.ChunkSize = *chunkSize*MB
 
 		if _, err = io.Copy(wc, reader); err != nil {
 			err = fmt.Errorf("error in io.Copy: %w", err)
