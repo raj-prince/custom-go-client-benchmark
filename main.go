@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"bytes"
+	"crypto/rand"
 	"crypto/tls"
 	"flag"
 	"fmt"
@@ -176,6 +178,45 @@ func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketH
 	return
 }
 
+func WriteObject(ctx context.Context, workerId int, bucketHandle *storage.BucketHandle) (err error) {
+
+	objectName := *objectNamePrefix + strconv.Itoa(workerId) + *objectNameSuffix
+
+	for i := 0; i < *numOfReadCallPerWorker; i++ {
+		var span trace.Span
+		traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "WriteObject")
+		span.SetAttributes(
+			attribute.KeyValue{"bucket", attribute.StringValue(*bucketName)},
+		)
+		data := make([]byte, 100*1024*1024)
+		rand.Read(data)
+		// byte slice to bytes.Reader, which implements the io.Reader interface
+		reader := bytes.NewReader(data)
+
+		start := time.Now()
+		object := bucketHandle.Object(objectName + strconv.Itoa(i))
+		wc := object.NewWriter(traceCtx)
+
+		if _, err = io.Copy(wc, reader); err != nil {
+			err = fmt.Errorf("error in io.Copy: %w", err)
+			return
+		}
+
+		// We can't use defer to close the writer, because we need to close the
+		// writer successfully before calling Attrs() method of writer.
+		if err = wc.Close(); err != nil {
+			err = fmt.Errorf("error in closing writer : %w", err)
+			return
+		}
+
+		duration := time.Since(start)
+		stats.Record(ctx, writeLatency.M(float64(duration.Milliseconds())))
+
+		span.End()
+	}
+
+	return
+}
 func main() {
 	flag.Parse()
 	ctx := context.Background()
@@ -250,7 +291,7 @@ func main() {
 	for i := 0; i < *numOfWorker; i++ {
 		idx := i
 		eG.Go(func() error {
-			err = ReadObject(ctx, idx, bucketHandle)
+			err = WriteObject(ctx, idx, bucketHandle)
 			if err != nil {
 				err = fmt.Errorf("while reading object %v: %w", *objectNamePrefix+strconv.Itoa(idx)+*objectNameSuffix, err)
 				return err

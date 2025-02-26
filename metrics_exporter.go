@@ -16,6 +16,7 @@ var (
 	// The restaurant rating in number of stars.
 	readLatency = stats.Float64("readLatency", "Complete read latency", stats.UnitMilliseconds)
 	firstByteReadLatency = stats.Float64("firstByteReadLatency", "First byte read latency", stats.UnitMilliseconds)
+	writeLatency = stats.Float64("writeLatency", "Complete read latency", stats.UnitMilliseconds)
 )
 
 var sdExporter *stackdriver.Exporter
@@ -31,6 +32,18 @@ func registerLatencyView() {
 
 	if err := view.Register(v); err != nil {
 		log.Fatalf("Failed to register the readLatency view: %v", err)
+	}
+
+	write := &view.View{
+		Name:        "go_client_write_latency",
+		Measure:     writeLatency,
+		Description: "Complete write latency for a given go-client",
+		TagKeys:     []tag.Key{tag.MustNewKey("write_latency")},
+		Aggregation: ochttp.DefaultLatencyDistribution,
+	}
+
+	if err := view.Register(write); err != nil {
+		log.Fatalf("Failed to register the writeLatency view: %v", err)
 	}
 }
 func registerFirstByteLatencyView() {
