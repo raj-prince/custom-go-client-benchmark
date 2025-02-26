@@ -40,6 +40,8 @@ var (
 
 	numOfWorker = flag.Int("worker", 48, "Number of concurrent worker to read")
 
+	fileSize = flag.Int("size", 100, "Number of concurrent worker to read")
+
 	numOfReadCallPerWorker = flag.Int("read-call-per-worker", 1000000, "Number of read call per worker")
 
 	maxRetryDuration = 30 * time.Second
@@ -188,7 +190,7 @@ func WriteObject(ctx context.Context, workerId int, bucketHandle *storage.Bucket
 		span.SetAttributes(
 			attribute.KeyValue{"bucket", attribute.StringValue(*bucketName)},
 		)
-		data := make([]byte, 100*1024*1024)
+		data := make([]byte, (*fileSize)*1024*1024)
 		rand.Read(data)
 		// byte slice to bytes.Reader, which implements the io.Reader interface
 		reader := bytes.NewReader(data)
