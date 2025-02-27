@@ -347,7 +347,7 @@ func main() {
 	for i := 0; i < *numOfWorker; i++ {
 		idx := i
 		eG.Go(func() error {
-			err = WriteViaGCSFuse(ctx, idx, bucketHandle)
+			err = WriteObject(ctx, idx, bucketHandle)
 			if err != nil {
 				err = fmt.Errorf("while reading object %v: %w", *objectNamePrefix+strconv.Itoa(idx)+*objectNameSuffix, err)
 				return err
