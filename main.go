@@ -10,19 +10,19 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"cloud.google.com/go/profiler"
 	"cloud.google.com/go/storage"
 	"cloud.google.com/go/storage/experimental"
 	"github.com/googleapis/gax-go/v2"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
-
-	"cloud.google.com/go/profiler"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -100,17 +100,12 @@ func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client
 	return storage.NewClient(ctx, clientOpts...)
 }
 
-func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
-	if err := os.Setenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS", "true"); err != nil {
-		log.Fatalf("error setting direct path env var: %v", err)
+// CreateGrpcClient sets up a gRPC client for GCS using the default credentials.
+func CreateGrpcClient(ctx context.Context) (*storage.Client, error) {
+	clientOpts := []option.ClientOption{
+		option.WithGRPCDialOption(grpc.WithTransportCredentials(insecure.NewCredentials())),
 	}
-
-	client, err = storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(GrpcConnPoolSize))
-
-	if err := os.Unsetenv("GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS"); err != nil {
-		log.Fatalf("error while unsetting direct path env var: %v", err)
-	}
-	return
+	return storage.NewClient(ctx, clientOpts...)
 }
 
 func getObjectNames(ctx context.Context, bucketHandle *storage.BucketHandle) ([]string, error) {
@@ -312,13 +307,46 @@ func main() {
 		}
 	}
 
-	// Do the work of reading files
-	records, err := ReadObject(ctx, 0, len(objectNames), bucketHandle, objectNames)
-	if err != nil {
-		log.Fatalf("Failed to read objects: %v", err)
+	// Setup goroutines for parallel processing based on worker count
+	recordsChannel := make(chan [][]string, *NumOfWorker)
+	workerGroup := errgroup.Group{}
+
+	// Split the work for goroutines
+	filesPerWorker := len(objectNames) / *NumOfWorker
+	if len(objectNames)%*NumOfWorker != 0 {
+		filesPerWorker++
 	}
 
-	csvData := makeCSV(records)
+	for i := 0; i < *NumOfWorker; i++ {
+		start := i * filesPerWorker
+		end := (i + 1) * filesPerWorker
+		if end > len(objectNames) {
+			end = len(objectNames)
+		}
+
+		workerGroup.Go(func() error {
+			records, err := ReadObject(ctx, start, end, bucketHandle, objectNames)
+			if err != nil {
+				return fmt.Errorf("error reading objects in range %d-%d: %v", start, end, err)
+			}
+			recordsChannel <- records
+			return nil
+		})
+	}
+
+	// Wait for all workers to finish
+	if err := workerGroup.Wait(); err != nil {
+		log.Fatalf("Error in worker goroutines: %v", err)
+	}
+
+	// Close the records channel and gather all records
+	var allRecords [][]string
+	close(recordsChannel)
+	for records := range recordsChannel {
+		allRecords = append(allRecords, records...)
+	}
+
+	csvData := makeCSV(allRecords)
 
 	writeCSVToGCS(ctx, csvData, *outputBucketPath)
 
