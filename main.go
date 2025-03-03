@@ -29,7 +29,7 @@ var (
 	GrpcConnPoolSize     = 1
 	MaxConnsPerHost      = 100
 	MaxIdleConnsPerHost  = 100
-	NumOfWorker          = flag.Int("worker", 32, "Number of concurrent worker to read") // Set to 32
+	NumOfWorker          = flag.Int("worker", 32, "Number of concurrent workers to read") // Set to 32
 	MaxRetryDuration     = 30 * time.Second
 	RetryMultiplier      = 2.0
 	BucketName           = flag.String("bucket", "vipin-us-central1", "GCS bucket name.")
@@ -48,7 +48,7 @@ var (
 	targetPercentile     = flag.Float64("target-percentile", 0.999, "Target percentile for read dynamic timeout")
 	outputBucketPath     = flag.String("output-bucket-path", "gs://vipin-metrics/go-sdk", "GCS bucket path to store the output CSV file")
 	totalFilesToRead     = flag.Int("total-files-to-read", 0, "Number of files to read. If not set, all files in the bucket will be read.")
-	bucketDir            = flag.String("bucket-dir", "1B", "Directory in the bucket where files are stored.")
+	bucketDir            = flag.String("bucket-dir", "", "Directory in the bucket where files are stored.")
 	eG                   errgroup.Group
 )
 
@@ -309,7 +309,6 @@ func main() {
 
 	// Setup goroutines for parallel processing based on worker count
 	recordsChannel := make(chan [][]string, *NumOfWorker)
-	workerGroup := errgroup.Group{}
 
 	// Split the work for goroutines
 	filesPerWorker := len(objectNames) / *NumOfWorker
@@ -317,6 +316,7 @@ func main() {
 		filesPerWorker++
 	}
 
+	// Use errgroup (eG) to manage the concurrent workers
 	for i := 0; i < *NumOfWorker; i++ {
 		start := i * filesPerWorker
 		end := (i + 1) * filesPerWorker
@@ -324,7 +324,7 @@ func main() {
 			end = len(objectNames)
 		}
 
-		workerGroup.Go(func() error {
+		eG.Go(func() error {
 			records, err := ReadObject(ctx, start, end, bucketHandle, objectNames)
 			if err != nil {
 				return fmt.Errorf("error reading objects in range %d-%d: %v", start, end, err)
@@ -335,7 +335,7 @@ func main() {
 	}
 
 	// Wait for all workers to finish
-	if err := workerGroup.Wait(); err != nil {
+	if err := eG.Wait(); err != nil {
 		log.Fatalf("Error in worker goroutines: %v", err)
 	}
 
