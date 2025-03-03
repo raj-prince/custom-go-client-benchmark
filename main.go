@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -20,8 +21,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
-
-	"strings"
 
 	"cloud.google.com/go/profiler"
 )
@@ -49,6 +48,7 @@ var (
 	targetPercentile     = flag.Float64("target-percentile", 0.999, "Target percentile for read dynamic timeout")
 	outputBucketPath     = flag.String("output-bucket-path", "gs://vipin-metrics/go-sdk", "GCS bucket path to store the output CSV file")
 	totalFilesToRead     = flag.Int("total-files-to-read", 0, "Number of files to read. If not set, all files in the bucket will be read.")
+	bucketDir            = flag.String("bucket-dir", "1B", "Directory in the bucket where files are stored.")
 	eG                   errgroup.Group
 )
 
@@ -58,9 +58,7 @@ func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client
 		transport = &http.Transport{
 			MaxConnsPerHost:     MaxConnsPerHost,
 			MaxIdleConnsPerHost: MaxIdleConnsPerHost,
-			TLSNextProto: make(
-				map[string]func(string, *tls.Conn) http.RoundTripper,
-			),
+			TLSNextProto:        make(map[string]func(string, *tls.Conn) http.RoundTripper),
 		}
 	} else {
 		transport = &http.Transport{
@@ -117,7 +115,14 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 
 func getObjectNames(ctx context.Context, bucketHandle *storage.BucketHandle) ([]string, error) {
 	var objectNames []string
-	it := bucketHandle.Objects(ctx, nil)
+
+	// If bucketDir is set, prepend it to the object names while listing
+	prefix := *bucketDir
+	if prefix != "" && !strings.HasSuffix(prefix, "/") {
+		prefix += "/"
+	}
+
+	it := bucketHandle.Objects(ctx, &storage.Query{Prefix: prefix})
 	for {
 		objAttrs, err := it.Next()
 		if err == io.EOF {
@@ -214,7 +219,6 @@ func ParseBucketAndObjectFromUri(uri string) (string, string, error) {
 }
 
 func writeCSVToGCS(ctx context.Context, csvData string, bucketPath string) {
-
 	client, err := storage.NewClient(ctx)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
@@ -301,52 +305,22 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to list objects: %v", err)
 		}
+
+		// Limit the number of files to read
 		if len(objectNames) > *totalFilesToRead {
 			objectNames = objectNames[:*totalFilesToRead]
 		}
-	} else {
-		objectNames, err = getObjectNames(ctx, bucketHandle)
-		if err != nil {
-			log.Fatalf("Failed to list objects: %v", err)
-		}
 	}
 
-	allRecords := [][]string{
-		{"Timestamp", "FirstByteLatency", "OverallLatency"},
-	}
-
-	filesPerWorker := (len(objectNames) + *NumOfWorker - 1) / *NumOfWorker
-
-	// Run the actual workload
-	for i := 0; i < *NumOfWorker; i++ {
-		start := i * filesPerWorker
-		count := filesPerWorker
-		if start+count > len(objectNames) {
-			count = len(objectNames) - start
-		}
-
-		eG.Go(func() error {
-			records, err := ReadObject(ctx, start, count, bucketHandle, objectNames)
-			if err != nil {
-				return err
-			}
-			allRecords = append(allRecords, records...)
-			return nil
-		})
-	}
-
-	err = eG.Wait()
-
+	// Do the work of reading files
+	records, err := ReadObject(ctx, 0, len(objectNames), bucketHandle, objectNames)
 	if err != nil {
-		log.Fatalf("Error while running benchmark: %v", err)
+		log.Fatalf("Failed to read objects: %v", err)
 	}
 
-	// Write to in-memory CSV
-	csvData := makeCSV(allRecords)
+	csvData := makeCSV(records)
 
-	// Write CSV to GCS bucket
 	writeCSVToGCS(ctx, csvData, *outputBucketPath)
 
-	fmt.Println("Read benchmark completed successfully!")
-	fmt.Printf("Results written to: %s\n", *outputBucketPath)
+	log.Println("CSV file written to GCS successfully.")
 }
