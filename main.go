@@ -83,8 +83,8 @@ func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client
 		Timeout: 0,
 	}
 
-	httpClient.Transport = &UserAgentRoundTripper{
-		Wrapped:   httpClient.Transport,
+	httpClient.Transport = &userAgentRoundTripper{
+		wrapped:   httpClient.Transport,
 		UserAgent: "vipin",
 	}
 
@@ -183,16 +183,6 @@ func makeCSV(records [][]string) string {
 		return ""
 	}
 	return b.String()
-}
-
-type UserAgentRoundTripper struct {
-	Wrapped   http.RoundTripper
-	UserAgent string
-}
-
-func (u *UserAgentRoundTripper) RoundTrip(r *http.Request) (*http.Response, error) {
-	r.Header.Set("User-Agent", u.UserAgent)
-	return u.Wrapped.RoundTrip(r)
 }
 
 // ParseBucketAndObjectFromUri parses a GCS URI into a bucket name and object path.
