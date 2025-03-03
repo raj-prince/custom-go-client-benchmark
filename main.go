@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,6 +21,7 @@ import (
 	"github.com/googleapis/gax-go/v2"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -46,8 +48,8 @@ var (
 	version              = flag.String("version", "original", "version to run profiler with")
 	withReadStallTimeout = flag.Bool("with-read-stall-timeout", true, "Enable read stall timeout")
 	targetPercentile     = flag.Float64("target-percentile", 0.999, "Target percentile for read dynamic timeout")
-	outputBucketPath     = flag.String("output-bucket-path", "gs://vipin-metrics/go-sdk", "GCS bucket path to store the output CSV file")
-	totalFilesToRead     = flag.Int("total-files-to-read", 0, "Number of files to read. If not set, all files in the bucket will be read.")
+	outputBucketPath     = flag.String("output-bucket-path", "gs://vipin-metrics/go-sdk/", "GCS bucket path to store the output CSV file")
+	totalFilesToRead     = flag.Int("total-files-to-read", math.MaxInt, "Number of files to read. If not set, all files in the bucket will be read.")
 	bucketDir            = flag.String("bucket-dir", "", "Directory in the bucket where files are stored.")
 	eG                   errgroup.Group
 )
@@ -120,7 +122,7 @@ func getObjectNames(ctx context.Context, bucketHandle *storage.BucketHandle) ([]
 	it := bucketHandle.Objects(ctx, &storage.Query{Prefix: prefix})
 	for {
 		objAttrs, err := it.Next()
-		if err == io.EOF {
+		if err == iterator.Done || len(objectNames) >= *totalFilesToRead {
 			break
 		}
 		if err != nil {
@@ -128,13 +130,15 @@ func getObjectNames(ctx context.Context, bucketHandle *storage.BucketHandle) ([]
 		}
 		objectNames = append(objectNames, objAttrs.Name)
 	}
+
+	// Return the list of object names
 	return objectNames, nil
 }
 
-func ReadObject(ctx context.Context, start int, count int, bucketHandle *storage.BucketHandle, objectNames []string) ([][]string, error) {
+func ReadObject(ctx context.Context, start int, end int, bucketHandle *storage.BucketHandle, objectNames []string) ([][]string, error) {
 	records := [][]string{}
 
-	for i := start; i < start+count; i++ {
+	for i := start; i < end; i++ {
 		objectName := objectNames[i]
 		startTime := time.Now()
 		object := bucketHandle.Object(objectName)
@@ -168,21 +172,30 @@ func ReadObject(ctx context.Context, start int, count int, bucketHandle *storage
 	return records, nil
 }
 
-func makeCSV(records [][]string) string {
+func makeCSV(records [][]string) (string, error) {
 	var b strings.Builder
 	w := csv.NewWriter(&b)
+
+	// Write the header line
+	header := []string{"Timestamp", "First Byte Latency", "Overall Latency"}
+	if err := w.Write(header); err != nil {
+		return "", fmt.Errorf("error writing header to csv: %v", err)
+	}
+
+	// Write the data records
 	for _, record := range records {
 		if err := w.Write(record); err != nil {
-			fmt.Println("error writing record to csv:", err)
-			return "" // or handle the error as needed
+			return "", fmt.Errorf("error writing record to csv: %v", err)
 		}
 	}
+
+	// Flush the writer to ensure everything is written to the string builder
 	w.Flush()
 	if err := w.Error(); err != nil {
-		fmt.Println("error flushing csv writer:", err)
-		return ""
+		return "", fmt.Errorf("error flushing csv writer: %v", err)
 	}
-	return b.String()
+
+	return b.String(), nil
 }
 
 // ParseBucketAndObjectFromUri parses a GCS URI into a bucket name and object path.
@@ -222,24 +235,30 @@ func writeCSVToGCS(ctx context.Context, csvData string, bucketPath string) {
 	defer client.Close()
 
 	bucketName, objectPath, err := ParseBucketAndObjectFromUri(bucketPath)
-
 	if err != nil {
 		log.Fatalf("Failed to parse output bucket path %v", err)
 		return
 	}
 
-	objectPath = objectPath + time.Now().UTC().Format(time.RFC3339) + ".csv"
+	// Check if the objectPath ends with "/" (folder)
+	if strings.HasSuffix(objectPath, "/") {
+		objectPath = objectPath + time.Now().UTC().Format(time.RFC3339) + ".csv"
+	}
 
 	wc := client.Bucket(bucketName).Object(objectPath).NewWriter(ctx)
+
 	_, err = wc.Write([]byte(csvData))
 	if err != nil {
 		log.Fatalf("Failed to write to object: %v", err)
 		return
 	}
+
 	if err := wc.Close(); err != nil {
 		log.Fatalf("Failed to close writer: %v", err)
 		return
 	}
+
+	log.Printf("CSV data successfully uploaded to gs://%s/%s", bucketName, objectPath)
 }
 
 func main() {
@@ -294,17 +313,9 @@ func main() {
 	// assumes bucket already exists
 	bucketHandle := client.Bucket(*BucketName)
 
-	var objectNames []string
-	if *totalFilesToRead > 0 {
-		objectNames, err = getObjectNames(ctx, bucketHandle)
-		if err != nil {
-			log.Fatalf("Failed to list objects: %v", err)
-		}
-
-		// Limit the number of files to read
-		if len(objectNames) > *totalFilesToRead {
-			objectNames = objectNames[:*totalFilesToRead]
-		}
+	objectNames, err := getObjectNames(ctx, bucketHandle)
+	if err != nil {
+		log.Fatalf("Failed to list objects: %v", err)
 	}
 
 	// Setup goroutines for parallel processing based on worker count
@@ -312,18 +323,19 @@ func main() {
 
 	// Split the work for goroutines
 	filesPerWorker := len(objectNames) / *NumOfWorker
-	if len(objectNames)%*NumOfWorker != 0 {
-		filesPerWorker++
-	}
+	remainder := len(objectNames) % *NumOfWorker
 
-	// Use errgroup (eG) to manage the concurrent workers
-	for i := 0; i < *NumOfWorker; i++ {
+	for i := range *NumOfWorker {
 		start := i * filesPerWorker
-		end := (i + 1) * filesPerWorker
-		if end > len(objectNames) {
-			end = len(objectNames)
-		}
+		var end int
 
+		if i < remainder {
+			start += i
+			end = start + filesPerWorker + 1
+		} else {
+			start += remainder
+			end = start + filesPerWorker
+		}
 		eG.Go(func() error {
 			records, err := ReadObject(ctx, start, end, bucketHandle, objectNames)
 			if err != nil {
@@ -346,9 +358,10 @@ func main() {
 		allRecords = append(allRecords, records...)
 	}
 
-	csvData := makeCSV(allRecords)
+	csvData, err := makeCSV(allRecords)
+	if err != nil {
+		log.Fatalf("Failed to create CSV: %v", err)
+	}
 
 	writeCSVToGCS(ctx, csvData, *outputBucketPath)
-
-	log.Println("CSV file written to GCS successfully.")
 }
