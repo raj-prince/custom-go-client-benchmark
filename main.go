@@ -11,7 +11,6 @@ import (
 	"log"
 	"math"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -31,10 +30,11 @@ var (
 	GrpcConnPoolSize     = 1
 	MaxConnsPerHost      = 100
 	MaxIdleConnsPerHost  = 100
-	NumOfWorker          = flag.Int("worker", 32, "Number of concurrent workers to read") // Set to 32
+	NumOfWorker          = flag.Int("worker", 32, "Number of concurrent workers to read")
 	MaxRetryDuration     = 30 * time.Second
 	RetryMultiplier      = 2.0
 	BucketName           = flag.String("bucket", "vipin-us-central1", "GCS bucket name.")
+	bucketDir            = flag.String("bucket-dir", "1B", "Directory in the bucket where files are stored.")
 	ProjectName          = flag.String("project", "gcs-fuse-test", "GCP project name.")
 	clientProtocol       = flag.String("client-protocol", "http", "Network protocol.")
 	enableCloudProfiler  = flag.Bool("enable-cloud-profiler", false, "Enable cloud profiler")
@@ -48,9 +48,8 @@ var (
 	version              = flag.String("version", "original", "version to run profiler with")
 	withReadStallTimeout = flag.Bool("with-read-stall-timeout", true, "Enable read stall timeout")
 	targetPercentile     = flag.Float64("target-percentile", 0.999, "Target percentile for read dynamic timeout")
-	outputBucketPath     = flag.String("output-bucket-path", "gs://vipin-metrics/go-sdk/", "GCS bucket path to store the output CSV file")
+	outputBucketPath     = flag.String("output-bucket-path", "vipin-metrics/go-sdk/", "GCS bucket path to store the output CSV file")
 	totalFilesToRead     = flag.Int("total-files-to-read", math.MaxInt, "Number of files to read. If not set, all files in the bucket will be read.")
-	bucketDir            = flag.String("bucket-dir", "", "Directory in the bucket where files are stored.")
 	eG                   errgroup.Group
 )
 
@@ -157,9 +156,9 @@ func ReadObject(ctx context.Context, start int, end int, bucketHandle *storage.B
 
 		duration := time.Since(startTime)
 		record := []string{
-			strconv.FormatInt(startTime.UnixNano(), 10),
-			fmt.Sprintf("%f", ttfbTime.Seconds()),
-			fmt.Sprintf("%f", duration.Seconds()),
+			fmt.Sprintf("%f", float64(startTime.UnixNano())/1e9),
+			fmt.Sprintf("%f", float64(ttfbTime.Nanoseconds())/1e6),
+			fmt.Sprintf("%f", float64(duration.Nanoseconds())/1e6),
 		}
 		records = append(records, record)
 
@@ -201,12 +200,10 @@ func makeCSV(records [][]string) (string, error) {
 // ParseBucketAndObjectFromUri parses a GCS URI into a bucket name and object path.
 // Example input: gs://bucket-name/path/to/file.txt
 func ParseBucketAndObjectFromUri(uri string) (string, string, error) {
-	if !strings.HasPrefix(uri, "gs://") {
-		return "", "", errors.New("invalid GCS URI, must start with 'gs://'")
-	}
 
-	// Remove the "gs://" prefix
-	uri = uri[5:]
+	if strings.HasPrefix(uri, "gs://") {
+		uri = uri[5:]
+	}
 
 	// Split the URI into bucket name and object path
 	parts := strings.SplitN(uri, "/", 2)
@@ -310,7 +307,9 @@ func main() {
 		)
 	}
 
-	// assumes bucket already exists
+	if strings.HasPrefix(*BucketName, "gs://") {
+		*BucketName = strings.TrimPrefix(*BucketName, "gs://")
+	}
 	bucketHandle := client.Bucket(*BucketName)
 
 	objectNames, err := getObjectNames(ctx, bucketHandle)
