@@ -43,7 +43,7 @@ var (
 	enableHeapAlloc      = flag.Bool("heap_alloc", false, "enable heap allocation profile collection")
 	enableThread         = flag.Bool("thread", false, "enable thread profile collection")
 	enableContention     = flag.Bool("contention", false, "enable contention profile collection")
-	minDelay             = flag.Duration("min-delay", 500*time.Millisecond, "min delay")
+	minDelay             = flag.Duration("min-delay", 1500*time.Millisecond, "min delay")
 	projectID            = flag.String("project_id", "", "project ID to run profiler with; only required when running outside of GCP.")
 	version              = flag.String("version", "original", "version to run profiler with")
 	withReadStallTimeout = flag.Bool("with-read-stall-timeout", true, "Enable read stall timeout")
