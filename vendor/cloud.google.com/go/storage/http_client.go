@@ -936,7 +936,7 @@ func (c *httpStorageClient) newRangeReaderXML(ctx context.Context, params *newRa
 			timer := time.After(stallTimeout)
 			select {
 			case <-timer:
-				log.Printf("stalled read-req (%p) cancelled after %fs", req, stallTimeout.Seconds())
+				log.Printf("stalled read-req (%p) for object (%s) cancelled after %fs", req, params.object, stallTimeout.Seconds())
 				cancel()
 				err = context.DeadlineExceeded
 				if res != nil && res.Body != nil {
