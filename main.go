@@ -201,10 +201,7 @@ func makeCSV(records [][]string) (string, error) {
 // Example input: gs://bucket-name/path/to/file.txt
 func ParseBucketAndObjectFromUri(uri string) (string, string, error) {
 
-	if strings.HasPrefix(uri, "gs://") {
-		uri = uri[5:]
-	}
-
+	uri = strings.TrimPrefix(uri, "gs://")
 	// Split the URI into bucket name and object path
 	parts := strings.SplitN(uri, "/", 2)
 	if len(parts) != 2 {
