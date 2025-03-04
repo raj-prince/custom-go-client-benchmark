@@ -251,8 +251,6 @@ func writeCSVToGCS(ctx context.Context, csvData string, bucketPath string) {
 		log.Fatalf("Failed to close writer: %v", err)
 		return
 	}
-
-	log.Printf("CSV data successfully uploaded to gs://%s/%s", bucketName, objectPath)
 }
 
 func main() {
