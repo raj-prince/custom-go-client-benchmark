@@ -27,6 +27,3 @@ benchmark-script/read_operation/read_operation
 benchmark-script/open_file/open_file
 benchmark-script/write_operations/write_operations
 .idea
-
-vendor
-
