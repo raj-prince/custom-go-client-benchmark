@@ -11,6 +11,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -53,6 +54,8 @@ var (
 	eG                   errgroup.Group
 )
 
+const dynamicReadReqInitialTimeoutEnv = "DYNAMIC_READ_REQ_INITIAL_TIMEOUT"
+
 func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client, err error) {
 	var transport *http.Transport
 	if !isHttp2 {
@@ -92,6 +95,14 @@ func CreateHttpClient(ctx context.Context, isHttp2 bool) (client *storage.Client
 	}
 
 	if *withReadStallTimeout {
+		// Hidden way to modify the initial-timeout of the dynamic delay algorithm in go-sdk.
+		// Ref: https://github.com/googleapis/google-cloud-go/blob/main/storage/option.go#L62
+		// Temporarily we kept an option to change the initial-timeout, will be removed
+		// once we get a good default.
+		err = os.Setenv(dynamicReadReqInitialTimeoutEnv, "1500ms")
+		if err != nil {
+			log.Printf("Error while setting the env %s: %v", dynamicReadReqInitialTimeoutEnv, err)
+		}
 		clientOpts = append(clientOpts, experimental.WithReadStallTimeout(&experimental.ReadStallTimeoutConfig{
 			Min:              *minDelay,
 			TargetPercentile: *targetPercentile,
@@ -292,15 +303,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("while creating the client: %v", err)
 	}
-	if *withReadStallTimeout {
-		client.SetRetry(
-			storage.WithBackoff(gax.Backoff{
-				Max:        MaxRetryDuration,
-				Multiplier: RetryMultiplier,
-			}),
-			storage.WithPolicy(storage.RetryAlways),
-		)
-	}
+	client.SetRetry(
+		storage.WithBackoff(gax.Backoff{
+			Max:        MaxRetryDuration,
+			Multiplier: RetryMultiplier,
+		}),
+		storage.WithPolicy(storage.RetryAlways),
+	)
 
 	if strings.HasPrefix(*BucketName, "gs://") {
 		*BucketName = strings.TrimPrefix(*BucketName, "gs://")
