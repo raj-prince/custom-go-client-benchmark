@@ -170,6 +170,7 @@ func ReadObject(ctx context.Context, start int, end int, bucketHandle *storage.B
 			fmt.Sprintf("%f", float64(startTime.UnixNano())/1e9),
 			fmt.Sprintf("%f", float64(ttfbTime.Nanoseconds())/1e6),
 			fmt.Sprintf("%f", float64(duration.Nanoseconds())/1e6),
+			objectName,
 		}
 		records = append(records, record)
 
@@ -187,7 +188,7 @@ func makeCSV(records [][]string) (string, error) {
 	w := csv.NewWriter(&b)
 
 	// Write the header line
-	header := []string{"Timestamp", "First Byte Latency", "Overall Latency"}
+	header := []string{"Timestamp", "First Byte Latency", "Overall Latency", "Object Name"}
 	if err := w.Write(header); err != nil {
 		return "", fmt.Errorf("error writing header to csv: %v", err)
 	}
