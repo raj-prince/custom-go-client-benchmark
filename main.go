@@ -165,7 +165,9 @@ func ReadObject(ctx context.Context, objectName string, bucketHandle *storage.Bu
 	)
 	startTime := time.Now()
 	object := bucketHandle.Object(objectName)
+	log.Printf("Creating NewReader for object(%s)", objectName)
 	rc, err := object.NewReader(traceCtx)
+	log.Printf("NewReader for object(%s) created after %fms", objectName, float64(time.Since(startTime).Milliseconds()))
 	if err != nil {
 		return nil, fmt.Errorf("while creating reader object %s: %v", objectName, err)
 	}
@@ -178,6 +180,7 @@ func ReadObject(ctx context.Context, objectName string, bucketHandle *storage.Bu
 	duration := time.Since(startTime)
 
 	err = rc.Close()
+	log.Printf("NewReader for object(%s) closed after %fms", objectName, float64(time.Since(startTime).Milliseconds()))
 	if err != nil {
 		return nil, fmt.Errorf("while closing the reader object %s: %v", objectName, err)
 	}

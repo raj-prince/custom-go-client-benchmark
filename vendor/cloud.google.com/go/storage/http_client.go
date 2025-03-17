@@ -919,7 +919,9 @@ func (c *httpStorageClient) newRangeReaderXML(ctx context.Context, params *newRa
 			done := make(chan bool)
 			go func() {
 				reqStartTime := time.Now()
+				log.Printf("Sending http request for object (%s)", params.object)
 				res, err = c.hc.Do(req.WithContext(cancelCtx))
+				log.Printf("Recieved http response for object (%s) after %fms", params.object, float64(time.Since(reqStartTime).Milliseconds()))
 				if err == nil {
 					reqLatency := time.Since(reqStartTime)
 					c.dynamicReadReqStallTimeout.update(params.bucket, reqLatency)
