@@ -34,6 +34,7 @@ import (
 	"cloud.google.com/go/iam/apiv1/iampb"
 	"cloud.google.com/go/internal/optional"
 	"cloud.google.com/go/internal/trace"
+	"github.com/google/uuid"
 	"github.com/googleapis/gax-go/v2/callctx"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/googleapi"
@@ -879,6 +880,7 @@ func (c *httpStorageClient) NewRangeReader(ctx context.Context, params *newRange
 }
 
 func (c *httpStorageClient) newRangeReaderXML(ctx context.Context, params *newRangeReaderParams, s *settings) (r *Reader, err error) {
+	requestId := uuid.New()
 	u := &url.URL{
 		Scheme:  c.scheme,
 		Host:    c.xmlHost,
@@ -919,9 +921,9 @@ func (c *httpStorageClient) newRangeReaderXML(ctx context.Context, params *newRa
 			done := make(chan bool)
 			go func() {
 				reqStartTime := time.Now()
-				log.Printf("Sending http request for object (%s)", params.object)
+				log.Printf("[%s] [http <-] object (%s)", requestId, params.object)
 				res, err = c.hc.Do(req.WithContext(cancelCtx))
-				log.Printf("Recieved http response for object (%s) after %fms", params.object, float64(time.Since(reqStartTime).Milliseconds()))
+				log.Printf("[%s] [http ->] object (%s) after %fms. err: %v", requestId, params.object, float64(time.Since(reqStartTime).Milliseconds()), err)
 				if err == nil {
 					reqLatency := time.Since(reqStartTime)
 					c.dynamicReadReqStallTimeout.update(params.bucket, reqLatency)
@@ -938,7 +940,7 @@ func (c *httpStorageClient) newRangeReaderXML(ctx context.Context, params *newRa
 			timer := time.After(stallTimeout)
 			select {
 			case <-timer:
-				log.Printf("stalled read-req (%p) for object (%s) cancelled after %fs", req, params.object, stallTimeout.Seconds())
+				log.Printf("[%s] stalled read-req for object (%s) cancelled after %fs", requestId, params.object, stallTimeout.Seconds())
 				cancel()
 				err = context.DeadlineExceeded
 				if res != nil && res.Body != nil {

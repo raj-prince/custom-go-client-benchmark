@@ -103,7 +103,7 @@ func (d *dynamicDelay) unsafeIncrease() {
 	} else {
 		d.value = v
 	}
-	log.Printf("Max Delay updated to %fms", float64(d.value.Milliseconds()))
+	log.Printf("Dynamic Delay updated to %fms", float64(d.value.Milliseconds()))
 }
 
 // increase notes that the operation took longer than the delay returned by Value.

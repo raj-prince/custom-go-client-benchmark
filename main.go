@@ -293,6 +293,7 @@ func writeCSVToGCS(ctx context.Context, csvData string, bucketPath string) {
 }
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
 	flag.Parse()
 	ctx := context.Background()
 
