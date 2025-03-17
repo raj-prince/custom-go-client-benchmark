@@ -25,6 +25,13 @@ import (
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	// Register the pprof endpoints under the web server root at /debug/pprof
+	_ "net/http/pprof"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -38,8 +45,11 @@ var (
 	bucketDir            = flag.String("bucket-dir", "1B", "Directory in the bucket where files are stored.")
 	ProjectName          = flag.String("project", "gcs-fuse-test", "GCP project name.")
 	clientProtocol       = flag.String("client-protocol", "http", "Network protocol.")
+	tracerName           = "vipinydv-read-tail-latency-investigation"
+	enableTracing        = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
 	enableCloudProfiler  = flag.Bool("enable-cloud-profiler", false, "Enable cloud profiler")
 	enablePprof          = flag.Bool("enable-pprof", false, "Enable pprof server")
+	traceSampleRate      = flag.Float64("trace-sample-rate", 1.0, "Sampling rate for Cloud Trace")
 	enableHeap           = flag.Bool("heap", false, "enable heap profile collection")
 	enableHeapAlloc      = flag.Bool("heap_alloc", false, "enable heap allocation profile collection")
 	enableThread         = flag.Bool("thread", false, "enable thread profile collection")
@@ -145,39 +155,53 @@ func getObjectNames(ctx context.Context, bucketHandle *storage.BucketHandle) ([]
 	return objectNames, nil
 }
 
-func ReadObject(ctx context.Context, start int, end int, bucketHandle *storage.BucketHandle, objectNames []string) ([][]string, error) {
+func ReadObject(ctx context.Context, objectName string, bucketHandle *storage.BucketHandle) ([]string, error) {
+	var span trace.Span
+	traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "ReadObject")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.KeyValue{Key: "bucket", Value: attribute.StringValue(*BucketName)},
+	)
+	startTime := time.Now()
+	object := bucketHandle.Object(objectName)
+	rc, err := object.NewReader(traceCtx)
+	if err != nil {
+		return nil, fmt.Errorf("while creating reader object %s: %v", objectName, err)
+	}
+	ttfbTime := time.Since(startTime)
+
+	_, err = io.Copy(io.Discard, rc)
+	if err != nil {
+		return nil, fmt.Errorf("while reading and discarding content from %s: %v", objectName, err)
+	}
+	duration := time.Since(startTime)
+
+	err = rc.Close()
+	if err != nil {
+		return nil, fmt.Errorf("while closing the reader object %s: %v", objectName, err)
+	}
+
+	record := []string{
+		fmt.Sprintf("%f", float64(startTime.UnixNano())/1e9),
+		fmt.Sprintf("%f", float64(ttfbTime.Nanoseconds())/1e6),
+		fmt.Sprintf("%f", float64(duration.Nanoseconds())/1e6),
+		objectName,
+	}
+
+	return record, nil
+}
+
+func ReadObjects(ctx context.Context, start int, end int, bucketHandle *storage.BucketHandle, objectNames []string) ([][]string, error) {
 	records := [][]string{}
 
 	for i := start; i < end; i++ {
 		objectName := objectNames[i]
-		startTime := time.Now()
-		object := bucketHandle.Object(objectName)
-		rc, err := object.NewReader(ctx)
+		record, err := ReadObject(ctx, objectName, bucketHandle)
 		if err != nil {
-			return nil, fmt.Errorf("while creating reader object %s: %v", objectName, err)
-		}
-
-		ttfbTime := time.Since(startTime)
-
-		_, err = io.Copy(io.Discard, rc)
-		if err != nil {
-			_ = rc.Close()
-			return nil, fmt.Errorf("while reading and discarding content from %s: %v", objectName, err)
-		}
-
-		duration := time.Since(startTime)
-		record := []string{
-			fmt.Sprintf("%f", float64(startTime.UnixNano())/1e9),
-			fmt.Sprintf("%f", float64(ttfbTime.Nanoseconds())/1e6),
-			fmt.Sprintf("%f", float64(duration.Nanoseconds())/1e6),
-			objectName,
+			return nil, fmt.Errorf("while reading object %s: %v", objectName, err)
 		}
 		records = append(records, record)
-
-		err = rc.Close()
-		if err != nil {
-			return nil, fmt.Errorf("while closing the reader object %s: %v", objectName, err)
-		}
 	}
 
 	return records, nil
@@ -269,6 +293,11 @@ func main() {
 	flag.Parse()
 	ctx := context.Background()
 
+	if *enableTracing {
+		cleanup := enableTraceExport(ctx, *traceSampleRate)
+		defer cleanup()
+	}
+
 	if *enableCloudProfiler {
 		if err := profiler.Start(profiler.Config{
 			Service:              "custom-go-benchmark",
@@ -341,7 +370,7 @@ func main() {
 			end = start + filesPerWorker
 		}
 		eG.Go(func() error {
-			records, err := ReadObject(ctx, start, end, bucketHandle, objectNames)
+			records, err := ReadObjects(ctx, start, end, bucketHandle, objectNames)
 			if err != nil {
 				return fmt.Errorf("error reading objects in range %d-%d: %v", start, end, err)
 			}
