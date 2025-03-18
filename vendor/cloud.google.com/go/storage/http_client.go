@@ -908,15 +908,20 @@ func (c *httpStorageClient) newRangeReaderXML(ctx context.Context, params *newRa
 		func(ctx context.Context) (*http.Response, error) {
 			setHeadersFromCtx(ctx, req.Header)
 
-			if c.dynamicReadReqStallTimeout == nil {
-				return c.hc.Do(req.WithContext(ctx))
-			}
-
-			cancelCtx, cancel := context.WithCancel(ctx)
 			var (
 				res *http.Response
 				err error
 			)
+
+			if c.dynamicReadReqStallTimeout == nil {
+				reqStartTime := time.Now()
+				log.Printf("[%s] [http <-] object (%s)", requestId, params.object)
+				res, err = c.hc.Do(req.WithContext(ctx))
+				log.Printf("[%s] [http ->] object (%s) after %fms. err: %v", requestId, params.object, float64(time.Since(reqStartTime).Milliseconds()), err)
+				return res, err
+			}
+
+			cancelCtx, cancel := context.WithCancel(ctx)
 
 			done := make(chan bool)
 			go func() {

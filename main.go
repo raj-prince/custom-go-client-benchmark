@@ -343,6 +343,7 @@ func main() {
 			Multiplier: RetryMultiplier,
 		}),
 		storage.WithPolicy(storage.RetryAlways),
+		storage.WithErrorFunc(ShouldRetry),
 	)
 
 	if strings.HasPrefix(*BucketName, "gs://") {
@@ -401,4 +402,12 @@ func main() {
 	}
 
 	writeCSVToGCS(ctx, csvData, *outputBucketPath)
+}
+
+func ShouldRetry(err error) (b bool) {
+	b = storage.ShouldRetry(err)
+	if b {
+		log.Printf("Retrying for the error: %v", err)
+	}
+	return
 }
