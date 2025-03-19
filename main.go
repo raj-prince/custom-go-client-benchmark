@@ -197,9 +197,11 @@ func ReadObject(ctx context.Context, objectName string, bucketHandle *storage.Bu
 
 func ReadObjects(ctx context.Context, start int, end int, bucketHandle *storage.BucketHandle, objectNames []string) ([][]string, error) {
 	records := [][]string{}
+	objectCount := len(objectNames)
 
 	for i := start; i < end; i++ {
-		objectName := objectNames[i]
+		objectIndex := i % objectCount // Loop back to the beginning if needed
+		objectName := objectNames[objectIndex]
 		record, err := ReadObject(ctx, objectName, bucketHandle)
 		if err != nil {
 			return nil, fmt.Errorf("while reading object %s: %v", objectName, err)
