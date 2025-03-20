@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math"
 	"net/http"
 	"os"
 	"strings"
@@ -60,7 +59,7 @@ var (
 	withReadStallTimeout = flag.Bool("with-read-stall-timeout", true, "Enable read stall timeout")
 	targetPercentile     = flag.Float64("target-percentile", 0.999, "Target percentile for read dynamic timeout")
 	outputBucketPath     = flag.String("output-bucket-path", "vipin-metrics/go-sdk/", "GCS bucket path to store the output CSV file")
-	totalFilesToRead     = flag.Int("total-files-to-read", math.MaxInt, "Number of files to read. If not set, all files in the bucket will be read.")
+	totalFilesToRead     = flag.Int("total-files-to-read", -1, "Number of files to read. If not set, all files in the bucket will be read.")
 	eG                   errgroup.Group
 )
 
@@ -361,9 +360,13 @@ func main() {
 	// Setup goroutines for parallel processing based on worker count
 	recordsChannel := make(chan [][]string, *NumOfWorker)
 
+	if *totalFilesToRead == -1 {
+		*totalFilesToRead = len(objectNames)
+	}
+
 	// Split the work for goroutines
-	filesPerWorker := len(objectNames) / *NumOfWorker
-	remainder := len(objectNames) % *NumOfWorker
+	filesPerWorker := *totalFilesToRead / *NumOfWorker
+	remainder := *totalFilesToRead % *NumOfWorker
 
 	for i := range *NumOfWorker {
 		start := i * filesPerWorker
