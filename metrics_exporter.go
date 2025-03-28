@@ -14,7 +14,7 @@ import (
 
 var (
 	// The restaurant rating in number of stars.
-	readLatency = stats.Float64("readLatency", "Complete read latency", stats.UnitMilliseconds)
+	readLatency = stats.Float64("statLatency", "Complete read latency", stats.UnitMilliseconds)
 	firstByteReadLatency = stats.Float64("firstByteReadLatency", "First byte read latency", stats.UnitMilliseconds)
 )
 
@@ -22,10 +22,10 @@ var sdExporter *stackdriver.Exporter
 
 func registerLatencyView() {
 	v := &view.View{
-		Name:        "princer_go_client_read_latency",
+		Name:        "go_client_stat_latency",
 		Measure:     readLatency,
-		Description: "Complete read latency for a given go-client",
-		TagKeys:     []tag.Key{tag.MustNewKey("princer_read_latency")},
+		Description: "Complete stat latency for a given go-client",
+		TagKeys:     []tag.Key{tag.MustNewKey("princer_stat_latency")},
 		Aggregation: ochttp.DefaultLatencyDistribution,
 	}
 

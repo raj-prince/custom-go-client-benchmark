@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+
 	// Register the pprof endpoints under the web server root at /debug/pprof
 	_ "net/http/pprof"
 	"os"
@@ -28,6 +30,14 @@ import (
 	"google.golang.org/api/option"
 )
 
+/**
+	Command to execute: 
+	go run . --worker 2 --stat-call-per-worker 10 --bucket <bucket_name> --obj-prefix <prefix> --object-suffix <suffix> --client-protocol <http/grpc>
+
+	E.g.
+	time go run . --worker 100 --stat-call-per-worker 100 --bucket princer-cpu-test-ue5c --obj-prefix "a" --obj-suffix "b" --client-protocol http
+**/
+
 var (
 	grpcConnPoolSize    = 1
 	maxConnsPerHost     = 100
@@ -38,7 +48,7 @@ var (
 
 	numOfWorker = flag.Int("worker", 48, "Number of concurrent worker to read")
 
-	numOfReadCallPerWorker = flag.Int("read-call-per-worker", 1000000, "Number of read call per worker")
+	numOfReadCallPerWorker = flag.Int("stat-call-per-worker", 1000000, "Number of read call per worker")
 
 	maxRetryDuration = 30 * time.Second
 
@@ -176,6 +186,33 @@ func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketH
 	return
 }
 
+func StatObject(ctx context.Context, workerID int, bucketHandle *storage.BucketHandle) (err error) {
+	totalLatency := int64(0)
+
+	objectName := *objectNamePrefix + strconv.Itoa(workerID) + *objectNameSuffix
+
+	for i := 0; i < *numOfReadCallPerWorker; i++ {
+		var span trace.Span
+		traceCtx, span := otel.GetTracerProvider().Tracer(tracerName).Start(ctx, "StatObject")
+		span.SetAttributes(
+			attribute.KeyValue{Key: "bucket", Value: attribute.StringValue(*bucketName)},
+		)
+		start := time.Now()
+		object := bucketHandle.Object(objectName)
+		_, err := object.Attrs(traceCtx)
+		if err != nil && !errors.Is(err, storage.ErrObjectNotExist) {
+			return fmt.Errorf("while performing stat object: %v", err)
+		}
+		duration := time.Since(start)
+		stats.Record(ctx, readLatency.M(float64(duration.Milliseconds())))
+		totalLatency += int64(duration.Seconds())
+		span.End()
+	}
+
+	return
+}
+
+
 func main() {
 	flag.Parse()
 	ctx := context.Background()
@@ -250,7 +287,7 @@ func main() {
 	for i := 0; i < *numOfWorker; i++ {
 		idx := i
 		eG.Go(func() error {
-			err = ReadObject(ctx, idx, bucketHandle)
+			err = StatObject(ctx, idx, bucketHandle)
 			if err != nil {
 				err = fmt.Errorf("while reading object %v: %w", *objectNamePrefix+strconv.Itoa(idx)+*objectNameSuffix, err)
 				return err
@@ -262,9 +299,10 @@ func main() {
 	err = eG.Wait()
 
 	if err == nil {
-		fmt.Println("Read benchmark completed successfully!")
+		fmt.Println("Stat benchmark completed successfully!")
 	} else {
 		fmt.Fprintf(os.Stderr, "Error while running benchmark: %v", err)
 		os.Exit(1)
 	}
 }
+
