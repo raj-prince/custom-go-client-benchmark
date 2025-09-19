@@ -230,7 +230,7 @@ func main() {
 
 	var client *storage.Client
 	var err error
-	if *clientProtocol == "http" {
+	if *clientProtocol == "http1" {
 		if *enableDebugLog {
 			log.Println("Creating HTTP client")
 		}
@@ -258,10 +258,10 @@ func main() {
 	bucketHandle := client.Bucket(*bucketName)
 
 	// Enable stack-driver exporter.
-	registerLatencyView()
-	registerFirstByteLatencyView()
+	// registerLatencyView()
+	// registerFirstByteLatencyView()
 
-	err = enableSDExporter()
+	// err = enableSDExporter()
 	if err != nil {
 		log.Printf("while enabling stackdriver exporter: %v", err)
 		os.Exit(1)
@@ -269,7 +269,7 @@ func main() {
 	if *enableDebugLog {
 		log.Println("Stackdriver exporter enabled")
 	}
-	defer closeSDExporter()
+	// defer closeSDExporter()
 
 	// Run the actual workload
 	for i := 0; i < *numOfWorker; i++ {
