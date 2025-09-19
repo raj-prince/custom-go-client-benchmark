@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+
 	// Register the pprof endpoints under the web server root at /debug/pprof
 	_ "net/http/pprof"
 	"os"
@@ -49,7 +50,7 @@ var (
 	// ProjectName denotes gcp project name.
 	ProjectName = flag.String("project", "gcs-fuse-test", "GCP project name.")
 
-	clientProtocol   = flag.String("client-protocol", "http", "Network protocol.")
+	clientProtocol = flag.String("client-protocol", "http", "Network protocol.")
 
 	// Object name = objectNamePrefix + {thread_id} + objectNameSuffix
 	objectNamePrefix = flag.String("obj-prefix", "princer_100M_files/file_", "Object prefix")
@@ -59,6 +60,7 @@ var (
 	enableTracing   = flag.Bool("enable-tracing", false, "Enable tracing with Cloud Trace export")
 	enablePprof     = flag.Bool("enable-pprof", false, "Enable pprof server")
 	traceSampleRate = flag.Float64("trace-sample-rate", 1.0, "Sampling rate for Cloud Trace")
+	enableDebugLog  = flag.Bool("debug", false, "Enable debug logging")
 
 	// Cloud profiler.
 	enableCloudProfiler = flag.Bool("enable-cloud-profiler", false, "Enable cloud profiler")
@@ -121,7 +123,7 @@ func CreateHTTPClient(ctx context.Context, isHTTP2 bool) (client *storage.Client
 	if *enableReadStallRetry {
 		return storage.NewClient(ctx, option.WithHTTPClient(httpClient),
 			experimental.WithReadStallTimeout(&experimental.ReadStallTimeoutConfig{
-				Min: time.Second,
+				Min:              time.Second,
 				TargetPercentile: 0.99,
 			}))
 	}
@@ -148,8 +150,18 @@ func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketH
 		span.SetAttributes(
 			attribute.KeyValue{Key: "bucket", Value: attribute.StringValue(*bucketName)},
 		)
+		newObjectName := objectName + strconv.Itoa(i)
+		if *enableDebugLog {
+			log.Printf("Reading object %v by worker %d", newObjectName, workerID)
+		}
 		start := time.Now()
-		object := bucketHandle.Object(objectName)
+		object := bucketHandle.Object(newObjectName)
+
+		if *enableDebugLog {
+			a, _ := object.Attrs(ctx) // warm up the connection
+			log.Printf("Object size: %d", a.Size)
+		}
+
 		rc, err := object.NewReader(traceCtx)
 		if err != nil {
 			return fmt.Errorf("while creating reader object: %v", err)
@@ -179,6 +191,10 @@ func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketH
 func main() {
 	flag.Parse()
 	ctx := context.Background()
+	if *enableDebugLog {
+		log.SetFlags(log.LstdFlags | log.Lshortfile)
+		log.Println("Debug logging enabled")
+	}
 
 	if *enableTracing {
 		cleanup := enableTraceExport(ctx, *traceSampleRate)
@@ -215,13 +231,19 @@ func main() {
 	var client *storage.Client
 	var err error
 	if *clientProtocol == "http" {
+		if *enableDebugLog {
+			log.Println("Creating HTTP client")
+		}
 		client, err = CreateHTTPClient(ctx, false)
 	} else {
+		if *enableDebugLog {
+			log.Println("Creating gRPC client")
+		}
 		client, err = CreateGrpcClient(ctx)
 	}
 
 	if err != nil {
-		fmt.Printf("while creating the client: %v", err)
+		log.Printf("while creating the client: %v", err)
 		os.Exit(1)
 	}
 
@@ -241,8 +263,11 @@ func main() {
 
 	err = enableSDExporter()
 	if err != nil {
-		fmt.Printf("while enabling stackdriver exporter: %v", err)
+		log.Printf("while enabling stackdriver exporter: %v", err)
 		os.Exit(1)
+	}
+	if *enableDebugLog {
+		log.Println("Stackdriver exporter enabled")
 	}
 	defer closeSDExporter()
 
@@ -250,10 +275,19 @@ func main() {
 	for i := 0; i < *numOfWorker; i++ {
 		idx := i
 		eG.Go(func() error {
+			if *enableDebugLog {
+				log.Printf("Worker %d starting read", idx)
+			}
 			err = ReadObject(ctx, idx, bucketHandle)
 			if err != nil {
 				err = fmt.Errorf("while reading object %v: %w", *objectNamePrefix+strconv.Itoa(idx)+*objectNameSuffix, err)
+				if *enableDebugLog {
+					log.Printf("Worker %d error: %v", idx, err)
+				}
 				return err
+			}
+			if *enableDebugLog {
+				log.Printf("Worker %d finished read", idx)
 			}
 			return err
 		})
@@ -262,9 +296,13 @@ func main() {
 	err = eG.Wait()
 
 	if err == nil {
-		fmt.Println("Read benchmark completed successfully!")
+		if *enableDebugLog {
+			log.Println("Read benchmark completed successfully!")
+		} else {
+			fmt.Println("Read benchmark completed successfully!")
+		}
 	} else {
-		fmt.Fprintf(os.Stderr, "Error while running benchmark: %v", err)
+		log.Printf("Error while running benchmark: %v", err)
 		os.Exit(1)
 	}
 }

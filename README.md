@@ -12,6 +12,16 @@ To benchmark the read performance go-http client and go-grpc client.
 respective client.
 8. Analyse the latency by various means, you may use python script to create
 histogram from the above generated files.
+
+## Debug Logging
+
+To enable debug logging, run the benchmark with the `-debug` flag:
+
+```
+go run main.go -debug ...other-flags...
+```
+
+This will print detailed debug logs to the console, including client creation, worker progress, and errors. Omit the flag to disable debug logs.
 ```python
 import sys
 from matplotlib import pyplot as plt
