@@ -11,93 +11,32 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"cloud.google.com/go/storage/experimental"
 	"github.com/raj-prince/custom-go-client-benchmark/rapid"
+	"github.com/raj-prince/custom-go-client-benchmark/rapid/workerpool"
 	"google.golang.org/api/option"
+
+	// Side effect to run grpc client with direct-path on gcp machine.
+	_ "google.golang.org/grpc/balancer/rls"
+	_ "google.golang.org/grpc/xds/googledirectpath"
 )
 
 var (
 	// Command-line flags
-	numThreads = flag.Int("threads", 10, "Number of concurrent threads/goroutines")
-	ioSize     = flag.Int64("io-size", 4*1024*1024, "IO size in bytes (default: 4MB)")
-	queueDepth = flag.Int("queue-depth", 10, "Queue depth - number of concurrent requests per thread")
-	bucketName = flag.String("bucket", "", "GCS bucket name (required)")
-	objectName = flag.String("object", "", "GCS object name (required)")
-	duration   = flag.Duration("duration", 60*time.Second, "Test duration (default: 60s)")
-	poolSize   = flag.Int("pool-size", 5, "MRD pool size (default: 5)")
-	projectID  = flag.String("project", "", "GCP project ID")
+	ioSize          = flag.Int64("io-size", 4*1024*1024, "IO size in bytes (default: 4MB)")
+	bucketName      = flag.String("bucket", "", "GCS bucket name (required)")
+	objectName      = flag.String("object", "", "GCS object name (required)")
+	duration        = flag.Duration("duration", 60*time.Second, "Test duration (default: 60s)")
+	poolSize        = flag.Int("pool-size", 6, "MRD pool size (default: 5)")
+	priorityWorkers = flag.Int("priority-workers", 2, "Number of priority workers (default: 2)")
+	normalWorkers   = flag.Int("normal-workers", 8, "Number of normal workers (default: 8)")
+	readMaxBlocks   = flag.Int64("read-max-blocks", 100, "Maximum concurrent read blocks (default: 100)")
 
 	// Metrics
 	totalBytesRead  uint64
 	totalOperations uint64
 	totalErrors     uint64
 )
-
-// WorkerStats tracks statistics for a single worker
-type WorkerStats struct {
-	bytesRead  uint64
-	operations uint64
-	errors     uint64
-}
-
-// worker performs downloads using the MRD pool
-func worker(ctx context.Context, pool *rapid.MRDPool, workerID int, queueDepth int, ioSize int64, stats *WorkerStats) error {
-	semaphore := make(chan struct{}, queueDepth)
-	var wg sync.WaitGroup
-
-	offset := int64(workerID * 100 * 1024 * 1024) // Start each worker at different offset
-
-	for {
-		select {
-		case <-ctx.Done():
-			// Wait for in-flight requests to complete
-			wg.Wait()
-			return ctx.Err()
-		default:
-			// Acquire semaphore slot
-			semaphore <- struct{}{}
-			wg.Add(1)
-
-			// Capture current offset for this request
-			currentOffset := offset
-			offset += ioSize
-
-			go func(reqOffset int64) {
-				defer wg.Done()
-				defer func() { <-semaphore }() // Release semaphore
-
-				var buf bytes.Buffer
-				completed := false
-				var downloadErr error
-
-				err := pool.Add(&buf, reqOffset, ioSize, func(offset, length int64, err error) {
-					if err != nil {
-						downloadErr = err
-						atomic.AddUint64(&stats.errors, 1)
-						atomic.AddUint64(&totalErrors, 1)
-					} else {
-						completed = true
-						atomic.AddUint64(&stats.bytesRead, uint64(length))
-						atomic.AddUint64(&totalBytesRead, uint64(length))
-					}
-					atomic.AddUint64(&stats.operations, 1)
-					atomic.AddUint64(&totalOperations, 1)
-				})
-
-				if err != nil {
-					log.Printf("Worker %d: Add failed: %v", workerID, err)
-					atomic.AddUint64(&stats.errors, 1)
-					atomic.AddUint64(&totalErrors, 1)
-					return
-				}
-
-				// Note: We don't call Wait() here - it will be called periodically
-				// or when context is done
-				_ = completed
-				_ = downloadErr
-			}(currentOffset)
-		}
-	}
-}
 
 // statsReporter periodically reports throughput statistics
 func statsReporter(ctx context.Context, interval time.Duration) {
@@ -141,6 +80,19 @@ func statsReporter(ctx context.Context, interval time.Duration) {
 	}
 }
 
+func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
+	tokenSource, err := rapid.GetTokenSource(ctx, "")
+	if err != nil {
+		return nil, err
+	}
+	return storage.NewGRPCClient(ctx,
+		option.WithGRPCConnectionPool(1),
+		option.WithTokenSource(tokenSource),
+		storage.WithDisabledClientMetrics(),
+		experimental.WithGRPCBidiReads(),
+	)
+}
+
 func main() {
 	flag.Parse()
 
@@ -152,23 +104,20 @@ func main() {
 		log.Fatal("--object is required")
 	}
 
-	log.Printf("Starting MRD Pool Benchmark")
+	log.Printf("Starting MRD Pool Benchmark with Worker Pool")
 	log.Printf("Configuration:")
-	log.Printf("  Threads: %d", *numThreads)
 	log.Printf("  IO Size: %d bytes (%.2f MB)", *ioSize, float64(*ioSize)/(1024*1024))
-	log.Printf("  Queue Depth: %d", *queueDepth)
-	log.Printf("  Pool Size: %d", *poolSize)
+	log.Printf("  MRD Pool Size: %d", *poolSize)
+	log.Printf("  Priority Workers: %d", *priorityWorkers)
+	log.Printf("  Normal Workers: %d", *normalWorkers)
+	log.Printf("  Read Max Blocks: %d", *readMaxBlocks)
 	log.Printf("  Duration: %v", *duration)
 	log.Printf("  Bucket: %s", *bucketName)
 	log.Printf("  Object: %s", *objectName)
-	log.Printf("  Total concurrent requests: %d", *numThreads**queueDepth)
 
 	ctx := context.Background()
 
-	// Create GCS client
-	var opts []option.ClientOption
-
-	client, err := storage.NewClient(ctx, opts...)
+	client, err := CreateGrpcClient(ctx)
 	if err != nil {
 		log.Fatalf("Failed to create storage client: %v", err)
 	}
@@ -176,10 +125,26 @@ func main() {
 
 	log.Printf("Created storage client successfully")
 
+	// Get object attributes to determine size
+	objectHandle := client.Bucket(*bucketName).Object(*objectName)
+	attrs, err := objectHandle.Attrs(ctx)
+	if err != nil {
+		log.Fatalf("Failed to get object attributes: %v", err)
+	}
+
+	objectSize := attrs.Size
+	log.Printf("Object size: %d bytes (%.2f MB)", objectSize, float64(objectSize)/(1024*1024))
+
+	// Calculate number of blocks
+	numBlocks := (objectSize + *ioSize - 1) / *ioSize
+	log.Printf("Will download %d blocks of size %d bytes", numBlocks, *ioSize)
+
 	// Create MRD pool
 	poolConfig := &rapid.MRDPoolConfig{
 		PoolSize: *poolSize,
 		Client:   client,
+		Bucket:   *bucketName,
+		Object:   *objectName,
 	}
 
 	pool, err := rapid.NewMRDPool(poolConfig)
@@ -190,6 +155,16 @@ func main() {
 
 	log.Printf("Created MRD pool with %d instances", *poolSize)
 
+	// Create static worker pool
+	workerPool, err := workerpool.NewStaticWorkerPool(uint32(*priorityWorkers), uint32(*normalWorkers), *readMaxBlocks)
+	if err != nil {
+		log.Fatalf("Failed to create worker pool: %v", err)
+	}
+	workerPool.Start()
+	defer workerPool.Stop()
+
+	log.Printf("Created worker pool with %d priority and %d normal workers", *priorityWorkers, *normalWorkers)
+
 	// Create context with timeout for the benchmark
 	benchCtx, cancel := context.WithTimeout(ctx, *duration)
 	defer cancel()
@@ -197,31 +172,77 @@ func main() {
 	// Start stats reporter
 	go statsReporter(benchCtx, 5*time.Second)
 
-	// Start workers
-	var wg sync.WaitGroup
-	workerStats := make([]*WorkerStats, *numThreads)
-
-	log.Printf("Starting %d workers...", *numThreads)
 	startTime := time.Now()
+	log.Printf("Starting download tasks...")
 
-	for i := 0; i < *numThreads; i++ {
-		workerStats[i] = &WorkerStats{}
-		wg.Add(1)
+	// Track active tasks
+	var activeTasks sync.WaitGroup
+	tasksScheduled := int64(0)
 
-		go func(workerID int) {
-			defer wg.Done()
-			err := worker(benchCtx, pool, workerID, *queueDepth, *ioSize, workerStats[workerID])
-			if err != nil && err != context.DeadlineExceeded && err != context.Canceled {
-				log.Printf("Worker %d error: %v", workerID, err)
+	// Schedule download tasks for each block
+	for blockIdx := int64(0); blockIdx < numBlocks; blockIdx++ {
+		// Check if context is done
+		select {
+		case <-benchCtx.Done():
+			log.Printf("Context cancelled, stopping task scheduling after %d tasks", tasksScheduled)
+			goto waitForCompletion
+		default:
+		}
+
+		offset := blockIdx * (*ioSize)
+		length := *ioSize
+
+		// Adjust length for the last block
+		if offset+length > objectSize {
+			length = objectSize - offset
+		}
+
+		block := rapid.Block{
+			Offset: offset,
+			Length: length,
+		}
+
+		// Create a buffer for this block
+		writer := &bytes.Buffer{}
+
+		// Create callback for this block
+		blockID := blockIdx
+		callback := func(off, len int64, err error) {
+			defer activeTasks.Done()
+
+			if err != nil {
+				atomic.AddUint64(&totalErrors, 1)
+				log.Printf("Block %d (offset %d, length %d) failed: %v", blockID, off, len, err)
+			} else {
+				atomic.AddUint64(&totalBytesRead, uint64(len))
+				atomic.AddUint64(&totalOperations, 1)
 			}
-		}(i)
+		}
+
+		// Create download task
+		task := rapid.NewDownloadTask(block, pool, writer, callback)
+
+		// Track this task
+		activeTasks.Add(1)
+
+		// Schedule task to worker pool (use normal priority)
+		workerPool.Schedule(false, task)
+		tasksScheduled++
+
+		// Throttle if too many tasks are pending
+		if tasksScheduled%1000 == 0 {
+			log.Printf("Scheduled %d tasks...", tasksScheduled)
+		}
 	}
 
-	// Wait for all workers to complete
-	wg.Wait()
+waitForCompletion:
+	log.Printf("Scheduled %d total tasks", tasksScheduled)
+	log.Printf("Waiting for all tasks to complete...")
 
-	// Wait for any pending downloads in the pool
-	log.Printf("Waiting for pending downloads to complete...")
+	// Wait for all tasks to finish
+	activeTasks.Wait()
+
+	// Wait for any pending downloads in the MRD pool
 	pool.Wait()
 
 	// Check for pool errors
@@ -239,17 +260,6 @@ func main() {
 	log.Printf("Total Errors: %d", totalErrors)
 	log.Printf("Average Throughput: %.2f MB/s", float64(totalBytesRead)/elapsed.Seconds()/(1024*1024))
 	log.Printf("Average IOPS: %.2f", float64(totalOperations)/elapsed.Seconds())
-
-	// Print per-worker statistics
-	log.Printf("\n=== Per-Worker Statistics ===")
-	for i, stats := range workerStats {
-		log.Printf("Worker %d: Operations=%d, Bytes=%.2f MB, Errors=%d",
-			i,
-			atomic.LoadUint64(&stats.operations),
-			float64(atomic.LoadUint64(&stats.bytesRead))/(1024*1024),
-			atomic.LoadUint64(&stats.errors),
-		)
-	}
 
 	// Print pool statistics
 	poolStats := pool.GetStats()

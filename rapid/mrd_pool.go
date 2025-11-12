@@ -1,6 +1,7 @@
 package rapid
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"sync"
@@ -27,7 +28,8 @@ type MRDPoolConfig struct {
 	// Client is the GCS storage client used to create MRD instances
 	Client *storage.Client
 
-	// Additional configuration options can be added here
+	Bucket string
+	Object string
 }
 
 // MRDPool manages a pool of MultiRangeDownloader instances and distributes
@@ -54,6 +56,12 @@ func NewMRDPool(config *MRDPoolConfig) (*MRDPool, error) {
 		return nil, fmt.Errorf("storage client cannot be nil")
 	}
 
+	if config.Bucket == "" || config.Object == "" {
+		return nil, fmt.Errorf("Bucket name and Object name cannot be empty")
+	}
+
+	objectHandle := config.Client.Bucket(config.Bucket).Object(config.Object)
+
 	pool := &MRDPool{
 		downloaders: make([]MultiRangeDownloader, config.PoolSize),
 		poolSize:    config.PoolSize,
@@ -61,7 +69,7 @@ func NewMRDPool(config *MRDPoolConfig) (*MRDPool, error) {
 
 	// Initialize all MRD instances in the pool
 	for i := 0; i < config.PoolSize; i++ {
-		mrd, err := createMultiRangeDownloader(config.Client)
+		mrd, err := objectHandle.NewMultiRangeDownloader(context.Background())
 		if err != nil {
 			// Clean up any created downloaders before returning error
 			pool.Close()
@@ -71,14 +79,6 @@ func NewMRDPool(config *MRDPoolConfig) (*MRDPool, error) {
 	}
 
 	return pool, nil
-}
-
-// createMultiRangeDownloader creates a new MultiRangeDownloader instance.
-// This is a placeholder - replace with actual MRD creation from go-sdk.
-func createMultiRangeDownloader(client *storage.Client) (MultiRangeDownloader, error) {
-	// TODO: Replace this with actual MultiRangeDownloader creation from go-sdk
-	// Example: return storage.NewMultiRangeDownloader(client, options...)
-	return nil, fmt.Errorf("MultiRangeDownloader creation not implemented - integrate with go-sdk")
 }
 
 // getNextDownloader returns the next downloader using round-robin selection.
