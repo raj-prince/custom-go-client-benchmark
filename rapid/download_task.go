@@ -1,6 +1,14 @@
 package rapid
 
-import "io"
+import (
+	"io"
+	"log"
+)
+
+type readResult struct {
+	bytesRead int
+	err       error
+}
 
 // Range represents a contiguous range of data to be downloaded.
 type Range struct {
@@ -30,9 +38,16 @@ func NewDownloadTask(downloadRange Range, pool *MRDPool, writer io.Writer, callb
 // Execute implements the workerpool.Task interface.
 // It schedules the download of the range using the MRD pool.
 func (dt *DownloadTask) Execute() {
-	err := dt.pool.Add(dt.writer, dt.downloadRange.Offset, dt.downloadRange.Length, dt.callback)
-	if err != nil && dt.callback != nil {
-		// If Add() fails, invoke the callback with the error
-		dt.callback(dt.downloadRange.Offset, dt.downloadRange.Length, err)
+	done := make(chan readResult, 1)
+	err := dt.pool.Add(dt.writer, dt.downloadRange.Offset, dt.downloadRange.Length,
+		func(off, len int64, err error) {
+			done <- readResult{int(len), err}
+			if dt.callback != nil {
+				dt.callback(off, int64(len), err)
+			}
+		})
+	if err != nil {
+		log.Printf("Failed to add download task to MRD pool: %v\n", err)
 	}
+	<-done // Ensure we wait for completion
 }
