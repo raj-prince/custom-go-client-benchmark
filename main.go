@@ -62,11 +62,11 @@ var (
 
 	// Cloud profiler.
 	enableCloudProfiler = flag.Bool("enable-cloud-profiler", false, "Enable cloud profiler")
-	enableHeap          = flag.Bool("heap", false, "enable heap profile collection")
+	enableHeap          = flag.Bool("heap", true, "enable heap profile collection")
 	enableCPU           = flag.Bool("cpu", true, "enable cpu profile collection")
-	enableHeapAlloc     = flag.Bool("heap_alloc", false, "enable heap allocation profile collection")
-	enableThread        = flag.Bool("thread", false, "enable thread profile collection")
-	enableContention    = flag.Bool("contention", false, "enable contention profile collection")
+	enableHeapAlloc     = flag.Bool("heap_alloc", true, "enable heap allocation profile collection")
+	enableThread        = flag.Bool("thread", true, "enable thread profile collection")
+	enableContention    = flag.Bool("contention", true, "enable contention profile collection")
 	projectID           = flag.String("project_id", "", "project ID to run profiler with; only required when running outside of GCP.")
 	version             = flag.String("version", "original", "version to run profiler with")
 
