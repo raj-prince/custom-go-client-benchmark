@@ -1,0 +1,1854 @@
+Sender started 0xc000bdd500
+Before enqueue : offset=131072, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=14811136, limit=131072 0 0xc000bdd500
+Before enqueue : offset=6815744, limit=131072 0 0xc000bdd500
+After enqueue : offset=6815744, limit=131072 for 0xc000bdd500
+Before enqueue : offset=3670016, limit=131072 1 0xc000bdd500
+After enqueue : offset=3670016, limit=131072 for 0xc000bdd500
+Before enqueue : offset=8650752, limit=131072 2 0xc000bdd500
+After enqueue : offset=8650752, limit=131072 for 0xc000bdd500
+Before enqueue : offset=6553600, limit=131072 3 0xc000bdd500
+After enqueue : offset=6553600, limit=131072 for 0xc000bdd500
+Before enqueue : offset=25690112, limit=131072 4 0xc000bdd500
+After enqueue : offset=25690112, limit=131072 for 0xc000bdd500
+After enqueue : offset=131072, limit=131072 for 0xc000bdd500
+Before enqueue : offset=6029312, limit=131072 5 0xc000bdd500
+Before enqueue : offset=20578304, limit=131072 6 0xc000bdd500
+Before enqueue : offset=12451840, limit=131072 5 0xc000bdd500
+After enqueue : offset=12451840, limit=131072 for 0xc000bdd500
+Before enqueue : offset=13369344, limit=131072 8 0xc000bdd500
+After enqueue : offset=13369344, limit=131072 for 0xc000bdd500
+Before enqueue : offset=23724032, limit=131072 0 0xc000bdd500
+After enqueue : offset=23724032, limit=131072 for 0xc000bdd500
+Before enqueue : offset=2752512, limit=131072 0 0xc000bdd500
+After enqueue : offset=2752512, limit=131072 for 0xc000bdd500
+Before enqueue : offset=11665408, limit=131072 11 0xc000bdd500
+After enqueue : offset=11665408, limit=131072 for 0xc000bdd500
+Before enqueue : offset=13107200, limit=131072 12 0xc000bdd500
+After enqueue : offset=13107200, limit=131072 for 0xc000bdd500
+After enqueue : offset=6029312, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=14811136, limit=131072 for 0xc000bdd500
+Before enqueue : offset=26083328, limit=131072 5 0xc000bdd500
+After enqueue : offset=26083328, limit=131072 for 0xc000bdd500
+Before enqueue : offset=5505024, limit=131072 7 0xc000bdd500
+After enqueue : offset=5505024, limit=131072 for 0xc000bdd500
+Before enqueue : offset=16908288, limit=131072 7 0xc000bdd500
+After enqueue : offset=16908288, limit=131072 for 0xc000bdd500
+Before enqueue : offset=17563648, limit=131072 8 0xc000bdd500
+After enqueue : offset=17563648, limit=131072 for 0xc000bdd500
+Before enqueue : offset=7995392, limit=131072 9 0xc000bdd500
+After enqueue : offset=7995392, limit=131072 for 0xc000bdd500
+Before enqueue : offset=12189696, limit=131072 7 0xc000bdd500
+After enqueue : offset=12189696, limit=131072 for 0xc000bdd500
+After enqueue : offset=20578304, limit=131072 for 0xc000bdd500
+Before enqueue : offset=11534336, limit=131072 10 0xc000bdd500
+Before enqueue : offset=20185088, limit=131072 12 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=7208960, limit=131072 13 0xc000bdd500
+After enqueue : offset=7208960, limit=131072 for 0xc000bdd500
+Before enqueue : offset=4849664, limit=131072 13 0xc000bdd500
+After enqueue : offset=4849664, limit=131072 for 0xc000bdd500
+After enqueue : offset=11534336, limit=131072 for 0xc000bdd500
+After enqueue : offset=20185088, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=26345472, limit=131072 0 0xc000bdd500
+After enqueue : offset=26345472, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=27394048, limit=131072 0 0xc000bdd500
+After enqueue : offset=27394048, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=28442624, limit=131072 0 0xc000bdd500
+After enqueue : offset=28442624, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=29491200, limit=131072 0 0xc000bdd500
+After enqueue : offset=29491200, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=30670848, limit=131072 0 0xc000bdd500
+After enqueue : offset=30670848, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=31326208, limit=131072 0 0xc000bdd500
+After enqueue : offset=31326208, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=32768000, limit=131072 0 0xc000bdd500
+After enqueue : offset=32768000, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=33816576, limit=131072 0 0xc000bdd500
+After enqueue : offset=33816576, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=34209792, limit=131072 0 0xc000bdd500
+After enqueue : offset=34209792, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=35782656, limit=131072 0 0xc000bdd500
+After enqueue : offset=35782656, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=38141952, limit=131072 0 0xc000bdd500
+After enqueue : offset=38141952, limit=131072 for 0xc000bdd500
+Before enqueue : offset=36700160, limit=131072 1 0xc000bdd500
+After enqueue : offset=36700160, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=38797312, limit=131072 0 0xc000bdd500
+After enqueue : offset=38797312, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=40108032, limit=131072 0 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=40108032, limit=131072 for 0xc000bdd500
+Before enqueue : offset=40501248, limit=131072 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=40501248, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=42336256, limit=131072 0 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=42336256, limit=131072 for 0xc000bdd500
+Before enqueue : offset=43384832, limit=131072 1 0xc000bdd500
+After enqueue : offset=43384832, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=44040192, limit=131072 0 0xc000bdd500
+After enqueue : offset=44040192, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=45088768, limit=131072 0 0xc000bdd500
+After enqueue : offset=45088768, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=46399488, limit=131072 0 0xc000bdd500
+After enqueue : offset=46399488, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=47448064, limit=131072 0 0xc000bdd500
+After enqueue : offset=47448064, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=48234496, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=48234496, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=49414144, limit=131072 0 0xc000bdd500
+After enqueue : offset=49414144, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=50462720, limit=131072 0 0xc000bdd500
+After enqueue : offset=50462720, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=51511296, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=51511296, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=52559872, limit=131072 0 0xc000bdd500
+After enqueue : offset=52559872, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=53608448, limit=131072 0 0xc000bdd500
+After enqueue : offset=53608448, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=54657024, limit=131072 0 0xc000bdd500
+After enqueue : offset=54657024, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=55836672, limit=131072 0 0xc000bdd500
+After enqueue : offset=55836672, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=56754176, limit=131072 0 0xc000bdd500
+After enqueue : offset=56754176, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=57802752, limit=131072 0 0xc000bdd500
+After enqueue : offset=57802752, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=58851328, limit=131072 0 0xc000bdd500
+After enqueue : offset=58851328, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=59899904, limit=131072 0 0xc000bdd500
+After enqueue : offset=59899904, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=60948480, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=60948480, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=61997056, limit=131072 0 0xc000bdd500
+After enqueue : offset=61997056, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=63045632, limit=131072 0 0xc000bdd500
+After enqueue : offset=63045632, limit=131072 for 0xc000bdd500
+Before enqueue : offset=64225280, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=64225280, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=65142784, limit=131072 0 0xc000bdd500
+After enqueue : offset=65142784, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=66191360, limit=131072 0 0xc000bdd500
+After enqueue : offset=66191360, limit=131072 for 0xc000bdd500
+Before enqueue : offset=67239936, limit=131072 1 0xc000bdd500
+After enqueue : offset=67239936, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=68288512, limit=131072 1 0xc000bdd500
+After enqueue : offset=68288512, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=69337088, limit=131072 2 0xc000bdd500
+After enqueue : offset=69337088, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=70385664, limit=131072 0 0xc000bdd500
+After enqueue : offset=70385664, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=71434240, limit=131072 0 0xc000bdd500
+After enqueue : offset=71434240, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=72482816, limit=131072 0 0xc000bdd500
+Sender started 0xc000bdd500
+After enqueue : offset=72482816, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=73531392, limit=131072 0 0xc000bdd500
+After enqueue : offset=73531392, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=74579968, limit=131072 0 0xc000bdd500
+After enqueue : offset=74579968, limit=131072 for 0xc000bdd500
+Before enqueue : offset=75628544, limit=131072 0 0xc000bdd500
+After enqueue : offset=75628544, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=76414976, limit=131072 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=76414976, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=77594624, limit=131072 0 0xc000bdd500
+After enqueue : offset=77594624, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=78774272, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+After enqueue : offset=78774272, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=79822848, limit=131072 0 0xc000bdd500
+Before enqueue : offset=80871424, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=79822848, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=80871424, limit=131072 for 0xc000bdd500
+Before enqueue : offset=82051072, limit=131072 0 0xc000bdd500
+After enqueue : offset=82051072, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=82968576, limit=131072 0 0xc000bdd500
+After enqueue : offset=82968576, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=84017152, limit=131072 0 0xc000bdd500
+After enqueue : offset=84017152, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=85065728, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=86114304, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=86114304, limit=131072 for 0xc000bdd500
+After enqueue : offset=85065728, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=87687168, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+After enqueue : offset=87687168, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=87293952, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=87293952, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=89260032, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=89260032, limit=131072 for 0xc000bdd500
+Before enqueue : offset=90439680, limit=131072 0 0xc000bdd500
+After enqueue : offset=90439680, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=92798976, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=92798976, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=91619328, limit=131072 0 0xc000bdd500
+After enqueue : offset=91619328, limit=131072 for 0xc000bdd500
+Before enqueue : offset=94896128, limit=131072 1 0xc000bdd500
+After enqueue : offset=94896128, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=93454336, limit=131072 0 0xc000bdd500
+After enqueue : offset=93454336, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=94765056, limit=131072 0 0xc000bdd500
+After enqueue : offset=94765056, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=96731136, limit=131072 0 0xc000bdd500
+After enqueue : offset=96731136, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=97648640, limit=131072 0 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=98697216, limit=131072 0 0xc000bdd500
+After enqueue : offset=98697216, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=97648640, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=99221504, limit=131072 0 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=99221504, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=103153664, limit=131072 0 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=100663296, limit=131072 0 0xc000bdd500
+After enqueue : offset=103153664, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=102236160, limit=131072 0 0xc000bdd500
+After enqueue : offset=102236160, limit=131072 for 0xc000bdd500
+After enqueue : offset=100663296, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=103677952, limit=131072 0 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=103677952, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=104988672, limit=131072 0 0xc000bdd500
+Before enqueue : offset=106037248, limit=131072 0 0xc000bdd500
+After enqueue : offset=106037248, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+After enqueue : offset=104988672, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=107216896, limit=131072 0 0xc000bdd500
+After enqueue : offset=107216896, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=108658688, limit=131072 0 0xc000bdd500
+After enqueue : offset=108658688, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=109445120, limit=131072 0 0xc000bdd500
+After enqueue : offset=109445120, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=110231552, limit=131072 1 0xc000bdd500
+After enqueue : offset=110231552, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=111411200, limit=131072 2 0xc000bdd500
+After enqueue : offset=111411200, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=112459776, limit=131072 2 0xc000bdd500
+After enqueue : offset=112459776, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=113639424, limit=131072 1 0xc000bdd500
+After enqueue : offset=113639424, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=115998720, limit=131072 0 0xc000bdd500
+After enqueue : offset=115998720, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=114556928, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=114556928, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=116654080, limit=131072 0 0xc000bdd500
+After enqueue : offset=116654080, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=118620160, limit=131072 0 0xc000bdd500
+After enqueue : offset=118620160, limit=131072 for 0xc000bdd500
+Before enqueue : offset=117571584, limit=131072 0 0xc000bdd500
+After enqueue : offset=117571584, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=119799808, limit=131072 0 0xc000bdd500
+After enqueue : offset=119799808, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=120848384, limit=131072 0 0xc000bdd500
+After enqueue : offset=120848384, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=121765888, limit=131072 0 0xc000bdd500
+After enqueue : offset=121765888, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=122683392, limit=131072 0 0xc000bdd500
+After enqueue : offset=122683392, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=123207680, limit=131072 0 0xc000bdd500
+After enqueue : offset=123207680, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=124780544, limit=131072 0 0xc000bdd500
+After enqueue : offset=124780544, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=125829120, limit=131072 0 0xc000bdd500
+After enqueue : offset=125829120, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=127008768, limit=131072 0 0xc000bdd500
+After enqueue : offset=127008768, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=128057344, limit=131072 0 0xc000bdd500
+After enqueue : offset=128057344, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=128712704, limit=131072 0 0xc000bdd500
+After enqueue : offset=128712704, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=130154496, limit=131072 0 0xc000bdd500
+After enqueue : offset=130154496, limit=131072 for 0xc000bdd500
+Before enqueue : offset=130940928, limit=131072 0 0xc000bdd500
+After enqueue : offset=130940928, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=132251648, limit=131072 0 0xc000bdd500
+After enqueue : offset=132251648, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=133169152, limit=131072 0 0xc000bdd500
+After enqueue : offset=133169152, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=134348800, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=134348800, limit=131072 for 0xc000bdd500
+Before enqueue : offset=135397376, limit=131072 0 0xc000bdd500
+After enqueue : offset=135397376, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=136445952, limit=131072 0 0xc000bdd500
+After enqueue : offset=136445952, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=137625600, limit=131072 0 0xc000bdd500
+After enqueue : offset=137625600, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=138412032, limit=131072 0 0xc000bdd500
+After enqueue : offset=138412032, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=139198464, limit=131072 0 0xc000bdd500
+After enqueue : offset=139198464, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=140771328, limit=131072 0 0xc000bdd500
+After enqueue : offset=140771328, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=141819904, limit=131072 0 0xc000bdd500
+After enqueue : offset=141819904, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=142606336, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=142606336, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=143785984, limit=131072 0 0xc000bdd500
+After enqueue : offset=143785984, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=145096704, limit=131072 0 0xc000bdd500
+After enqueue : offset=145096704, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=146014208, limit=131072 0 0xc000bdd500
+After enqueue : offset=146014208, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=147193856, limit=131072 0 0xc000bdd500
+After enqueue : offset=147193856, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=147324928, limit=131072 1 0xc000bdd500
+After enqueue : offset=147324928, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=148766720, limit=131072 2 0xc000bdd500
+After enqueue : offset=148766720, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=150470656, limit=131072 0 0xc000bdd500
+After enqueue : offset=150470656, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=151257088, limit=131072 0 0xc000bdd500
+After enqueue : offset=151257088, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=152567808, limit=131072 0 0xc000bdd500
+After enqueue : offset=152567808, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=154140672, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+After enqueue : offset=154140672, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender retry 0xc000bdd500:
+Before enqueue : offset=153223168, limit=131072 0 0xc000bdd500
+After enqueue : offset=153223168, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=155320320, limit=131072 0 0xc000bdd500
+After enqueue : offset=155320320, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=156368896, limit=131072 0 0xc000bdd500
+After enqueue : offset=156368896, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=157941760, limit=131072 1 0xc000bdd500
+After enqueue : offset=157941760, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=158334976, limit=131072 2 0xc000bdd500
+After enqueue : offset=158334976, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=158859264, limit=131072 2 0xc000bdd500
+After enqueue : offset=158859264, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=161087488, limit=131072 1 0xc000bdd500
+Before enqueue : offset=160956416, limit=131072 2 0xc000bdd500
+After enqueue : offset=161087488, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=160956416, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=163184640, limit=131072 3 0xc000bdd500
+After enqueue : offset=163184640, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=162922496, limit=131072 0 0xc000bdd500
+After enqueue : offset=162922496, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=164757504, limit=131072 1 0xc000bdd500
+After enqueue : offset=164757504, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=163053568, limit=131072 2 0xc000bdd500
+After enqueue : offset=163053568, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=166985728, limit=131072 2 0xc000bdd500
+After enqueue : offset=166985728, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=167903232, limit=131072 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=167903232, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=168165376, limit=131072 0 0xc000bdd500
+After enqueue : offset=168165376, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=170262528, limit=131072 0 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+After enqueue : offset=170262528, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=170786816, limit=131072 0 0xc000bdd500
+After enqueue : offset=170786816, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=171311104, limit=131072 0 0xc000bdd500
+After enqueue : offset=171311104, limit=131072 for 0xc000bdd500
+Before enqueue : offset=173277184, limit=131072 1 0xc000bdd500
+After enqueue : offset=173277184, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=174194688, limit=131072 2 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+After enqueue : offset=174194688, limit=131072 for 0xc000bdd500
+Before enqueue : offset=175374336, limit=131072 0 0xc000bdd500
+After enqueue : offset=175374336, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=176685056, limit=131072 0 0xc000bdd500
+After enqueue : offset=176685056, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=177602560, limit=131072 1 0xc000bdd500
+After enqueue : offset=177602560, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=178520064, limit=131072 0 0xc000bdd500
+After enqueue : offset=178520064, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=179699712, limit=131072 0 0xc000bdd500
+After enqueue : offset=179699712, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=181272576, limit=131072 0 0xc000bdd500
+Before enqueue : offset=180748288, limit=131072 0 0xc000bdd500
+After enqueue : offset=180748288, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=181272576, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=182583296, limit=131072 0 0xc000bdd500
+After enqueue : offset=182583296, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=183894016, limit=131072 0 0xc000bdd500
+After enqueue : offset=183894016, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=184549376, limit=131072 0 0xc000bdd500
+After enqueue : offset=184549376, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=184942592, limit=131072 0 0xc000bdd500
+After enqueue : offset=184942592, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=186384384, limit=131072 0 0xc000bdd500
+After enqueue : offset=186384384, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=187695104, limit=131072 0 0xc000bdd500
+After enqueue : offset=187695104, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=188874752, limit=131072 1 0xc000bdd500
+After enqueue : offset=188874752, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=189923328, limit=131072 0 0xc000bdd500
+After enqueue : offset=189923328, limit=131072 for 0xc000bdd500
+Before enqueue : offset=192282624, limit=131072 0 0xc000bdd500
+After enqueue : offset=192282624, limit=131072 for 0xc000bdd500
+Before enqueue : offset=191365120, limit=131072 0 0xc000bdd500
+After enqueue : offset=191365120, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=193331200, limit=131072 0 0xc000bdd500
+After enqueue : offset=193331200, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=195297280, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=196608000, limit=131072 1 0xc000bdd500
+After enqueue : offset=196608000, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=194510848, limit=131072 1 0xc000bdd500
+After enqueue : offset=194510848, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=197263360, limit=131072 3 0xc000bdd500
+After enqueue : offset=197263360, limit=131072 for 0xc000bdd500
+After enqueue : offset=195297280, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=198705152, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Dequeued ranges to read: 1 0xc000bdd500
+Sender started 0xc000bdd500
+After enqueue : offset=198705152, limit=131072 for 0xc000bdd500
+Before enqueue : offset=199360512, limit=131072 0 0xc000bdd500
+After enqueue : offset=199360512, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=200409088, limit=131072 0 0xc000bdd500
+After enqueue : offset=200409088, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=201719808, limit=131072 0 0xc000bdd500
+After enqueue : offset=201719808, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=202506240, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=202506240, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=204603392, limit=131072 0 0xc000bdd500
+After enqueue : offset=204603392, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=203685888, limit=131072 0 0xc000bdd500
+After enqueue : offset=203685888, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=206700544, limit=131072 0 0xc000bdd500
+After enqueue : offset=206700544, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=205783040, limit=131072 0 0xc000bdd500
+After enqueue : offset=205783040, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=207618048, limit=131072 0 0xc000bdd500
+After enqueue : offset=207618048, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=209846272, limit=131072 0 0xc000bdd500
+Before enqueue : offset=210894848, limit=131072 0 0xc000bdd500
+After enqueue : offset=210894848, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=208797696, limit=131072 0 0xc000bdd500
+After enqueue : offset=208797696, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=209846272, limit=131072 for 0xc000bdd500
+Before enqueue : offset=211943424, limit=131072 0 0xc000bdd500
+After enqueue : offset=211943424, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=212992000, limit=131072 0 0xc000bdd500
+After enqueue : offset=212992000, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=214171648, limit=131072 0 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=214171648, limit=131072 for 0xc000bdd500
+Before enqueue : offset=215089152, limit=131072 1 0xc000bdd500
+After enqueue : offset=215089152, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=215875584, limit=131072 2 0xc000bdd500
+After enqueue : offset=215875584, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=217186304, limit=131072 0 0xc000bdd500
+After enqueue : offset=217186304, limit=131072 for 0xc000bdd500
+Before enqueue : offset=218234880, limit=131072 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=218234880, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=219414528, limit=131072 1 0xc000bdd500
+After enqueue : offset=219414528, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=220200960, limit=131072 0 0xc000bdd500
+Before enqueue : offset=221380608, limit=131072 0 0xc000bdd500
+After enqueue : offset=221380608, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=222560256, limit=131072 0 0xc000bdd500
+After enqueue : offset=222560256, limit=131072 for 0xc000bdd500
+After enqueue : offset=220200960, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=223870976, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+After enqueue : offset=223870976, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=223477760, limit=131072 0 0xc000bdd500
+After enqueue : offset=223477760, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=225443840, limit=131072 0 0xc000bdd500
+Before enqueue : offset=226099200, limit=131072 1 0xc000bdd500
+After enqueue : offset=226099200, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+After enqueue : offset=225443840, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=227016704, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=228851712, limit=131072 0 0xc000bdd500
+After enqueue : offset=228851712, limit=131072 for 0xc000bdd500
+Before enqueue : offset=230817792, limit=131072 1 0xc000bdd500
+After enqueue : offset=230817792, limit=131072 for 0xc000bdd500
+Before enqueue : offset=229638144, limit=131072 0 0xc000bdd500
+After enqueue : offset=229638144, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=227016704, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=231997440, limit=131072 2 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=231997440, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=233046016, limit=131072 1 0xc000bdd500
+After enqueue : offset=233046016, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=233832448, limit=131072 0 0xc000bdd500
+After enqueue : offset=233832448, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=234749952, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=234749952, limit=131072 for 0xc000bdd500
+Before enqueue : offset=237502464, limit=131072 0 0xc000bdd500
+After enqueue : offset=237502464, limit=131072 for 0xc000bdd500
+Before enqueue : offset=236322816, limit=131072 0 0xc000bdd500
+After enqueue : offset=236322816, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=238026752, limit=131072 2 0xc000bdd500
+After enqueue : offset=238026752, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=239599616, limit=131072 1 0xc000bdd500
+After enqueue : offset=239599616, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=241696768, limit=131072 0 0xc000bdd500
+After enqueue : offset=241696768, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=240386048, limit=131072 0 0xc000bdd500
+After enqueue : offset=240386048, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=243531776, limit=131072 0 0xc000bdd500
+After enqueue : offset=243531776, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=242352128, limit=131072 0 0xc000bdd500
+After enqueue : offset=242352128, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender retry 0xc000bdd500:
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=245235712, limit=131072 0 0xc000bdd500
+Before enqueue : offset=243924992, limit=131072 0 0xc000bdd500
+After enqueue : offset=243924992, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=245235712, limit=131072 for 0xc000bdd500
+Before enqueue : offset=247595008, limit=131072 0 0xc000bdd500
+After enqueue : offset=247595008, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=246939648, limit=131072 0 0xc000bdd500
+After enqueue : offset=246939648, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=249561088, limit=131072 0 0xc000bdd500
+After enqueue : offset=249561088, limit=131072 for 0xc000bdd500
+Before enqueue : offset=248643584, limit=131072 0 0xc000bdd500
+After enqueue : offset=248643584, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=250609664, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=250609664, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=251265024, limit=131072 0 0xc000bdd500
+After enqueue : offset=251265024, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=252706816, limit=131072 1 0xc000bdd500
+After enqueue : offset=252706816, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=254279680, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=253886464, limit=131072 0 0xc000bdd500
+After enqueue : offset=254279680, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=253886464, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=257163264, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=256638976, limit=131072 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+After enqueue : offset=256638976, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=257163264, limit=131072 for 0xc000bdd500
+Before enqueue : offset=257818624, limit=131072 0 0xc000bdd500
+Before enqueue : offset=259653632, limit=131072 1 0xc000bdd500
+After enqueue : offset=259653632, limit=131072 for 0xc000bdd500
+After enqueue : offset=257818624, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=261619712, limit=131072 0 0xc000bdd500
+After enqueue : offset=261619712, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=262275072, limit=131072 0 0xc000bdd500
+After enqueue : offset=262275072, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=263454720, limit=131072 1 0xc000bdd500
+Before enqueue : offset=259915776, limit=131072 2 0xc000bdd500
+After enqueue : offset=259915776, limit=131072 for 0xc000bdd500
+After enqueue : offset=263454720, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=264634368, limit=131072 3 0xc000bdd500
+After enqueue : offset=264634368, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=265551872, limit=131072 2 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+After enqueue : offset=265551872, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=266731520, limit=131072 1 0xc000bdd500
+After enqueue : offset=266731520, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=267386880, limit=131072 2 0xc000bdd500
+After enqueue : offset=267386880, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=268566528, limit=131072 3 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+After enqueue : offset=268566528, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=270401536, limit=131072 0 0xc000bdd500
+After enqueue : offset=270401536, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=270925824, limit=131072 1 0xc000bdd500
+After enqueue : offset=270925824, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=271712256, limit=131072 0 0xc000bdd500
+After enqueue : offset=271712256, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=273940480, limit=131072 0 0xc000bdd500
+After enqueue : offset=273940480, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender retry 0xc000bdd500:
+Before enqueue : offset=273022976, limit=131072 0 0xc000bdd500
+After enqueue : offset=273022976, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=275120128, limit=131072 0 0xc000bdd500
+After enqueue : offset=275120128, limit=131072 for 0xc000bdd500
+Before enqueue : offset=275775488, limit=131072 1 0xc000bdd500
+After enqueue : offset=275775488, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=277086208, limit=131072 0 0xc000bdd500
+After enqueue : offset=277086208, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=278265856, limit=131072 1 0xc000bdd500
+After enqueue : offset=278265856, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=280231936, limit=131072 1 0xc000bdd500
+After enqueue : offset=280231936, limit=131072 for 0xc000bdd500
+Before enqueue : offset=279445504, limit=131072 2 0xc000bdd500
+After enqueue : offset=279445504, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=281149440, limit=131072 3 0xc000bdd500
+After enqueue : offset=281149440, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=282591232, limit=131072 0 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=282591232, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=283377664, limit=131072 1 0xc000bdd500
+After enqueue : offset=283377664, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=284033024, limit=131072 0 0xc000bdd500
+After enqueue : offset=284033024, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=285605888, limit=131072 0 0xc000bdd500
+After enqueue : offset=285605888, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=284557312, limit=131072 1 0xc000bdd500
+After enqueue : offset=284557312, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=287309824, limit=131072 0 0xc000bdd500
+After enqueue : offset=287309824, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=289669120, limit=131072 0 0xc000bdd500
+Before enqueue : offset=288489472, limit=131072 0 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=289669120, limit=131072 for 0xc000bdd500
+After enqueue : offset=288489472, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender started 0xc000bdd500
+Before enqueue : offset=290979840, limit=131072 2 0xc000bdd500
+After enqueue : offset=290979840, limit=131072 for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=292945920, limit=131072 0 0xc000bdd500
+After enqueue : offset=292945920, limit=131072 for 0xc000bdd500
+Before enqueue : offset=290193408, limit=131072 0 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+After enqueue : offset=290193408, limit=131072 for 0xc000bdd500
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Before enqueue : offset=293863424, limit=131072 1 0xc000bdd500
+After enqueue : offset=293863424, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=294649856, limit=131072 0 0xc000bdd500
+After enqueue : offset=294649856, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=295829504, limit=131072 0 0xc000bdd500
+After enqueue : offset=295829504, limit=131072 for 0xc000bdd500
+Before enqueue : offset=297009152, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=297009152, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=298188800, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=298188800, limit=131072 for 0xc000bdd500
+Before enqueue : offset=298975232, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+After enqueue : offset=298975232, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender started 0xc000bdd500
+Sender retry 0xc000bdd500:
+Sender retry 0xc000bdd500:
+Sender started 0xc000bdd500
+Before enqueue : offset=300023808, limit=131072 0 0xc000bdd500
+After enqueue : offset=300023808, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=301203456, limit=131072 0 0xc000bdd500
+After enqueue : offset=301203456, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=302514176, limit=131072 0 0xc000bdd500
+After enqueue : offset=302514176, limit=131072 for 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+Before enqueue : offset=303169536, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=303169536, limit=131072 for 0xc000bdd500
+Before enqueue : offset=304218112, limit=131072 0 0xc000bdd500
+Dequeued ranges to read: 1 0xc000bdd500
+After enqueue : offset=304218112, limit=131072 for 0xc000bdd500
+Receiver retrier called for 0xc000bdd500
+Sender retry 0xc000bdd500:
+Before enqueue : offset=305004544, limit=131072 0 0xc000bdd500
+After enqueue : offset=305004544, limit=131072 for 0xc000bdd500
+Before enqueue : offset=306184192, limit=131072 1 0xc000bdd500
+After enqueue : offset=306184192, limit=131072 for 0xc000bdd500
+Before enqueue : offset=307363840, limit=131072 2 0xc000bdd500
+After enqueue : offset=307363840, limit=131072 for 0xc000bdd500
+Before enqueue : offset=308543488, limit=131072 3 0xc000bdd500
+After enqueue : offset=308543488, limit=131072 for 0xc000bdd500
+Before enqueue : offset=309592064, limit=131072 4 0xc000bdd500
+After enqueue : offset=309592064, limit=131072 for 0xc000bdd500
+Before enqueue : offset=310509568, limit=131072 5 0xc000bdd500
+After enqueue : offset=310509568, limit=131072 for 0xc000bdd500
+Before enqueue : offset=312082432, limit=131072 6 0xc000bdd500
+After enqueue : offset=312082432, limit=131072 for 0xc000bdd500
+Before enqueue : offset=312606720, limit=131072 7 0xc000bdd500
+After enqueue : offset=312606720, limit=131072 for 0xc000bdd500
+Before enqueue : offset=313655296, limit=131072 8 0xc000bdd500
+After enqueue : offset=313655296, limit=131072 for 0xc000bdd500
+Before enqueue : offset=314703872, limit=131072 9 0xc000bdd500
+After enqueue : offset=314703872, limit=131072 for 0xc000bdd500
+Before enqueue : offset=315752448, limit=131072 10 0xc000bdd500
+After enqueue : offset=315752448, limit=131072 for 0xc000bdd500
+Before enqueue : offset=316801024, limit=131072 11 0xc000bdd500
+After enqueue : offset=316801024, limit=131072 for 0xc000bdd500
+Before enqueue : offset=317849600, limit=131072 12 0xc000bdd500
+After enqueue : offset=317849600, limit=131072 for 0xc000bdd500
+Before enqueue : offset=319029248, limit=131072 13 0xc000bdd500
+After enqueue : offset=319029248, limit=131072 for 0xc000bdd500
+Before enqueue : offset=320077824, limit=131072 14 0xc000bdd500
+After enqueue : offset=320077824, limit=131072 for 0xc000bdd500
+Before enqueue : offset=321126400, limit=131072 15 0xc000bdd500
+After enqueue : offset=321126400, limit=131072 for 0xc000bdd500
+Before enqueue : offset=321781760, limit=131072 16 0xc000bdd500
+After enqueue : offset=321781760, limit=131072 for 0xc000bdd500
+Before enqueue : offset=323223552, limit=131072 17 0xc000bdd500
+After enqueue : offset=323223552, limit=131072 for 0xc000bdd500
+Before enqueue : offset=324403200, limit=131072 18 0xc000bdd500
+After enqueue : offset=324403200, limit=131072 for 0xc000bdd500
+Before enqueue : offset=325320704, limit=131072 19 0xc000bdd500
+After enqueue : offset=325320704, limit=131072 for 0xc000bdd500
+Before enqueue : offset=326238208, limit=131072 20 0xc000bdd500
+After enqueue : offset=326238208, limit=131072 for 0xc000bdd500
+Before enqueue : offset=327680000, limit=131072 21 0xc000bdd500
+After enqueue : offset=327680000, limit=131072 for 0xc000bdd500
+Before enqueue : offset=328597504, limit=131072 22 0xc000bdd500
+After enqueue : offset=328597504, limit=131072 for 0xc000bdd500
+Before enqueue : offset=329515008, limit=131072 23 0xc000bdd500
+After enqueue : offset=329515008, limit=131072 for 0xc000bdd500
+Before enqueue : offset=330432512, limit=131072 24 0xc000bdd500
+After enqueue : offset=330432512, limit=131072 for 0xc000bdd500
+Before enqueue : offset=331481088, limit=131072 25 0xc000bdd500
+After enqueue : offset=331481088, limit=131072 for 0xc000bdd500
+Before enqueue : offset=332398592, limit=131072 26 0xc000bdd500
+After enqueue : offset=332398592, limit=131072 for 0xc000bdd500
+Before enqueue : offset=333578240, limit=131072 27 0xc000bdd500
+Before enqueue : offset=334888960, limit=131072 28 0xc000bdd500
+After enqueue : offset=333578240, limit=131072 for 0xc000bdd500
+After enqueue : offset=334888960, limit=131072 for 0xc000bdd500
+Before enqueue : offset=335544320, limit=131072 29 0xc000bdd500
+After enqueue : offset=335544320, limit=131072 for 0xc000bdd500
+Before enqueue : offset=336461824, limit=131072 30 0xc000bdd500
+After enqueue : offset=336461824, limit=131072 for 0xc000bdd500
+Before enqueue : offset=338427904, limit=131072 31 0xc000bdd500
+After enqueue : offset=338427904, limit=131072 for 0xc000bdd500
+Before enqueue : offset=338165760, limit=131072 32 0xc000bdd500
+After enqueue : offset=338165760, limit=131072 for 0xc000bdd500
+Before enqueue : offset=339869696, limit=131072 33 0xc000bdd500
+After enqueue : offset=339869696, limit=131072 for 0xc000bdd500
+Before enqueue : offset=341180416, limit=131072 34 0xc000bdd500
+After enqueue : offset=341180416, limit=131072 for 0xc000bdd500
+Before enqueue : offset=342360064, limit=131072 35 0xc000bdd500
+After enqueue : offset=342360064, limit=131072 for 0xc000bdd500
+Before enqueue : offset=343015424, limit=131072 36 0xc000bdd500
+After enqueue : offset=343015424, limit=131072 for 0xc000bdd500
+Before enqueue : offset=344195072, limit=131072 37 0xc000bdd500
+After enqueue : offset=344195072, limit=131072 for 0xc000bdd500
+Before enqueue : offset=345112576, limit=131072 38 0xc000bdd500
+After enqueue : offset=345112576, limit=131072 for 0xc000bdd500
+Before enqueue : offset=346423296, limit=131072 39 0xc000bdd500
+After enqueue : offset=346423296, limit=131072 for 0xc000bdd500
+Before enqueue : offset=347471872, limit=131072 40 0xc000bdd500
+After enqueue : offset=347471872, limit=131072 for 0xc000bdd500
+Before enqueue : offset=347865088, limit=131072 41 0xc000bdd500
+After enqueue : offset=347865088, limit=131072 for 0xc000bdd500
+Before enqueue : offset=349569024, limit=131072 42 0xc000bdd500
+After enqueue : offset=349569024, limit=131072 for 0xc000bdd500
+Before enqueue : offset=350224384, limit=131072 43 0xc000bdd500
+After enqueue : offset=350224384, limit=131072 for 0xc000bdd500
+Before enqueue : offset=351535104, limit=131072 44 0xc000bdd500
+After enqueue : offset=351535104, limit=131072 for 0xc000bdd500
+Before enqueue : offset=352583680, limit=131072 45 0xc000bdd500
+After enqueue : offset=352583680, limit=131072 for 0xc000bdd500
+Before enqueue : offset=353501184, limit=131072 46 0xc000bdd500
+After enqueue : offset=353501184, limit=131072 for 0xc000bdd500
+Before enqueue : offset=354418688, limit=131072 47 0xc000bdd500
+After enqueue : offset=354418688, limit=131072 for 0xc000bdd500
+Before enqueue : offset=355729408, limit=131072 48 0xc000bdd500
+After enqueue : offset=355729408, limit=131072 for 0xc000bdd500
+Before enqueue : offset=356777984, limit=131072 49 0xc000bdd500
+After enqueue : offset=356777984, limit=131072 for 0xc000bdd500
+Before enqueue : offset=357826560, limit=131072 50 0xc000bdd500
+After enqueue : offset=357826560, limit=131072 for 0xc000bdd500
+Before enqueue : offset=359006208, limit=131072 51 0xc000bdd500
+After enqueue : offset=359006208, limit=131072 for 0xc000bdd500
+Before enqueue : offset=359923712, limit=131072 52 0xc000bdd500
+After enqueue : offset=359923712, limit=131072 for 0xc000bdd500
+Before enqueue : offset=360972288, limit=131072 53 0xc000bdd500
+After enqueue : offset=360972288, limit=131072 for 0xc000bdd500
+Before enqueue : offset=361889792, limit=131072 54 0xc000bdd500
+After enqueue : offset=361889792, limit=131072 for 0xc000bdd500
+Before enqueue : offset=362938368, limit=131072 55 0xc000bdd500
+After enqueue : offset=362938368, limit=131072 for 0xc000bdd500
+Before enqueue : offset=364118016, limit=131072 56 0xc000bdd500
+After enqueue : offset=364118016, limit=131072 for 0xc000bdd500
+Before enqueue : offset=365035520, limit=131072 57 0xc000bdd500
+After enqueue : offset=365035520, limit=131072 for 0xc000bdd500
+Before enqueue : offset=366084096, limit=131072 58 0xc000bdd500
+After enqueue : offset=366084096, limit=131072 for 0xc000bdd500
+Before enqueue : offset=366870528, limit=131072 59 0xc000bdd500
+After enqueue : offset=366870528, limit=131072 for 0xc000bdd500
+Before enqueue : offset=368050176, limit=131072 60 0xc000bdd500
+After enqueue : offset=368050176, limit=131072 for 0xc000bdd500
+Before enqueue : offset=369360896, limit=131072 61 0xc000bdd500
+After enqueue : offset=369360896, limit=131072 for 0xc000bdd500
+Before enqueue : offset=370409472, limit=131072 62 0xc000bdd500
+After enqueue : offset=370409472, limit=131072 for 0xc000bdd500
+Before enqueue : offset=371326976, limit=131072 63 0xc000bdd500
+After enqueue : offset=371326976, limit=131072 for 0xc000bdd500
+Before enqueue : offset=372375552, limit=131072 64 0xc000bdd500
+After enqueue : offset=372375552, limit=131072 for 0xc000bdd500
+Before enqueue : offset=373161984, limit=131072 65 0xc000bdd500
+After enqueue : offset=373161984, limit=131072 for 0xc000bdd500
+Before enqueue : offset=374341632, limit=131072 66 0xc000bdd500
+After enqueue : offset=374341632, limit=131072 for 0xc000bdd500
+Before enqueue : offset=375259136, limit=131072 67 0xc000bdd500
+After enqueue : offset=375259136, limit=131072 for 0xc000bdd500
+Before enqueue : offset=376569856, limit=131072 68 0xc000bdd500
+After enqueue : offset=376569856, limit=131072 for 0xc000bdd500
+Before enqueue : offset=377094144, limit=131072 69 0xc000bdd500
+After enqueue : offset=377094144, limit=131072 for 0xc000bdd500
+Before enqueue : offset=378667008, limit=131072 70 0xc000bdd500
+After enqueue : offset=378667008, limit=131072 for 0xc000bdd500
+Before enqueue : offset=379846656, limit=131072 71 0xc000bdd500
+After enqueue : offset=379846656, limit=131072 for 0xc000bdd500
+Before enqueue : offset=380895232, limit=131072 72 0xc000bdd500
+After enqueue : offset=380895232, limit=131072 for 0xc000bdd500
+Before enqueue : offset=381812736, limit=131072 73 0xc000bdd500
+After enqueue : offset=381812736, limit=131072 for 0xc000bdd500
+Before enqueue : offset=382861312, limit=131072 74 0xc000bdd500
+After enqueue : offset=382861312, limit=131072 for 0xc000bdd500
+Before enqueue : offset=384040960, limit=131072 75 0xc000bdd500
+After enqueue : offset=384040960, limit=131072 for 0xc000bdd500
+Before enqueue : offset=384958464, limit=131072 76 0xc000bdd500
+After enqueue : offset=384958464, limit=131072 for 0xc000bdd500
+Before enqueue : offset=386007040, limit=131072 77 0xc000bdd500
+After enqueue : offset=386007040, limit=131072 for 0xc000bdd500
+Before enqueue : offset=387186688, limit=131072 78 0xc000bdd500
+After enqueue : offset=387186688, limit=131072 for 0xc000bdd500
+Before enqueue : offset=388104192, limit=131072 79 0xc000bdd500
+After enqueue : offset=388104192, limit=131072 for 0xc000bdd500
+Before enqueue : offset=389152768, limit=131072 80 0xc000bdd500
+After enqueue : offset=389152768, limit=131072 for 0xc000bdd500
+Before enqueue : offset=390201344, limit=131072 81 0xc000bdd500
+After enqueue : offset=390201344, limit=131072 for 0xc000bdd500
+Before enqueue : offset=391249920, limit=131072 82 0xc000bdd500
+After enqueue : offset=391249920, limit=131072 for 0xc000bdd500
+Before enqueue : offset=392298496, limit=131072 83 0xc000bdd500
+After enqueue : offset=392298496, limit=131072 for 0xc000bdd500
+Before enqueue : offset=393347072, limit=131072 84 0xc000bdd500
+After enqueue : offset=393347072, limit=131072 for 0xc000bdd500
+Before enqueue : offset=394395648, limit=131072 85 0xc000bdd500
+After enqueue : offset=394395648, limit=131072 for 0xc000bdd500
+Before enqueue : offset=395444224, limit=131072 86 0xc000bdd500
+After enqueue : offset=395444224, limit=131072 for 0xc000bdd500
+Before enqueue : offset=396623872, limit=131072 87 0xc000bdd500
+After enqueue : offset=396623872, limit=131072 for 0xc000bdd500
+Before enqueue : offset=397410304, limit=131072 88 0xc000bdd500
+After enqueue : offset=397410304, limit=131072 for 0xc000bdd500
+Before enqueue : offset=398589952, limit=131072 89 0xc000bdd500
+After enqueue : offset=398589952, limit=131072 for 0xc000bdd500
+Before enqueue : offset=399376384, limit=131072 90 0xc000bdd500
+After enqueue : offset=399376384, limit=131072 for 0xc000bdd500
+Before enqueue : offset=400687104, limit=131072 91 0xc000bdd500
+After enqueue : offset=400687104, limit=131072 for 0xc000bdd500
+Before enqueue : offset=401604608, limit=131072 92 0xc000bdd500
+After enqueue : offset=401604608, limit=131072 for 0xc000bdd500
+Before enqueue : offset=402784256, limit=131072 93 0xc000bdd500
+After enqueue : offset=402784256, limit=131072 for 0xc000bdd500
+Before enqueue : offset=403832832, limit=131072 94 0xc000bdd500
+After enqueue : offset=403832832, limit=131072 for 0xc000bdd500
+Before enqueue : offset=404881408, limit=131072 95 0xc000bdd500
+After enqueue : offset=404881408, limit=131072 for 0xc000bdd500
+Before enqueue : offset=406192128, limit=131072 96 0xc000bdd500
+After enqueue : offset=406192128, limit=131072 for 0xc000bdd500
+Before enqueue : offset=406978560, limit=131072 97 0xc000bdd500
+After enqueue : offset=406978560, limit=131072 for 0xc000bdd500
+Before enqueue : offset=408027136, limit=131072 98 0xc000bdd500
+After enqueue : offset=408027136, limit=131072 for 0xc000bdd500
+Before enqueue : offset=409075712, limit=131072 99 0xc000bdd500
+After enqueue : offset=409075712, limit=131072 for 0xc000bdd500
+Before enqueue : offset=409993216, limit=131072 100 0xc000bdd500
+Before enqueue : offset=411566080, limit=131072 100 0xc000bdd500
+Before enqueue : offset=413401088, limit=131072 100 0xc000bdd500
+Before enqueue : offset=412221440, limit=131072 100 0xc000bdd500
+Before enqueue : offset=414318592, limit=131072 100 0xc000bdd500
+Before enqueue : offset=415498240, limit=131072 100 0xc000bdd500
+Before enqueue : offset=416546816, limit=131072 100 0xc000bdd500
+Before enqueue : offset=417464320, limit=131072 100 0xc000bdd500
+Before enqueue : offset=418512896, limit=131072 100 0xc000bdd500
+Before enqueue : offset=419561472, limit=131072 100 0xc000bdd500
+Before enqueue : offset=420610048, limit=131072 100 0xc000bdd500
+Before enqueue : offset=421658624, limit=131072 100 0xc000bdd500
+Before enqueue : offset=422707200, limit=131072 100 0xc000bdd500
+Before enqueue : offset=423755776, limit=131072 100 0xc000bdd500
+Before enqueue : offset=424804352, limit=131072 100 0xc000bdd500
+Before enqueue : offset=425852928, limit=131072 100 0xc000bdd500
+Before enqueue : offset=426901504, limit=131072 100 0xc000bdd500
+Before enqueue : offset=427950080, limit=131072 100 0xc000bdd500
+Before enqueue : offset=428998656, limit=131072 100 0xc000bdd500
+Before enqueue : offset=430047232, limit=131072 100 0xc000bdd500
+Before enqueue : offset=431095808, limit=131072 100 0xc000bdd500
+Before enqueue : offset=432144384, limit=131072 100 0xc000bdd500
+Before enqueue : offset=433192960, limit=131072 100 0xc000bdd500
+Before enqueue : offset=434372608, limit=131072 100 0xc000bdd500
+Before enqueue : offset=435421184, limit=131072 100 0xc000bdd500
+Before enqueue : offset=436338688, limit=131072 100 0xc000bdd500
+Before enqueue : offset=437387264, limit=131072 100 0xc000bdd500
+Before enqueue : offset=438435840, limit=131072 100 0xc000bdd500
+Before enqueue : offset=439484416, limit=131072 100 0xc000bdd500
+Before enqueue : offset=440532992, limit=131072 100 0xc000bdd500
+Before enqueue : offset=441581568, limit=131072 100 0xc000bdd500
+Before enqueue : offset=442630144, limit=131072 100 0xc000bdd500
+Before enqueue : offset=443678720, limit=131072 100 0xc000bdd500
+Before enqueue : offset=444727296, limit=131072 100 0xc000bdd500
+Before enqueue : offset=445775872, limit=131072 100 0xc000bdd500
+Before enqueue : offset=446824448, limit=131072 100 0xc000bdd500
+Before enqueue : offset=447873024, limit=131072 100 0xc000bdd500
+Before enqueue : offset=448921600, limit=131072 100 0xc000bdd500
+Before enqueue : offset=449970176, limit=131072 100 0xc000bdd500
+Before enqueue : offset=451018752, limit=131072 100 0xc000bdd500
+Before enqueue : offset=452067328, limit=131072 100 0xc000bdd500
+Before enqueue : offset=453115904, limit=131072 100 0xc000bdd500
+Before enqueue : offset=454164480, limit=131072 100 0xc000bdd500
+Before enqueue : offset=455213056, limit=131072 100 0xc000bdd500
+Before enqueue : offset=456261632, limit=131072 100 0xc000bdd500
+Before enqueue : offset=457310208, limit=131072 100 0xc000bdd500
+Before enqueue : offset=458358784, limit=131072 100 0xc000bdd500
+Before enqueue : offset=459407360, limit=131072 100 0xc000bdd500
+Before enqueue : offset=460455936, limit=131072 100 0xc000bdd500
+Before enqueue : offset=461504512, limit=131072 100 0xc000bdd500
+Before enqueue : offset=462553088, limit=131072 100 0xc000bdd500
+Reopening stream with failSpec 0xc000bdd500

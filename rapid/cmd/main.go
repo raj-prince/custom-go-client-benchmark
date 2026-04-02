@@ -56,7 +56,7 @@ var logger *Logger
 
 var (
 	// Command-line flags
-	fIoSize          = flag.Int64("io-size", 4*1024*1024, "IO size in bytes (default: 4MB)")
+	fIoSize          = flag.Int64("io-size", 2*1024*1024, "IO size in bytes (default: 4MB)")
 	fBucketName      = flag.String("bucket", "", "GCS bucket name (required)")
 	fObjectName      = flag.String("object", "", "GCS object name (required)")
 	fDuration        = flag.Duration("duration", 60*time.Second, "Test duration (default: 60s)")
@@ -354,7 +354,7 @@ func statsReporter(ctx context.Context, interval time.Duration) {
 			throughputMBps := float64(bytesDelta) / elapsed / (1024 * 1024)
 			iops := float64(opsDelta) / elapsed
 
-			logger.Debug("Throughput: %.2f MB/s | IOPS: %.2f | Total: %.2f MB | Operations: %d | Errors: %d",
+			logger.Info("Throughput: %.2f MB/s | IOPS: %.2f | Total: %.2f MB | Operations: %d | Errors: %d",
 				throughputMBps,
 				iops,
 				float64(currentBytes)/(1024*1024),

@@ -39,6 +39,8 @@ func NewDownloadTask(downloadRange Range, pool *MRDPool, writer io.Writer, callb
 // It schedules the download of the range using the MRD pool.
 func (dt *DownloadTask) Execute() {
 	done := make(chan readResult, 1)
+	defer close(done)
+
 	err := dt.pool.Add(dt.writer, dt.downloadRange.Offset, dt.downloadRange.Length,
 		func(off, len int64, err error) {
 			done <- readResult{int(len), err}

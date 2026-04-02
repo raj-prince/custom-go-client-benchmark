@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	cloud.google.com/go/profiler v0.4.1
-	cloud.google.com/go/storage v1.56.3
+	cloud.google.com/go/storage v1.57.1
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.14
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.20.0
 	github.com/google/go-cmp v0.7.0
@@ -21,6 +21,7 @@ require (
 	golang.org/x/sync v0.16.0
 	gonum.org/v1/plot v0.14.0
 	google.golang.org/api v0.247.0
+	google.golang.org/grpc v1.74.3
 )
 
 require (
@@ -82,7 +83,6 @@ require (
 	google.golang.org/genproto v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250818200422-3122310a409c // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c // indirect
-	google.golang.org/grpc v1.74.2 // indirect
 	google.golang.org/protobuf v1.36.7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

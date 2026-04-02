@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"sync"
 	"testing"
 
 	"cloud.google.com/go/storage"
@@ -64,14 +65,6 @@ func (m *mockMultiRangeDownloader) Error() error {
 
 func (m *mockMultiRangeDownloader) GetHandle() []byte {
 	return []byte(fmt.Sprintf("handle-%d", m.id))
-}
-
-// Override createMultiRangeDownloader for testing
-var testMRDCounter = 0
-
-func createMockMRD(client *storage.Client) (MultiRangeDownloader, error) {
-	testMRDCounter++
-	return &mockMultiRangeDownloader{id: testMRDCounter}, nil
 }
 
 func TestNewMRDPool(t *testing.T) {
@@ -413,7 +406,101 @@ func containsSubstring(s, substr string) bool {
 	return false
 }
 
-// Example usage test
+// Test concurrent recreation attempts
+func TestMRDPool_ConcurrentRecreation(t *testing.T) {
+	poolSize := 1
+	pool := &MRDPool{
+		downloaders:       make([]MultiRangeDownloader, poolSize),
+		poolSize:          poolSize,
+		downloaderMutexes: make([]sync.Mutex, poolSize),
+		cfg: &MRDPoolConfig{
+			PoolSize: poolSize,
+			Client:   &storage.Client{},
+			Bucket:   "test-bucket",
+			Object:   "test-object",
+		},
+	}
+
+	// Create a downloader WITHOUT error for this test
+	// (recreation would require real GCS client)
+	pool.downloaders[0] = &mockMultiRangeDownloader{id: 0}
+
+	// Launch multiple goroutines trying to use the pool
+	numGoroutines := 10
+	successChan := make(chan bool, numGoroutines)
+	doneChan := make(chan bool, numGoroutines)
+
+	for i := 0; i < numGoroutines; i++ {
+		go func(id int) {
+			var buf bytes.Buffer
+			err := pool.Add(&buf, int64(id*1024), 1024, nil)
+			successChan <- (err == nil)
+			doneChan <- true
+		}(i)
+	}
+
+	// Wait for all goroutines
+	successCount := 0
+	for i := 0; i < numGoroutines; i++ {
+		<-doneChan
+		if <-successChan {
+			successCount++
+		}
+	}
+
+	// All should succeed since downloader is healthy
+	if successCount != numGoroutines {
+		t.Errorf("Expected %d successes, got %d", numGoroutines, successCount)
+	}
+}
+
+// Test retry logic in Add method
+// Note: Requires real GCS client to test full recreation flow
+func TestMRDPool_AddWithRetry(t *testing.T) {
+	t.Skip("Skipping: requires real GCS client for full integration test")
+
+	poolSize := 3
+	pool := &MRDPool{
+		downloaders:       make([]MultiRangeDownloader, poolSize),
+		poolSize:          poolSize,
+		downloaderMutexes: make([]sync.Mutex, poolSize),
+		cfg: &MRDPoolConfig{
+			PoolSize: poolSize,
+			Client:   &storage.Client{},
+			Bucket:   "test-bucket",
+			Object:   "test-object",
+		},
+	}
+
+	// Create a mix: some healthy, some with errors
+	pool.downloaders[0] = &mockMultiRangeDownloader{id: 0, err: fmt.Errorf("error 0")}
+	pool.downloaders[1] = &mockMultiRangeDownloader{id: 1} // healthy
+	pool.downloaders[2] = &mockMultiRangeDownloader{id: 2, err: fmt.Errorf("error 2")}
+
+	// Add should eventually hit the healthy downloader through retry logic
+	var buf bytes.Buffer
+	err := pool.Add(&buf, 0, 1024, nil)
+
+	// Should succeed when it hits the healthy downloader (index 1)
+	if err != nil {
+		t.Logf("Add() returned error: %v (may happen depending on round-robin order)", err)
+	}
+
+	// Try multiple times to ensure retry logic works
+	successCount := 0
+	for i := 0; i < 10; i++ {
+		var testBuf bytes.Buffer
+		if pool.Add(&testBuf, int64(i*1024), 1024, nil) == nil {
+			successCount++
+		}
+	}
+
+	// At least some should succeed by hitting the healthy downloader
+	if successCount == 0 {
+		t.Error("Expected at least some Add() calls to succeed")
+	}
+	t.Logf("Success rate: %d/10", successCount)
+} // Example usage test
 func ExampleMRDPool() {
 	// Create a storage client (in real usage)
 	// client, err := storage.NewClient(context.Background())

@@ -40,6 +40,9 @@ type MRDPool struct {
 	poolSize    int
 	mu          sync.RWMutex
 	closed      bool
+	cfg         *MRDPoolConfig
+	// Per-downloader mutexes for safe recreation
+	downloaderMutexes []sync.Mutex
 }
 
 // NewMRDPool creates a new pool of MultiRangeDownloader instances.
@@ -57,14 +60,16 @@ func NewMRDPool(config *MRDPoolConfig) (*MRDPool, error) {
 	}
 
 	if config.Bucket == "" || config.Object == "" {
-		return nil, fmt.Errorf("Bucket name and Object name cannot be empty")
+		return nil, fmt.Errorf("bucket name and object name cannot be empty")
 	}
 
 	objectHandle := config.Client.Bucket(config.Bucket).Object(config.Object)
 
 	pool := &MRDPool{
-		downloaders: make([]MultiRangeDownloader, config.PoolSize),
-		poolSize:    config.PoolSize,
+		downloaders:       make([]MultiRangeDownloader, config.PoolSize),
+		poolSize:          config.PoolSize,
+		cfg:               config,
+		downloaderMutexes: make([]sync.Mutex, config.PoolSize),
 	}
 
 	// Initialize all MRD instances in the pool
@@ -82,30 +87,100 @@ func NewMRDPool(config *MRDPoolConfig) (*MRDPool, error) {
 }
 
 // getNextDownloader returns the next downloader using round-robin selection.
-func (p *MRDPool) getNextDownloader() (MultiRangeDownloader, error) {
+func (p *MRDPool) getNextDownloader() (MultiRangeDownloader, int, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
 	if p.closed {
-		return nil, fmt.Errorf("pool is closed")
+		return nil, -1, fmt.Errorf("pool is closed")
 	}
 
 	// Use atomic operations for thread-safe round-robin
-	index := atomic.AddUint64(&p.counter, 1) % uint64(p.poolSize)
-	return p.downloaders[index], nil
+	index := int(atomic.AddUint64(&p.counter, 1) % uint64(p.poolSize))
+
+	return p.downloaders[index], index, nil
+}
+
+// recreateDownloader safely recreates a downloader at the given index.
+// It uses a per-downloader mutex to ensure only one goroutine recreates it at a time.
+func (p *MRDPool) recreateDownloader(index int) error {
+	// Use per-downloader mutex to prevent concurrent recreation
+	p.downloaderMutexes[index].Lock()
+	defer p.downloaderMutexes[index].Unlock()
+
+	// Check again if the downloader is still in error state
+	// (another goroutine might have already fixed it)
+	p.mu.RLock()
+	currentDownloader := p.downloaders[index]
+	closed := p.closed
+	p.mu.RUnlock()
+
+	if closed {
+		return fmt.Errorf("pool is closed")
+	}
+
+	if currentDownloader != nil && currentDownloader.Error() == nil {
+		// Already fixed by another goroutine
+		return nil
+	}
+
+	// Create new downloader
+	objectHandle := p.cfg.Client.Bucket(p.cfg.Bucket).Object(p.cfg.Object)
+	newDownloader, err := objectHandle.NewMultiRangeDownloader(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to recreate downloader %d: %w", index, err)
+	}
+
+	// Close the old downloader (best effort, ignore errors)
+	if currentDownloader != nil {
+		_ = currentDownloader.Close()
+	}
+
+	// Replace with new downloader
+	p.mu.Lock()
+	p.downloaders[index] = newDownloader
+	p.mu.Unlock()
+
+	return nil
 }
 
 // Add adds a download task to one of the MRD instances using round-robin selection.
 // The output writer receives the downloaded data, and the callback is invoked
 // when the download completes with the offset, length, and any error.
+// If the selected downloader is in error state, it attempts to recreate it and retry
+// up to maxRetries times across different downloaders.
 func (p *MRDPool) Add(output io.Writer, offset, length int64, callback func(int64, int64, error)) error {
-	downloader, err := p.getNextDownloader()
-	if err != nil {
-		return err
+	const maxRetries = 3
+
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		downloader, index, err := p.getNextDownloader()
+		if err != nil {
+			return err
+		}
+
+		// Check if this downloader has an error
+		if downloader.Error() != nil {
+			// Attempt to recreate the downloader
+			if recreateErr := p.recreateDownloader(index); recreateErr != nil {
+				// If we can't recreate, try next downloader
+				if attempt < maxRetries-1 {
+					continue
+				}
+				return fmt.Errorf("failed to recreate downloader after %d attempts: %w", maxRetries, recreateErr)
+			}
+
+			// Get the newly created downloader
+			p.mu.RLock()
+			downloader = p.downloaders[index]
+			p.mu.RUnlock()
+		}
+
+		// Add the download task
+		downloader.Add(output, offset, length, callback)
+		return nil
 	}
 
-	downloader.Add(output, offset, length, callback)
-	return nil
+	return fmt.Errorf("failed to add download task after %d retries", maxRetries)
 }
 
 // Wait waits for all downloads on all MRD instances to complete.
