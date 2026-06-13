@@ -19,6 +19,9 @@ import (
 	"golang.org/x/oauth2/google"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
+
+	_ "google.golang.org/grpc/balancer/rls"
+	_ "google.golang.org/grpc/xds/googledirectpath"
 )
 
 var (

@@ -4,7 +4,7 @@ This file contains results of the comparisons between HTTP/1.1, gRPC Cloud-Path 
 
 ---
 
-## Run 1: 1 Worker (50 Calls Total)
+## Run 1: 1 Worker (50 Calls Total) - Executed on Non-Co-located Host (Asia to US)
 
 ```
 =======================================================================
@@ -25,10 +25,9 @@ gRPC Direct-Path   | 50        | 23.482s      | 2.13  | 469.63 ms   | 615.60 ms 
 
 =====================================================================
 ```
-
 ---
 
-## Run 2: 16 Workers (800 Calls Total)
+## Run 2: 16 Workers (800 Calls Total) - Executed on Co-located VM (abhishek-central1a, us-central1-a)
 
 ```
 =======================================================================
@@ -43,9 +42,9 @@ Running gRPC Direct-Path benchmark... DONE
 
 Protocol           | Total Ops | Elapsed Time | QPS    | Avg Latency | P50 Latency | P90 Latency | P99 Latency | Status/Error
 --------           | --------- | ------------ | ---    | ----------- | ----------- | ----------- | ----------- | ------------
-HTTP/1.1           | 800       | 27.997s      | 28.57  | 544.05 ms   | 742.63 ms   | 875.68 ms   | 1185.64 ms  | Success
-gRPC Cloud-Path    | 800       | 16.098s      | 49.70  | 307.07 ms   | 199.07 ms   | 881.50 ms   | 1929.10 ms  | Success
-gRPC Direct-Path   | 800       | 22.31s       | 35.86  | 426.50 ms   | 200.19 ms   | 908.32 ms   | 1177.24 ms  | Success
+HTTP/1.1           | 800       | 2.103s       | 380.41 | 26.90 ms    | 23.93 ms    | 33.87 ms    | 58.95 ms    | Success
+gRPC Cloud-Path    | 800       | 2.29s        | 349.28 | 36.55 ms    | 33.34 ms    | 48.88 ms    | 82.12 ms    | Success
+gRPC Direct-Path   | 800       | 1.607s       | 497.78 | 30.06 ms    | 24.78 ms    | 34.46 ms    | 237.57 ms   | Success
 
 =====================================================================
 ```
