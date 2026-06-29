@@ -16,6 +16,7 @@ var (
 	// The restaurant rating in number of stars.
 	readLatency = stats.Float64("readLatency", "Complete read latency", stats.UnitMilliseconds)
 	firstByteReadLatency = stats.Float64("firstByteReadLatency", "First byte read latency", stats.UnitMilliseconds)
+	allocSize = stats.Int64("allocSize", "Buffer pool allocation size", stats.UnitBytes)
 )
 
 var sdExporter *stackdriver.Exporter
@@ -44,6 +45,31 @@ func registerFirstByteLatencyView() {
 
 	if err := view.Register(v); err != nil {
 		log.Fatalf("Failed to register the firstByteReadLatency view: %v", err)
+	}
+}
+func registerAllocSizeView() {
+	bounds := []float64{
+		4 * 1024,
+		16 * 1024,
+		64 * 1024,
+		256 * 1024,
+		512 * 1024,
+		1 * 1024 * 1024,
+		2 * 1024 * 1024,
+		4 * 1024 * 1024,
+		8 * 1024 * 1024,
+		16 * 1024 * 1024,
+	}
+	v := &view.View{
+		Name:        "princer_go_client_alloc_size",
+		Measure:     allocSize,
+		Description: "Buffer pool allocation sizes",
+		TagKeys:     []tag.Key{tag.MustNewKey("princer_alloc_size")},
+		Aggregation: view.Distribution(bounds...),
+	}
+
+	if err := view.Register(v); err != nil {
+		log.Fatalf("Failed to register the allocSize view: %v", err)
 	}
 }
 

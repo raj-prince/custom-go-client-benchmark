@@ -26,6 +26,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/option"
+	grpcexperimental "google.golang.org/grpc/experimental"
 )
 
 var (
@@ -73,7 +74,14 @@ var (
 	// Enable read stall retry.
 	enableReadStallRetry = flag.Bool("enable-read-stall-retry", false, "Enable read stall retry")
 
+	// Custom shared pool flag.
+	enableCustomSharedPool = flag.Bool("enable-custom-shared-pool", false, "Enable custom shared buffer pool (gomem) for gRPC client")
+
+	// Read delay flag.
+	readDelay = flag.Duration("read-delay", 0, "Artificial delay to introduce after each read chunk to simulate processing")
+
 	eG errgroup.Group
+	globalBufferPool *gomemBufferPool
 )
 
 // CreateHTTPClient create http storage client.
@@ -134,7 +142,16 @@ func CreateGrpcClient(ctx context.Context) (client *storage.Client, err error) {
 	if err != nil {
 		return nil, err
 	}
-	return storage.NewGRPCClient(ctx, option.WithGRPCConnectionPool(grpcConnPoolSize), option.WithTokenSource(tokenSource), storage.WithDisabledClientMetrics())
+	clientOpts := []option.ClientOption{
+		option.WithGRPCConnectionPool(grpcConnPoolSize),
+		option.WithTokenSource(tokenSource),
+		storage.WithDisabledClientMetrics(),
+	}
+	if *enableCustomSharedPool {
+		globalBufferPool = newGomemBufferPool(16 * 1024 * 1024) // 16MB initial size
+		clientOpts = append(clientOpts, option.WithGRPCDialOption(grpcexperimental.WithBufferPool(globalBufferPool)))
+	}
+	return storage.NewGRPCClient(ctx, clientOpts...)
 }
 
 // ReadObject creates reader object corresponding to workerID with the help of bucketHandle.
@@ -158,7 +175,11 @@ func ReadObject(ctx context.Context, workerID int, bucketHandle *storage.BucketH
 		stats.Record(ctx, firstByteReadLatency.M(float64(firstByteTime.Milliseconds())))
 
 		// Calls Reader.WriteTo implicitly.
-		_, err = io.Copy(io.Discard, rc)
+		var writer io.Writer = io.Discard
+		if *readDelay > 0 {
+			writer = &slowWriter{writer: io.Discard, delay: *readDelay}
+		}
+		_, err = io.Copy(writer, rc)
 		if err != nil {
 			return fmt.Errorf("while reading and discarding content: %v", err)
 		}
@@ -238,6 +259,7 @@ func main() {
 	// Enable stack-driver exporter.
 	registerLatencyView()
 	registerFirstByteLatencyView()
+	registerAllocSizeView()
 
 	err = enableSDExporter()
 	if err != nil {
@@ -247,6 +269,7 @@ func main() {
 	defer closeSDExporter()
 
 	// Run the actual workload
+	globalStart := time.Now()
 	for i := 0; i < *numOfWorker; i++ {
 		idx := i
 		eG.Go(func() error {
@@ -260,11 +283,37 @@ func main() {
 	}
 
 	err = eG.Wait()
+	if globalBufferPool != nil {
+		globalBufferPool.Close()
+	}
+	totalDuration := time.Since(globalStart)
 
 	if err == nil {
-		fmt.Println("Read benchmark completed successfully!")
+		fmt.Printf("Read benchmark completed successfully in %v!\n", totalDuration)
+		if *enableCustomSharedPool {
+			printActiveZeroCounters()
+		}
 	} else {
-		fmt.Fprintf(os.Stderr, "Error while running benchmark: %v", err)
+		fmt.Fprintf(os.Stderr, "Error while running benchmark: %v\n", err)
 		os.Exit(1)
 	}
+
+	if *enableCloudProfiler {
+		fmt.Println("Sleeping for 30 seconds to allow Cloud Profiler to upload final profiles...")
+		time.Sleep(30 * time.Second)
+		fmt.Println("Profiler sleep completed. Exiting.")
+	}
+}
+
+type slowWriter struct {
+	writer io.Writer
+	delay  time.Duration
+}
+
+func (w *slowWriter) Write(p []byte) (n int, err error) {
+	n, err = w.writer.Write(p)
+	if w.delay > 0 {
+		time.Sleep(w.delay)
+	}
+	return
 }

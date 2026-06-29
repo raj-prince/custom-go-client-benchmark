@@ -1,0 +1,6 @@
+Cloud Profiler: 2026/06/25 12:45:09 Cloud Profiler Go Agent version: 0.4.1
+Cloud Profiler: 2026/06/25 12:45:09 profiler has started
+Cloud Profiler: 2026/06/25 12:45:09 creating a new profile via profiler service
+Stack driver agent started successfully!!
+Cloud Profiler: 2026/06/25 12:45:09 failed to create profile, will retry: rpc error: code = PermissionDenied desc = Cloud Profiler API has not been used in project cloudtop-prod-asia-east before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudprofiler.googleapis.com/overview?project=cloudtop-prod-asia-east then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.
+Error while running benchmark: while reading object princer_100M_files/file_47: while creating reader object: storage: object doesn't exist: rpc error: code = NotFound desc = No such object: princer-working-dirs/princer_100M_files/file_47exit status 1
